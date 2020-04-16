@@ -1,0 +1,21 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "github"]
+	url = https://github.com/easychessanimations/gobbit.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = github
+	merge = refs/heads/master
+[remote "github"]
+	url = https://github.com/easychessanimations/gobbit.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[user]
+	name = easychessanimations
+	email = chessbotroulette@gmail.com
+	[credential "https://github.com/easychessanimations/gobbit.git"]
+		username = easychessanimations
