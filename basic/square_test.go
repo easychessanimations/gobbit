@@ -28,6 +28,16 @@ func TestSquare(t *testing.T) {
 	if sq != SquareG7 {
 		t.Errorf("wrong square for rank 7, file g, expected %v, got %v", SquareG7, sq)
 	}
+	rof := RankOf[SquareD4]
+	sqr := SquareD4.Rank()
+	if rof != sqr {
+		t.Errorf("array ( %v ) and member ( %v ) access to rank of square differ", rof, sqr)
+	}
+	fof := FileOf[SquareD4]
+	sqf := SquareD4.File()
+	if fof != sqf {
+		t.Errorf("array ( %v ) and member ( %v ) access to file of square differ", fof, sqf)
+	}
 }
 
 func BenchmarkSquareArray(b *testing.B) {

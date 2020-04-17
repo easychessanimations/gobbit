@@ -9,13 +9,13 @@ var FileOf [BOARD_AREA]int
 // RankOf tells the rank of a square
 var RankOf [BOARD_AREA]int
 
-// File tells the file of a square
-func (sq Square) File() int {
-	return int(sq & Square(RANK_MASK) >> RANK_SHIFT_IN_BITS)
-}
-
 // Rank tells the rank of a square
 func (sq Square) Rank() int {
+	return int((sq & Square(RANK_MASK)) >> RANK_SHIFT_IN_BITS)
+}
+
+// File tells the file of a square
+func (sq Square) File() int {
 	return int(sq & Square(FILE_MASK))
 }
 
