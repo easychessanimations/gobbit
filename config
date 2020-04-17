@@ -8,14 +8,16 @@
 [remote "github"]
 	url = https://github.com/easychessanimations/gobbit.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "gitlab"]
+	url = https://gitlab.com/easychessanimations/gobbit.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
 [branch "master"]
 	remote = github
 	merge = refs/heads/master
-[remote "github"]
-	url = https://github.com/easychessanimations/gobbit.git
-	fetch = +refs/heads/*:refs/remotes/origin/*
 [user]
 	name = easychessanimations
 	email = chessbotroulette@gmail.com
 	[credential "https://github.com/easychessanimations/gobbit.git"]
+		username = easychessanimations
+	[credential "https://gitlab.com/easychessanimations/gobbit.git"]
 		username = easychessanimations
