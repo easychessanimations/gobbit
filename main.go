@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println("main, importing", basic.About())
+	fmt.Println("main, importing", basic.About(), "e4", basic.SquareE4)
 }
