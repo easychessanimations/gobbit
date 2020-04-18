@@ -88,4 +88,14 @@ func TestPiece(t *testing.T) {
 	if BlackQueen.IsLancer() {
 		t.Errorf("black queen is a lancer")
 	}
+
+	p, ok := SymbolToPiece["Lnw"]
+
+	if !ok {
+		t.Errorf("figure for symbol lnw not found")
+	}
+
+	if p != WhiteLancerNW {
+		t.Errorf("expected %v as piece for Lnw, got %v", LancerNW, p)
+	}
 }

@@ -58,7 +58,7 @@ func (p Piece) UCI() string {
 }
 
 func init() {
-	for i := 0; i < int(FigureMaxValue); i++ {
+	for i := 0; i <= int(FigureMaxValue); i++ {
 		FigureOf[i*2] = Figure(i)
 		FigureOf[i*2+1] = Figure(i)
 

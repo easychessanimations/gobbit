@@ -8,7 +8,7 @@ import (
 
 func main() {
 	st := State{}
-	st.Pieces[Rank8][FileB] = BlackLancerSE
-	st.Pieces[Rank1][FileB] = WhiteLancerNE
+	st.ParsePlacementString("jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -")
+
 	fmt.Println(st.PrettyPlacementString())
 }

@@ -104,3 +104,41 @@ var ColorOf [36]Color
 // ColorFigure constructs a Piece from Color and Figure
 var ColorFigure[2][18]Piece
 
+// SymbolToPiece tells Piece for a FEN symbol
+var SymbolToPiece = map[string]Piece{
+   "p"    : BlackPawn,
+   "P"    : WhitePawn,
+   "n"    : BlackKnight,
+   "N"    : WhiteKnight,
+   "b"    : BlackBishop,
+   "B"    : WhiteBishop,
+   "r"    : BlackRook,
+   "R"    : WhiteRook,
+   "q"    : BlackQueen,
+   "Q"    : WhiteQueen,
+   "k"    : BlackKing,
+   "K"    : WhiteKing,
+   "l"    : BlackLancer,
+   "L"    : WhiteLancer,
+   "ln"   : BlackLancerN,
+   "Ln"   : WhiteLancerN,
+   "lne"  : BlackLancerNE,
+   "Lne"  : WhiteLancerNE,
+   "le"   : BlackLancerE,
+   "Le"   : WhiteLancerE,
+   "lse"  : BlackLancerSE,
+   "Lse"  : WhiteLancerSE,
+   "ls"   : BlackLancerS,
+   "Ls"   : WhiteLancerS,
+   "lsw"  : BlackLancerSW,
+   "Lsw"  : WhiteLancerSW,
+   "lw"   : BlackLancerW,
+   "Lw"   : WhiteLancerW,
+   "lnw"  : BlackLancerNW,
+   "Lnw"  : WhiteLancerNW,
+   "s"    : BlackSentry,
+   "S"    : WhiteSentry,
+   "j"    : BlackJailer,
+   "J"    : WhiteJailer,
+}
+

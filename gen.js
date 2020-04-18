@@ -154,6 +154,14 @@ var ColorOf [${figures.length*2}]Color
 
 // ColorFigure constructs a Piece from Color and Figure
 var ColorFigure[2][${figures.length}]Piece
+
+// SymbolToPiece tells Piece for a FEN symbol
+var SymbolToPiece = map[string]Piece{
+${figures.slice(1).map(fig => {
+    return  `   "${fig[1]}"`.padEnd(10, " ") + `: Black${fig[0]},\n` +
+            `   "${fig[1].substring(0,1).toUpperCase()+fig[1].substring(1)}"`.padEnd(10, " ") + `: White${fig[0]},`
+}).join("\n")}
+}
 `
 
 writeFile("piece", "basic", piece_go)
