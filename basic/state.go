@@ -21,7 +21,7 @@ var VariantInfos = []VariantInfo{
 		DisplayName: "Standard",
 	},
 	{ // eightpiece
-		StartFen:    "jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1",
+		StartFen:    "jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -",
 		DisplayName: "Eightpiece",
 	},
 }
@@ -36,14 +36,17 @@ type CastlingRights [2]ColorCastlingRights
 
 // State records the state of a position
 type State struct {
-	Variant         int
-	Pieces          [NUM_RANKS][NUM_FILES]Piece
-	Turn            Color
-	CastlingRights  CastlingRights
-	EnPassantSquare Square
-	EpSquare        Square
-	HalfmoveClock   int
-	FullmoveNumber  int
+	Variant           int
+	Pieces            [NUM_RANKS][NUM_FILES]Piece
+	Turn              Color
+	CastlingRights    CastlingRights
+	EnPassantSquare   Square
+	EpSquare          Square
+	HalfmoveClock     int
+	FullmoveNumber    int
+	HasDisabledMove   bool
+	DisableFromSquare Square
+	DisableToSquare   Square
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -120,11 +123,37 @@ func (st *State) ParseFen(fen string) error {
 		st.ParseHalfmoveClock(fenParts[4])
 	}
 
-	if len(fenParts) > 4 {
+	if len(fenParts) > 5 {
 		st.ParseFullmoveNumber(fenParts[5])
 	}
 
+	if len(fenParts) > 6 {
+		st.ParseDisabledMove(fenParts[6])
+	}
+
 	return nil
+}
+
+func (st *State) ParseDisabledMove(dms string) {
+	st.HasDisabledMove = false
+
+	if len(dms) == 0 {
+		return
+	}
+
+	if dms[:1] == "-" {
+		return
+	}
+
+	t := Tokenizer{}
+	t.Init(dms)
+
+	st.DisableFromSquare = t.GetSquare()
+	st.DisableToSquare = t.GetSquare()
+
+	if st.DisableFromSquare != st.DisableToSquare {
+		st.HasDisabledMove = true
+	}
 }
 
 func (st *State) ParseEnPassantSquare(epsqs string) {
@@ -218,7 +247,12 @@ func (st State) ReportFen() string {
 	buff += " " + fmt.Sprintf("%d", st.FullmoveNumber)
 
 	if st.Variant == VariantEightPiece {
-		buff += " " + "-"
+		if st.HasDisabledMove {
+			buff += " " + st.DisableFromSquare.UCI() + st.DisableToSquare.UCI()
+		} else {
+			buff += " -"
+		}
+
 	}
 
 	return buff
