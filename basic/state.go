@@ -40,6 +40,8 @@ type State struct {
 	Pieces         [NUM_RANKS][NUM_FILES]Piece
 	Turn           Color
 	CastlingRights CastlingRights
+	HalfmoveClock  int
+	FullmoveNumber int
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -108,7 +110,27 @@ func (st *State) ParseFen(fen string) error {
 		st.ParseCastlingRights(fenParts[2])
 	}
 
+	if len(fenParts) > 4 {
+		st.ParseHalfmoveClock(fenParts[4])
+	}
+
+	if len(fenParts) > 4 {
+		st.ParseFullmoveNumber(fenParts[5])
+	}
+
 	return nil
+}
+
+func (st *State) ParseHalfmoveClock(hmcs string) {
+	t := Tokenizer{}
+	t.Init(hmcs)
+	st.HalfmoveClock = t.GetInt()
+}
+
+func (st *State) ParseFullmoveNumber(fmns string) {
+	t := Tokenizer{}
+	t.Init(fmns)
+	st.FullmoveNumber = t.GetInt()
 }
 
 func (st *State) ParseCastlingRights(crs string) {
@@ -172,6 +194,16 @@ func (st State) ReportFen() string {
 	buff += " " + st.Turn.String()
 
 	buff += " " + st.CastlingRights.String()
+
+	buff += " " + "-"
+
+	buff += " " + fmt.Sprintf("%d", st.HalfmoveClock)
+
+	buff += " " + fmt.Sprintf("%d", st.FullmoveNumber)
+
+	if st.Variant == VariantEightPiece {
+		buff += " " + "-"
+	}
 
 	return buff
 }

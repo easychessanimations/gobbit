@@ -10,6 +10,24 @@ func (t *Tokenizer) Init(content string) {
 	t.Content = content
 }
 
+func (t *Tokenizer) GetInt() int {
+	num := 0
+
+	for {
+		if len(t.Content) == 0 {
+			return num
+		}
+
+		if t.Content[0] >= '0' && t.Content[0] <= '9' {
+			num *= 10
+			num += int(t.Content[0] - '0')
+			t.Content = t.Content[1:]
+		} else {
+			return num
+		}
+	}
+}
+
 func (t *Tokenizer) GetCastlingRights() CastlingRights {
 	ccrs := [2]ColorCastlingRights{}
 
