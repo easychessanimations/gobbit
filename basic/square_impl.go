@@ -19,6 +19,16 @@ func (sq Square) File() int {
 	return int(sq & Square(FILE_MASK))
 }
 
+// UCI tells the UCI representation of a square
+func (sq Square) UCI() string {
+	buff := []byte{}
+
+	buff = append(buff, byte(FileOf[sq]+'a'))
+	buff = append(buff, byte(RankOf[sq]+'1'))
+
+	return string(buff)
+}
+
 func init() {
 	UCIToSquare = make(map[string]Square)
 	for rank := 0; rank < NUM_RANKS; rank++ {

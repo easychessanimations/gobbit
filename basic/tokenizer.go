@@ -10,6 +10,37 @@ func (t *Tokenizer) Init(content string) {
 	t.Content = content
 }
 
+func (t *Tokenizer) GetSquare() Square {
+	file := 0
+	rank := 0
+
+	parseFile := true
+
+	for {
+		if len(t.Content) == 0 {
+			return RankFile[rank][file]
+		}
+
+		c := t.Content[0]
+
+		if parseFile {
+			if c >= 'a' && c <= 'z' {
+				file = int(c - 'a')
+				t.Content = t.Content[1:]
+				parseFile = false
+			} else {
+				return RankFile[rank][file]
+			}
+		} else {
+			if c >= '1' && c <= '9' {
+				rank = int(c - '1')
+				t.Content = t.Content[1:]
+			}
+			return RankFile[rank][file]
+		}
+	}
+}
+
 func (t *Tokenizer) GetInt() int {
 	num := 0
 

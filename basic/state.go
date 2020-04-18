@@ -36,12 +36,14 @@ type CastlingRights [2]ColorCastlingRights
 
 // State records the state of a position
 type State struct {
-	Variant        int
-	Pieces         [NUM_RANKS][NUM_FILES]Piece
-	Turn           Color
-	CastlingRights CastlingRights
-	HalfmoveClock  int
-	FullmoveNumber int
+	Variant         int
+	Pieces          [NUM_RANKS][NUM_FILES]Piece
+	Turn            Color
+	CastlingRights  CastlingRights
+	EnPassantSquare Square
+	EpSquare        Square
+	HalfmoveClock   int
+	FullmoveNumber  int
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -110,6 +112,10 @@ func (st *State) ParseFen(fen string) error {
 		st.ParseCastlingRights(fenParts[2])
 	}
 
+	if len(fenParts) > 3 {
+		st.ParseEnPassantSquare(fenParts[3])
+	}
+
 	if len(fenParts) > 4 {
 		st.ParseHalfmoveClock(fenParts[4])
 	}
@@ -119,6 +125,12 @@ func (st *State) ParseFen(fen string) error {
 	}
 
 	return nil
+}
+
+func (st *State) ParseEnPassantSquare(epsqs string) {
+	t := Tokenizer{}
+	t.Init(epsqs)
+	st.EnPassantSquare = t.GetSquare()
 }
 
 func (st *State) ParseHalfmoveClock(hmcs string) {
@@ -195,7 +207,11 @@ func (st State) ReportFen() string {
 
 	buff += " " + st.CastlingRights.String()
 
-	buff += " " + "-"
+	if st.EnPassantSquare == SquareA1 {
+		buff += " -"
+	} else {
+		buff += " " + st.EnPassantSquare.UCI()
+	}
 
 	buff += " " + fmt.Sprintf("%d", st.HalfmoveClock)
 
