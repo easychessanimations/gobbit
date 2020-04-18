@@ -8,7 +8,7 @@ import (
 
 func main() {
 	st := State{}
-	st.ParsePlacementString("jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -")
+	st.Init(VariantEightPiece)
 
-	fmt.Println(st.PrettyPlacementString())
+	fmt.Println(st.PrettyPrintString())
 }

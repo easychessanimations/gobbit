@@ -1,10 +1,97 @@
 package basic
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
+
+const (
+	VariantStandard = iota
+	VariantEightPiece
+)
+
+type VariantInfo struct {
+	StartFen    string
+	DisplayName string
+}
+
+var VariantInfos = []VariantInfo{
+	{ // standard
+		StartFen:    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+		DisplayName: "Standard",
+	},
+	{ // eightpiece
+		StartFen:    "jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1",
+		DisplayName: "Eightpiece",
+	},
+}
 
 // State records the state of a position
 type State struct {
-	Pieces [NUM_RANKS][NUM_FILES]Piece
+	Variant int
+	Pieces  [NUM_RANKS][NUM_FILES]Piece
+}
+
+// Init initializes state
+// sets itself up from variant start fen
+func (st *State) Init(variant int) {
+	st.Variant = variant
+	st.ParseFen(VariantInfos[st.Variant].StartFen)
+}
+
+// ParseFen sets up state from a fen
+func (st *State) ParseFen(fen string) error {
+	fenParts := strings.Split(fen, " ")
+
+	if len(fenParts) > 0 {
+		err := st.ParsePlacementString(fenParts[0])
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// PrettyPrintString returns the state pretty print string
+func (st State) PrettyPrintString() string {
+	buff := st.PrettyPlacementString()
+
+	buff += "\n" + VariantInfos[st.Variant].DisplayName + " : " + st.ReportFen()
+
+	return buff
+}
+
+// ReportFen reports the state as a fen string
+func (st State) ReportFen() string {
+	buff := ""
+
+	cum := 0
+
+	for rank := LAST_RANK; rank >= 0; rank-- {
+		for file := 0; file < NUM_FILES; file++ {
+			p := st.Pieces[rank][file]
+
+			if p == NoPiece {
+				cum++
+			} else {
+				if cum > 0 {
+					buff += fmt.Sprintf("%d", cum)
+				}
+				cum = 0
+				buff += p.FenSymbol()
+			}
+		}
+		if cum > 0 {
+			buff += fmt.Sprintf("%d", cum)
+		}
+		cum = 0
+		if rank > 0 {
+			buff += "/"
+		}
+	}
+
+	return buff
 }
 
 // PrettyPlacementString returns the pretty string representation of the board
