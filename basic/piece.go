@@ -25,6 +25,11 @@ const (
    Jailer           = Figure(17)
 )
 
+const FigureMinValue = Pawn
+const FigureMaxValue = Jailer
+const FigureArraySize = FigureMaxValue - FigureMinValue + 1
+
+// SymbolOf tells the symbol of a Figure
 var SymbolOf = [18]string{"." , "p" , "n" , "b" , "r" , "q" , "k" , "l" , "ln" , "lne" , "le" , "lse" , "ls" , "lsw" , "lw" , "lnw" , "s" , "j"}
 
 type Piece int
@@ -67,4 +72,30 @@ const (
    BlackJailer           = Piece(34)
    WhiteJailer           = Piece(35)
 )
+
+const PieceMinValue = BlackPawn
+const PieceMaxValue = WhiteJailer
+const PieceArraySize = PieceMaxValue - PieceMinValue + 1
+
+var FigureOf [36]Figure
+
+type Color int
+
+const (   
+   Black   =  Color(0) 
+   White   =  Color(1)
+   NoColor =  Color(2)
+)
+
+const COLOR_MASK = White
+
+const ColorMinValue = 0
+const ColorMaxValue = NoColor
+const ColorArraySize = ColorMaxValue - ColorMinValue + 1
+
+// ColorOf tells the color of a Piece
+var ColorOf [36]Color
+
+// ColorFigure constructs a Piece from Color and Figure
+var ColorFigure[2][18]Piece
 

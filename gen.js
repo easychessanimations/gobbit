@@ -106,6 +106,11 @@ const (
 ${figures.map((p,i) => "   " + p[0].padEnd(16, " ") + " = Figure(" + i + ")").join("\n")}
 )
 
+const FigureMinValue = ${figures[1][0]}
+const FigureMaxValue = ${figures[figures.length-1][0]}
+const FigureArraySize = FigureMaxValue - FigureMinValue + 1
+
+// SymbolOf tells the symbol of a Figure
 var SymbolOf = [${figures.length}]string{${figures.map(fig => '"' + fig[1] + '"').join(" , ")}}
 
 type Piece int
@@ -118,6 +123,32 @@ ${figures.slice(1).map((p,i) =>
     "   " + ("White"+p[0]).padEnd(21, " ") + " = Piece(" + (2*i + 3) + ")"
 ).join("\n")}
 )
+
+const PieceMinValue = Black${figures[1][0]}
+const PieceMaxValue = White${figures[figures.length-1][0]}
+const PieceArraySize = PieceMaxValue - PieceMinValue + 1
+
+var FigureOf [${figures.length*2}]Figure
+
+type Color int
+
+const (   
+   Black   =  Color(0) 
+   White   =  Color(1)
+   NoColor =  Color(2)
+)
+
+const COLOR_MASK = White
+
+const ColorMinValue = 0
+const ColorMaxValue = NoColor
+const ColorArraySize = ColorMaxValue - ColorMinValue + 1
+
+// ColorOf tells the color of a Piece
+var ColorOf [${figures.length*2}]Color
+
+// ColorFigure constructs a Piece from Color and Figure
+var ColorFigure[2][${figures.length}]Piece
 `
 
 writeFile("piece", "basic", piece_go)
