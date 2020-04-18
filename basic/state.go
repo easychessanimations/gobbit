@@ -30,6 +30,20 @@ var VariantInfos = []VariantInfo{
 type State struct {
 	Variant int
 	Pieces  [NUM_RANKS][NUM_FILES]Piece
+	Turn    Color
+}
+
+// Color.String() converts a color to "b" for black, "w" for white and "-" for no color
+func (color Color) String() string {
+	if color == Black {
+		return "b"
+	}
+
+	if color == White {
+		return "w"
+	}
+
+	return "-"
 }
 
 // Init initializes state
@@ -50,7 +64,24 @@ func (st *State) ParseFen(fen string) error {
 		}
 	}
 
+	if len(fenParts) > 1 {
+		st.ParseTurnString(fenParts[0])
+	}
+
 	return nil
+}
+
+func (st *State) ParseTurnString(ts string) {
+	t := Tokenizer{}
+	t.Init(ts)
+
+	color := t.GetColor()
+
+	st.Turn = White
+
+	if color != NoColor {
+		st.Turn = color
+	}
 }
 
 // PrettyPrintString returns the state pretty print string
@@ -91,6 +122,8 @@ func (st State) ReportFen() string {
 		}
 	}
 
+	buff += " " + st.Turn.String()
+
 	return buff
 }
 
@@ -101,6 +134,9 @@ func (st State) PrettyPlacementString() string {
 	for rank := LAST_RANK; rank >= 0; rank-- {
 		for file := 0; file < NUM_FILES; file++ {
 			buff += st.Pieces[rank][file].PrettySymbol()
+		}
+		if (rank == 0 && st.Turn == White) || (rank == LAST_RANK && st.Turn == Black) {
+			buff += " *"
 		}
 		buff += "\n"
 	}

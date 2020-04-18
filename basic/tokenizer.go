@@ -10,6 +10,24 @@ func (t *Tokenizer) Init(content string) {
 	t.Content = content
 }
 
+func (t *Tokenizer) GetColor() Color {
+	if len(t.Content) == 0 {
+		return NoColor
+	}
+
+	if t.Content[0] == 'b' {
+		t.Content = t.Content[1:]
+		return Black
+	}
+
+	if t.Content[0] == 'w' {
+		t.Content = t.Content[1:]
+		return White
+	}
+
+	return NoColor
+}
+
 func (t *Tokenizer) GetFenPiece() []Piece {
 	if len(t.Content) <= 0 {
 		return []Piece{}
