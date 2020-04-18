@@ -26,11 +26,47 @@ var VariantInfos = []VariantInfo{
 	},
 }
 
+const (
+	CastlingSideKing = iota
+	CastlingSideQueen
+)
+
+type ColorCastlingRights [2]bool
+type CastlingRights [2]ColorCastlingRights
+
 // State records the state of a position
 type State struct {
-	Variant int
-	Pieces  [NUM_RANKS][NUM_FILES]Piece
-	Turn    Color
+	Variant        int
+	Pieces         [NUM_RANKS][NUM_FILES]Piece
+	Turn           Color
+	CastlingRights CastlingRights
+}
+
+// CastlingRights.String() reports castling rights in fen format
+func (crs CastlingRights) String() string {
+	buff := ""
+
+	if crs[White][CastlingSideKing] {
+		buff += "K"
+	}
+
+	if crs[White][CastlingSideQueen] {
+		buff += "Q"
+	}
+
+	if crs[Black][CastlingSideKing] {
+		buff += "k"
+	}
+
+	if crs[Black][CastlingSideQueen] {
+		buff += "q"
+	}
+
+	if buff == "" {
+		return "-"
+	}
+
+	return buff
 }
 
 // Color.String() converts a color to "b" for black, "w" for white and "-" for no color
@@ -65,10 +101,21 @@ func (st *State) ParseFen(fen string) error {
 	}
 
 	if len(fenParts) > 1 {
-		st.ParseTurnString(fenParts[0])
+		st.ParseTurnString(fenParts[1])
+	}
+
+	if len(fenParts) > 2 {
+		st.ParseCastlingRights(fenParts[2])
 	}
 
 	return nil
+}
+
+func (st *State) ParseCastlingRights(crs string) {
+	t := Tokenizer{}
+	t.Init(crs)
+
+	st.CastlingRights = t.GetCastlingRights()
 }
 
 func (st *State) ParseTurnString(ts string) {
@@ -123,6 +170,8 @@ func (st State) ReportFen() string {
 	}
 
 	buff += " " + st.Turn.String()
+
+	buff += " " + st.CastlingRights.String()
 
 	return buff
 }

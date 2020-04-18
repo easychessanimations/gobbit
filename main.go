@@ -10,5 +10,6 @@ func main() {
 	st := State{}
 	st.Init(VariantEightPiece)
 
+	fmt.Println(st)
 	fmt.Println(st.PrettyPrintString())
 }

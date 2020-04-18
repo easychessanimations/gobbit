@@ -10,6 +10,34 @@ func (t *Tokenizer) Init(content string) {
 	t.Content = content
 }
 
+func (t *Tokenizer) GetCastlingRights() CastlingRights {
+	ccrs := [2]ColorCastlingRights{}
+
+	for {
+		if len(t.Content) == 0 {
+			return ccrs
+		}
+
+		c := t.Content[0]
+
+		if c == 'K' {
+			ccrs[White][CastlingSideKing] = true
+			t.Content = t.Content[1:]
+		} else if c == 'Q' {
+			ccrs[White][CastlingSideQueen] = true
+			t.Content = t.Content[1:]
+		} else if c == 'k' {
+			ccrs[Black][CastlingSideKing] = true
+			t.Content = t.Content[1:]
+		} else if c == 'q' {
+			ccrs[Black][CastlingSideQueen] = true
+			t.Content = t.Content[1:]
+		} else {
+			return ccrs
+		}
+	}
+}
+
 func (t *Tokenizer) GetColor() Color {
 	if len(t.Content) == 0 {
 		return NoColor
