@@ -80,4 +80,12 @@ func TestPiece(t *testing.T) {
 	if sanLetterBlackLancerSW != "L" {
 		t.Errorf("expected L as san letter of black lancer south west, got %v", sanLetterBlackLancerSW)
 	}
+
+	if !WhiteLancerE.IsLancer() {
+		t.Errorf("white lancer east is not a lancer")
+	}
+
+	if BlackQueen.IsLancer() {
+		t.Errorf("black queen is a lancer")
+	}
 }

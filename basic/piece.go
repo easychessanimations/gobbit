@@ -29,6 +29,11 @@ const FigureMinValue = Pawn
 const FigureMaxValue = Jailer
 const FigureArraySize = FigureMaxValue - FigureMinValue + 1
 
+const LancerMinValue = LancerN
+const LancerMaxValue = LancerNW
+
+const LANCER_DIRECTION_MASK = 0b111
+
 // SymbolOf tells the symbol of a Figure
 var SymbolOf = [18]string{"." , "p" , "n" , "b" , "r" , "q" , "k" , "l" , "ln" , "lne" , "le" , "lse" , "ls" , "lsw" , "lw" , "lnw" , "s" , "j"}
 

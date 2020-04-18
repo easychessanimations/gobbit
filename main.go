@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/easychessanimations/gobbit/basic"
+	. "github.com/easychessanimations/gobbit/basic"
 )
 
 func main() {
-	fmt.Println("main, importing", basic.About(), "e4", basic.SquareE4)
+	st := State{}
+	st.Pieces[Rank8][FileB] = BlackLancerSE
+	st.Pieces[Rank1][FileB] = WhiteLancerNE
+	fmt.Println(st.PrettyPlacementString())
 }

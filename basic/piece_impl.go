@@ -19,6 +19,26 @@ func (p Piece) SanSymbol() string {
 	return strings.ToUpper(sym[0:1]) + sym[1:]
 }
 
+// IsLancer tells whether a Piece is a lancer
+func (p Piece) IsLancer() bool {
+	return (FigureOf[p] &^ Figure(LANCER_DIRECTION_MASK)) == LancerMinValue
+}
+
+// PrettySymbol tells the pretty print symbol of a Piece
+func (p Piece) PrettySymbol() string {
+	sym := p.FenSymbol()
+
+	if len(sym) == 1 {
+		return " " + sym + " "
+	}
+
+	if len(sym) == 2 {
+		return sym + " "
+	}
+
+	return sym
+}
+
 // SanLetter tells the SAN letter of a Piece
 func (p Piece) SanLetter() string {
 	return p.SanSymbol()[0:1]

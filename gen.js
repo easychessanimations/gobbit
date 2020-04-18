@@ -1,9 +1,7 @@
 const fs = require('fs')
 
 const NUM_RANKS = 8
-const LAST_RANK = NUM_RANKS - 1
 const NUM_FILES = 8
-const LAST_FILE = NUM_FILES - 1
 
 const rankLetters = ["1", "2", "3", "4", "5", "6", "7", "8"]
 const fileLetters = ["a", "b", "c", "d", "e", "f", "g", "h"]
@@ -38,7 +36,9 @@ for(let file=0; file<NUM_FILES; file++) files.push(
 
 const square_go = `
 const NUM_RANKS = ${NUM_RANKS}
+const LAST_RANK = NUM_RANKS - 1
 const NUM_FILES = ${NUM_RANKS}
+const LAST_FILE = NUM_FILES - 1
 
 const BOARD_AREA = NUM_RANKS * NUM_FILES
 
@@ -109,6 +109,11 @@ ${figures.map((p,i) => "   " + p[0].padEnd(16, " ") + " = Figure(" + i + ")").jo
 const FigureMinValue = ${figures[1][0]}
 const FigureMaxValue = ${figures[figures.length-1][0]}
 const FigureArraySize = FigureMaxValue - FigureMinValue + 1
+
+const LancerMinValue = LancerN
+const LancerMaxValue = LancerNW
+
+const LANCER_DIRECTION_MASK = 0b111
 
 // SymbolOf tells the symbol of a Figure
 var SymbolOf = [${figures.length}]string{${figures.map(fig => '"' + fig[1] + '"').join(" , ")}}
