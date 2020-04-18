@@ -57,6 +57,11 @@ func (p Piece) UCI() string {
 	return SymbolOf[FigureOf[p]]
 }
 
+// String tells the string representation of a Piece, default to UCI
+func (p Piece) String() string {
+	return p.UCI()
+}
+
 func init() {
 	for i := 0; i <= int(FigureMaxValue); i++ {
 		FigureOf[i*2] = Figure(i)

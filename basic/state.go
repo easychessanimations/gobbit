@@ -5,8 +5,14 @@ import (
 	"strings"
 )
 
+type Variant int
+
+func (v Variant) String() string {
+	return VariantInfos[v].DisplayName
+}
+
 const (
-	VariantStandard = iota
+	VariantStandard = Variant(iota)
 	VariantEightPiece
 )
 
@@ -36,7 +42,7 @@ type CastlingRights [2]ColorCastlingRights
 
 // State records the state of a position
 type State struct {
-	Variant           int
+	Variant           Variant
 	Pieces            [NUM_RANKS][NUM_FILES]Piece
 	Turn              Color
 	CastlingRights    CastlingRights
@@ -91,7 +97,7 @@ func (color Color) String() string {
 
 // Init initializes state
 // sets itself up from variant start fen
-func (st *State) Init(variant int) {
+func (st *State) Init(variant Variant) {
 	st.Variant = variant
 	st.ParseFen(VariantInfos[st.Variant].StartFen)
 }

@@ -29,6 +29,11 @@ func (sq Square) UCI() string {
 	return string(buff)
 }
 
+// String tells the string representation of a square, defaults to UCI
+func (sq Square) String() string {
+	return sq.UCI()
+}
+
 func init() {
 	UCIToSquare = make(map[string]Square)
 	for rank := 0; rank < NUM_RANKS; rank++ {
