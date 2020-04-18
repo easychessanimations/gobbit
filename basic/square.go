@@ -22,7 +22,7 @@ const FILE_MASK = (1 << FILE_STORAGE_SIZE_IN_BITS) - 1
 
 type Rank int
 type File int
-type Square int
+type Square uint
 
 const (
    SquareA1 = Square(0)
@@ -90,6 +90,9 @@ const (
    SquareG8 = Square(62)
    SquareH8 = Square(63)
 )
+
+const SquareMinValue = SquareA1
+const SquareMaxValue = SquareH8
 
 const (
    Rank1 = Rank(0)

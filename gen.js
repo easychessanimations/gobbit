@@ -55,11 +55,14 @@ const FILE_MASK = (1 << FILE_STORAGE_SIZE_IN_BITS) - 1
 
 type Rank int
 type File int
-type Square int
+type Square uint
 
 const (
 ${sqs.join("\n")}
 )
+
+const SquareMinValue = SquareA1
+const SquareMaxValue = SquareH8
 
 const (
 ${ranks.join("\n")}

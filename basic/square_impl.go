@@ -1,5 +1,10 @@
 package basic
 
+// Bitboard returns a bitboard that has sq set
+func (sq Square) Bitboard() Bitboard {
+	return 1 << sq
+}
+
 // RankFile constructs a square from rank and file
 var RankFile [NUM_RANKS][NUM_FILES]Square
 
