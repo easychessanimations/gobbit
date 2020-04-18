@@ -35,7 +35,26 @@ const LancerMaxValue = LancerNW
 const LANCER_DIRECTION_MASK = 0b111
 
 // SymbolOf tells the symbol of a Figure
-var SymbolOf = [18]string{"." , "p" , "n" , "b" , "r" , "q" , "k" , "l" , "ln" , "lne" , "le" , "lse" , "ls" , "lsw" , "lw" , "lnw" , "s" , "j"}
+var SymbolOf = [18]string{
+   "."    , // 0   NoFigure
+   "p"    , // 1   Pawn
+   "n"    , // 2   Knight
+   "b"    , // 3   Bishop
+   "r"    , // 4   Rook
+   "q"    , // 5   Queen
+   "k"    , // 6   King
+   "l"    , // 7   Lancer
+   "ln"   , // 8   LancerN
+   "lne"  , // 9   LancerNE
+   "le"   , // 10  LancerE
+   "lse"  , // 11  LancerSE
+   "ls"   , // 12  LancerS
+   "lsw"  , // 13  LancerSW
+   "lw"   , // 14  LancerW
+   "lnw"  , // 15  LancerNW
+   "s"    , // 16  Sentry
+   "j"    , // 17  Jailer
+}
 
 type Piece int
 
@@ -106,39 +125,39 @@ var ColorFigure[2][18]Piece
 
 // SymbolToPiece tells Piece for a FEN symbol
 var SymbolToPiece = map[string]Piece{
-   "p"    : BlackPawn,
-   "P"    : WhitePawn,
-   "n"    : BlackKnight,
-   "N"    : WhiteKnight,
-   "b"    : BlackBishop,
-   "B"    : WhiteBishop,
-   "r"    : BlackRook,
-   "R"    : WhiteRook,
-   "q"    : BlackQueen,
-   "Q"    : WhiteQueen,
-   "k"    : BlackKing,
-   "K"    : WhiteKing,
-   "l"    : BlackLancer,
-   "L"    : WhiteLancer,
-   "ln"   : BlackLancerN,
-   "Ln"   : WhiteLancerN,
-   "lne"  : BlackLancerNE,
-   "Lne"  : WhiteLancerNE,
-   "le"   : BlackLancerE,
-   "Le"   : WhiteLancerE,
-   "lse"  : BlackLancerSE,
-   "Lse"  : WhiteLancerSE,
-   "ls"   : BlackLancerS,
-   "Ls"   : WhiteLancerS,
-   "lsw"  : BlackLancerSW,
-   "Lsw"  : WhiteLancerSW,
-   "lw"   : BlackLancerW,
-   "Lw"   : WhiteLancerW,
-   "lnw"  : BlackLancerNW,
-   "Lnw"  : WhiteLancerNW,
-   "s"    : BlackSentry,
-   "S"    : WhiteSentry,
-   "j"    : BlackJailer,
-   "J"    : WhiteJailer,
+   "p"    : BlackPawn,        // 2
+   "P"    : WhitePawn,        // 3
+   "n"    : BlackKnight,      // 4
+   "N"    : WhiteKnight,      // 5
+   "b"    : BlackBishop,      // 6
+   "B"    : WhiteBishop,      // 7
+   "r"    : BlackRook,        // 8
+   "R"    : WhiteRook,        // 9
+   "q"    : BlackQueen,       // 10
+   "Q"    : WhiteQueen,       // 11
+   "k"    : BlackKing,        // 12
+   "K"    : WhiteKing,        // 13
+   "l"    : BlackLancer,      // 14
+   "L"    : WhiteLancer,      // 15
+   "ln"   : BlackLancerN,     // 16
+   "Ln"   : WhiteLancerN,     // 17
+   "lne"  : BlackLancerNE,    // 18
+   "Lne"  : WhiteLancerNE,    // 19
+   "le"   : BlackLancerE,     // 20
+   "Le"   : WhiteLancerE,     // 21
+   "lse"  : BlackLancerSE,    // 22
+   "Lse"  : WhiteLancerSE,    // 23
+   "ls"   : BlackLancerS,     // 24
+   "Ls"   : WhiteLancerS,     // 25
+   "lsw"  : BlackLancerSW,    // 26
+   "Lsw"  : WhiteLancerSW,    // 27
+   "lw"   : BlackLancerW,     // 28
+   "Lw"   : WhiteLancerW,     // 29
+   "lnw"  : BlackLancerNW,    // 30
+   "Lnw"  : WhiteLancerNW,    // 31
+   "s"    : BlackSentry,      // 32
+   "S"    : WhiteSentry,      // 33
+   "j"    : BlackJailer,      // 34
+   "J"    : WhiteJailer,      // 35
 }
 

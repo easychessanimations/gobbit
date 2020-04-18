@@ -116,7 +116,9 @@ const LancerMaxValue = LancerNW
 const LANCER_DIRECTION_MASK = 0b111
 
 // SymbolOf tells the symbol of a Figure
-var SymbolOf = [${figures.length}]string{${figures.map(fig => '"' + fig[1] + '"').join(" , ")}}
+var SymbolOf = [${figures.length}]string{
+${figures.map((fig,i) => ('   "' + fig[1] + '"').padEnd(10, " ") + ', // ' + (""+i).padEnd(4, " ") + fig[0]).join("\n")}
+}
 
 type Piece int
 
@@ -157,9 +159,9 @@ var ColorFigure[2][${figures.length}]Piece
 
 // SymbolToPiece tells Piece for a FEN symbol
 var SymbolToPiece = map[string]Piece{
-${figures.slice(1).map(fig => {
-    return  `   "${fig[1]}"`.padEnd(10, " ") + `: Black${fig[0]},\n` +
-            `   "${fig[1].substring(0,1).toUpperCase()+fig[1].substring(1)}"`.padEnd(10, " ") + `: White${fig[0]},`
+${figures.slice(1).map((fig,i) => {
+    return  `   "${fig[1]}"`.padEnd(10, " ") + `: Black${fig[0]},`.padEnd(20, " ") + "// " + (i*2+2) + "\n" + 
+            `   "${fig[1].substring(0,1).toUpperCase()+fig[1].substring(1)}"`.padEnd(10, " ") + `: White${fig[0]},`.padEnd(20, " ") + "// " + (i*2+3)
 }).join("\n")}
 }
 `
