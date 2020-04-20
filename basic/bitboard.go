@@ -181,3 +181,26 @@ func (bb *Bitboard) Pop() Square {
 	*bb -= sq
 	return Square(bits.TrailingZeros64(uint64(sq)) & 0x3f)
 }
+
+// String return the string representation of a bitboard
+func (bb Bitboard) String() string {
+	buff := ""
+
+	for rank := LAST_RANK; rank >= 0; rank-- {
+		for file := 0; file < NUM_FILES; file++ {
+			sq := RankFile[rank][file]
+			mask := sq.Bitboard()
+
+			if bb&mask != 0 {
+				buff += "1"
+			} else {
+				buff += "0"
+			}
+		}
+		if rank > 0 {
+			buff += "\n"
+		}
+	}
+
+	return buff
+}
