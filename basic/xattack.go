@@ -86,7 +86,7 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 	nodes := 0
 	for shift := 22; shift > 6; shift-- {
 		found := false
-		for loop := 0; loop < 5000; loop++ {
+		for loop := 0; loop < 400000; loop++ {
 			nodes++
 			magic := randMagic() >> 6 //+ uint64(64-shift)<<58
 			hash := make(map[uint64]uint64)
@@ -136,7 +136,7 @@ func init() {
 			maxShift = shift
 		}
 		if ok {
-			fmt.Printf("Found bishop magic for %v shift %2d magic %016x nodes %d sqs  %d\n", sq, shift, magic, nodes, len(sqs))
+			fmt.Printf("found bishop magic for %v %2d shift %2d magic %016x nodes %6d sqs %2d\n", sq, sq, shift, magic, nodes, len(sqs))
 		} else {
 			fmt.Println("Failed", sq)
 			break
@@ -148,7 +148,7 @@ func init() {
 			maxShift = shift
 		}
 		if ok {
-			fmt.Printf("Found rook   magic for %v shift %2d magic %016x nodes %d sqs %d\n", sq, shift, magic, nodes, len(sqs))
+			fmt.Printf("found rook   magic for %v %2d shift %2d magic %016x nodes %6d sqs %2d\n", sq, sq, shift, magic, nodes, len(sqs))
 		} else {
 			fmt.Println("Failed", sq)
 			break
