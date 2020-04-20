@@ -89,18 +89,19 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 		for loop := 0; loop < 5000; loop++ {
 			nodes++
 			magic := randMagic() >> 6 //+ uint64(64-shift)<<58
-			hash := make(map[uint64]int)
+			hash := make(map[uint64]uint64)
 			coll := 0
 			for enum = 0; enum < 1<<len(sqs); enum++ {
 				tr := uint64(Translate(sqs, enum))
 				key := (magic * tr) >> (64 - shift)
-				cnt, foundKey := hash[key]
+				mask, foundKey := hash[key]
 				if foundKey {
-					hash[key] = cnt + 1
-					coll++
-					break
+					if mask != tr {
+						coll++
+						break
+					}
 				} else {
-					hash[key] = 1
+					hash[key] = tr
 				}
 				//fmt.Println(Translate(sqs, enum))
 				//fmt.Println()
@@ -128,8 +129,8 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 func init() {
 	maxShift := 0
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
-		sqs, bb := GenAttackSquares(sq, NormalizedBishopDirection)
-		fmt.Println(bb)
+		sqs, _ := GenAttackSquares(sq, NormalizedBishopDirection)
+		//fmt.Println(bb)
 		shift, magic, ok, nodes := SearchMagic(sq, sqs)
 		if shift > maxShift {
 			maxShift = shift
@@ -140,8 +141,8 @@ func init() {
 			fmt.Println("Failed", sq)
 			break
 		}
-		sqs, bb = GenAttackSquares(sq, NormalizedRookDirection)
-		fmt.Println(bb)
+		sqs, _ = GenAttackSquares(sq, NormalizedRookDirection)
+		//fmt.Println(bb)
 		shift, magic, ok, nodes = SearchMagic(sq, sqs)
 		if shift > maxShift {
 			maxShift = shift
