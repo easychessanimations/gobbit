@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-func BishopAttackSquares(sq Square) []Square {
+func GenAttackSquares(sq Square, normFunc func(Square, Square) (Delta, bool)) []Square {
 	sqs := []Square{}
 
 	middle := ^BbBorder
@@ -13,7 +13,7 @@ func BishopAttackSquares(sq Square) []Square {
 	var testSq Square = middle.Pop()
 
 	for ; testSq != 0; testSq = middle.Pop() {
-		_, ok := NormalizedBishopDirection(sq, testSq)
+		_, ok := normFunc(sq, testSq)
 		if ok {
 			sqs = append(sqs, testSq)
 		}
@@ -42,8 +42,9 @@ func randMagic() uint64 {
 	return r << 1
 }
 
-func SearchBishopMagic(sq Square) (int, uint64, bool, int) {
-	sqs := BishopAttackSquares(sq)
+func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
+	Rand = rand.New(rand.NewSource(1))
+
 	var enum uint64
 	var lastGoodMagic uint64
 	var lastGoodShift int
@@ -90,9 +91,16 @@ func SearchBishopMagic(sq Square) (int, uint64, bool, int) {
 
 func init() {
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
-		shift, magic, ok, nodes := SearchBishopMagic(sq)
+		shift, magic, ok, nodes := SearchMagic(sq, GenAttackSquares(sq, NormalizedBishopDirection))
 		if ok {
-			fmt.Println("Found bishop magic for", sq, shift, magic, nodes)
+			fmt.Printf("Found bishop magic for %v shift %2d magic %016x nodes %d\n", sq, shift, magic, nodes)
+		} else {
+			fmt.Println("Failed", sq)
+			break
+		}
+		shift, magic, ok, nodes = SearchMagic(sq, GenAttackSquares(sq, NormalizedRookDirection))
+		if ok {
+			fmt.Printf("Found rook   magic for %v shift %2d magic %016x nodes %d\n", sq, shift, magic, nodes)
 		} else {
 			fmt.Println("Failed", sq)
 			break

@@ -6,7 +6,7 @@ type Delta struct {
 	dFile int
 }
 
-// BishopDirection tells the normalized bishop direction from fromSq to toSq
+// NormalizedBishopDirection tells the normalized bishop direction from fromSq to toSq
 // returns true in the second return parameter if such a direction exists, false otherwise
 func NormalizedBishopDirection(fromSq, toSq Square) (Delta, bool) {
 	dRank := RankOf[toSq] - RankOf[fromSq]
@@ -30,6 +30,33 @@ func NormalizedBishopDirection(fromSq, toSq Square) (Delta, bool) {
 		return Delta{-1, 1}, true
 	} else {
 		return Delta{-1, -1}, true
+	}
+}
+
+// NormalizedRookDirection tells the normalized rook direction from fromSq to toSq
+// returns true in the second return parameter if such a direction exists, false otherwise
+func NormalizedRookDirection(fromSq, toSq Square) (Delta, bool) {
+	dRank := RankOf[toSq] - RankOf[fromSq]
+	dFile := FileOf[toSq] - FileOf[fromSq]
+
+	if dRank == 0 && dFile == 0 {
+		// original and destination square are the same
+		return Delta{}, false
+	}
+
+	if dRank != 0 && dFile != 0 {
+		// not a rook direction
+		return Delta{}, false
+	}
+
+	if dRank > 0 {
+		return Delta{1, 0}, true
+	} else if dRank < 0 {
+		return Delta{-1, 0}, true
+	} else if dFile > 0 {
+		return Delta{0, 1}, true
+	} else {
+		return Delta{0, -1}, true
 	}
 }
 
