@@ -1,5 +1,38 @@
 package basic
 
+// Delta is a square vector
+type Delta struct {
+	dRank int
+	dFile int
+}
+
+// BishopDirection tells the normalized bishop direction from fromSq to toSq
+// returns true in the second return parameter if such a direction exists, false otherwise
+func NormalizedBishopDirection(fromSq, toSq Square) (Delta, bool) {
+	dRank := RankOf[toSq] - RankOf[fromSq]
+	dFile := FileOf[toSq] - FileOf[fromSq]
+
+	if dRank == 0 && dFile == 0 {
+		// original and destination square are the same
+		return Delta{}, false
+	}
+
+	if dRank*dRank != dFile*dFile {
+		// not a bishop direction
+		return Delta{}, false
+	}
+
+	if dRank > 0 && dFile > 0 {
+		return Delta{1, 1}, true
+	} else if dRank > 0 && dFile < 0 {
+		return Delta{1, -1}, true
+	} else if dFile > 0 {
+		return Delta{-1, 1}, true
+	} else {
+		return Delta{-1, -1}, true
+	}
+}
+
 // Bitboard returns a bitboard that has sq set
 func (sq Square) Bitboard() Bitboard {
 	return 1 << sq
