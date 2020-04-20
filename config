@@ -6,10 +6,10 @@
 	symlinks = false
 	ignorecase = true
 [remote "github"]
-	url = https://github.com/easychessanimations/gobbit.git
+	url = https://easychessanimations@github.com/easychessanimations/gobbit.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [remote "gitlab"]
-	url = https://gitlab.com/easychessanimations/gobbit.git
+	url = https://easychessanimations@gitlab.com/easychessanimations/gobbit.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [branch "master"]
 	remote = github
@@ -17,7 +17,7 @@
 [user]
 	name = easychessanimations
 	email = chessbotroulette@gmail.com
-	[credential "https://github.com/easychessanimations/gobbit.git"]
+	[credential "https://easychessanimations@github.com/easychessanimations/gobbit.git"]
 		username = easychessanimations
-	[credential "https://gitlab.com/easychessanimations/gobbit.git"]
+	[credential "https://easychessanimations@gitlab.com/easychessanimations/gobbit.git"]
 		username = easychessanimations
