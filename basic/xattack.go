@@ -5,21 +5,55 @@ import (
 	"math/rand"
 )
 
-func GenAttackSquares(sq Square, normFunc func(Square, Square) (Delta, bool)) []Square {
+func GenAttackSquares(sq Square, normFunc func(Square, Square) (Delta, bool)) ([]Square, Bitboard) {
 	sqs := []Square{}
 
-	middle := ^BbBorder
+	middle := BbFull
 
-	var testSq Square = middle.Pop()
+	if RankOf[sq] == 0 {
+		middle &^= BbRank8
+	}
 
-	for ; testSq != 0; testSq = middle.Pop() {
+	if RankOf[sq] == LAST_RANK {
+		middle &^= BbRank1
+	}
+
+	if FileOf[sq] == 0 {
+		middle &^= BbFileH
+	}
+
+	if FileOf[sq] == LAST_FILE {
+		middle &^= BbFileA
+	}
+
+	if RankOf[sq] >= 1 && RankOf[sq] <= (LAST_RANK-1) {
+		middle &^= BbRank1
+		middle &^= BbRank8
+	}
+
+	if FileOf[sq] >= 1 && FileOf[sq] <= (LAST_FILE-1) {
+		middle &^= BbFileA
+		middle &^= BbFileH
+	}
+
+	if (sq.Bitboard() &^ BbBorder) != 0 {
+		middle = ^BbBorder
+	}
+
+	bb := BbEmpty
+
+	var testSq Square
+
+	for middle != 0 {
+		testSq = middle.Pop()
 		_, ok := normFunc(sq, testSq)
 		if ok {
 			sqs = append(sqs, testSq)
+			bb |= testSq.Bitboard()
 		}
 	}
 
-	return sqs
+	return sqs, bb
 }
 
 func Translate(sqs []Square, occup uint64) Bitboard {
@@ -50,19 +84,21 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 	var lastGoodShift int
 	foundMagic := false
 	nodes := 0
-	for shift := 14; shift > 6; shift-- {
+	for shift := 22; shift > 6; shift-- {
 		found := false
-		for loop := 0; loop < 100; loop++ {
+		for loop := 0; loop < 5000; loop++ {
 			nodes++
 			magic := randMagic() >> 6 //+ uint64(64-shift)<<58
 			hash := make(map[uint64]int)
 			coll := 0
 			for enum = 0; enum < 1<<len(sqs); enum++ {
-				key := (magic * enum) >> (64 - shift)
-				cnt, found := hash[key]
-				if found {
+				tr := uint64(Translate(sqs, enum))
+				key := (magic * tr) >> (64 - shift)
+				cnt, foundKey := hash[key]
+				if foundKey {
 					hash[key] = cnt + 1
 					coll++
+					break
 				} else {
 					hash[key] = 1
 				}
@@ -90,20 +126,32 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 }
 
 func init() {
+	maxShift := 0
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
-		shift, magic, ok, nodes := SearchMagic(sq, GenAttackSquares(sq, NormalizedBishopDirection))
+		sqs, bb := GenAttackSquares(sq, NormalizedBishopDirection)
+		fmt.Println(bb)
+		shift, magic, ok, nodes := SearchMagic(sq, sqs)
+		if shift > maxShift {
+			maxShift = shift
+		}
 		if ok {
-			fmt.Printf("Found bishop magic for %v shift %2d magic %016x nodes %d\n", sq, shift, magic, nodes)
+			fmt.Printf("Found bishop magic for %v shift %2d magic %016x nodes %d sqs  %d\n", sq, shift, magic, nodes, len(sqs))
 		} else {
 			fmt.Println("Failed", sq)
 			break
 		}
-		shift, magic, ok, nodes = SearchMagic(sq, GenAttackSquares(sq, NormalizedRookDirection))
+		sqs, bb = GenAttackSquares(sq, NormalizedRookDirection)
+		fmt.Println(bb)
+		shift, magic, ok, nodes = SearchMagic(sq, sqs)
+		if shift > maxShift {
+			maxShift = shift
+		}
 		if ok {
-			fmt.Printf("Found rook   magic for %v shift %2d magic %016x nodes %d\n", sq, shift, magic, nodes)
+			fmt.Printf("Found rook   magic for %v shift %2d magic %016x nodes %d sqs %d\n", sq, shift, magic, nodes, len(sqs))
 		} else {
 			fmt.Println("Failed", sq)
 			break
 		}
 	}
+	fmt.Println("max shift", maxShift)
 }
