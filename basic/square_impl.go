@@ -59,12 +59,14 @@ func (sq Square) File() int {
 
 // UCI tells the UCI representation of a square
 func (sq Square) UCI() string {
-	buff := []byte{}
+	/*buff := []byte{}
 
 	buff = append(buff, byte(FileOf[sq]+'a'))
 	buff = append(buff, byte(RankOf[sq]+'1'))
 
-	return string(buff)
+	return string(buff)*/
+
+	return UCIOf[sq]
 }
 
 // String tells the string representation of a square, defaults to UCI
