@@ -163,6 +163,8 @@ func SearchMagic(sq Square, sqs []Square, deltas []Delta, tries int) (int, uint6
 
 var BISHOP_DELTAS = []Delta{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}
 var ROOK_DELTAS = []Delta{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+var KNIGHT_DELTAS = []Delta{{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}}
+var KING_DELTAS = append(BISHOP_DELTAS, ROOK_DELTAS...)
 
 type Wizard struct {
 	Name   string
@@ -240,9 +242,42 @@ func QueenMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboa
 	return BishopMobility(kind, sq, occupUs, occupThem) | RookMobility(kind, sq, occupUs, occupThem)
 }
 
+func KnightMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	attack := KnightAttack[sq]
+	if !kind.IsViolent() {
+		attack &^= occupThem
+	}
+	return attack &^ occupUs
+}
+
+func KingMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	attack := KingAttack[sq]
+	if !kind.IsViolent() {
+		attack &^= occupThem
+	}
+	return attack &^ occupUs
+}
+
 var BishopAttack [BOARD_AREA]Bitboard
 var RookAttack [BOARD_AREA]Bitboard
 var QueenAttack [BOARD_AREA]Bitboard
+var KnightAttack [BOARD_AREA]Bitboard
+var KingAttack [BOARD_AREA]Bitboard
+
+func JumpAttack(sq Square, deltas []Delta) Bitboard {
+	bb := BbEmpty
+
+	for _, delta := range deltas {
+		rank := RankOf[sq] + delta.dRank
+		file := FileOf[sq] + delta.dFile
+
+		if rank >= 0 && rank < NUM_FILES && file >= 0 && file < NUM_FILES {
+			bb |= RankFile[rank][file].Bitboard()
+		}
+	}
+
+	return bb
+}
 
 func init() {
 	/*for _, wiz := range Wizards {
@@ -267,6 +302,9 @@ func init() {
 
 			if wi == BISHOP_WIZARD_INDEX {
 				BishopAttack[msq.Square] = BishopMobility(Violent|Quiet, msq.Square, BbEmpty, BbEmpty)
+
+				KnightAttack[msq.Square] = JumpAttack(msq.Square, KNIGHT_DELTAS)
+				KingAttack[msq.Square] = JumpAttack(msq.Square, KING_DELTAS)
 			} else if wi == ROOK_WIZARD_INDEX {
 				RookAttack[msq.Square] = RookMobility(Violent|Quiet, msq.Square, BbEmpty, BbEmpty)
 				QueenAttack[msq.Square] = BishopAttack[msq.Square] | RookAttack[msq.Square]

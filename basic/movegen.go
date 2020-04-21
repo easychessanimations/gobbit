@@ -101,6 +101,10 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 		return st.GenBitboardMoves(sq, RookMobility(kind, sq, occupUs, occupThem))
 	case Queen:
 		return st.GenBitboardMoves(sq, QueenMobility(kind, sq, occupUs, occupThem))
+	case Knight:
+		return st.GenBitboardMoves(sq, KnightMobility(kind, sq, occupUs, occupThem))
+	case King:
+		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem))
 	}
 
 	return []Move{}
