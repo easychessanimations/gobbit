@@ -9,4 +9,7 @@ func main() {
 	st.Init(VariantEightPiece)
 
 	//fmt.Println(st.PrettyPrintString())
+
+	/*fmt.Println(BISHOP_MAGICS)
+	fmt.Println(ROOK_MAGICS)*/
 }

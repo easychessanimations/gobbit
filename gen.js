@@ -170,3 +170,55 @@ ${figures.slice(1).map((fig,i) => {
 `
 
 writeFile("piece", "basic", piece_go)
+
+let magicsTxt = fs.readFileSync("magics.txt").toString()
+
+let magics ={
+    bishop:[],
+    rook:[]
+}
+
+for(let line of magicsTxt.split("\n")){
+    let m
+    if(m=line.match(/^found ([^\s]+)/)){        
+        let kind = m[1]
+        m = line.match(/for ([^\s]+)/)
+        let squareUci = m[1]
+        m = line.match(/shift\s+([^\s]+)/)
+        let shift = m[1]
+        m = line.match(/magic ([^\s]+)/g)
+        m = m[1].match(/magic ([^\s]+)/)
+        let magic = m[1]
+        magics[kind].push({
+            squareUci: squareUci,
+            shift: shift,
+            magic: magic
+        })
+    }
+}
+
+let magics_go = `
+import "fmt"
+
+type MagicSquare struct{
+    Square Square
+    Shift  int
+    Magic  uint64
+}
+
+func (msq MagicSquare) String() string{
+    return fmt.Sprintf("MagicSquare %v %2d %016X", msq.Square, msq.Shift, msq.Magic)
+}
+
+type Magics [BOARD_AREA]MagicSquare`
+
+for(let kind in magics){
+    magics_go += "\n\nvar " + kind.toUpperCase() + "_MAGICS = Magics{\n"
+    for(let msq of magics[kind]){
+        magics_go += `   {Square${msq.squareUci.toUpperCase()}, ${msq.shift.padStart(3, " ")}, 0x${msq.magic.toLowerCase()}},\n`
+    }
+    magics_go += "}"
+}
+
+writeFile("magics", "basic", magics_go)
+

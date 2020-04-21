@@ -204,7 +204,7 @@ func (wiz *Wizard) GenAttacks() {
 }
 
 func init() {
-	for _, wiz := range wizards {
+	/*for _, wiz := range wizards {
 		wiz.GenAttacks()
-	}
+	}*/
 }
