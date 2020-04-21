@@ -1,131 +1,134 @@
 
 C:\gomodules\modules\gobbit>go run main.go 
-found bishop magic for a1  0 shift  7 magic 0020081001101121 nodes    247 sqs  6
-found rook   magic for a1  0 shift 12 magic 008000400021d088 nodes 414321 sqs 12
-found bishop magic for b1  1 shift  7 magic 0011080300308084 nodes     90 sqs  5
-found rook   magic for b1  1 shift 11 magic 0040004110002000 nodes 405089 sqs 11
-found bishop magic for c1  2 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for c1  2 shift 11 magic 0300084031002000 nodes 562309 sqs 11
-found bishop magic for d1  3 shift  7 magic 0080940310010818 nodes     54 sqs  5
-found rook   magic for d1  3 shift 11 magic 0280080030008004 nodes 572692 sqs 11
-found bishop magic for e1  4 shift  7 magic 000048d600000100 nodes     67 sqs  5
-found rook   magic for e1  4 shift 11 magic 0200055002002008 nodes 491755 sqs 11
-found bishop magic for f1  5 shift  7 magic 0080940310010818 nodes     54 sqs  5
-found rook   magic for f1  5 shift 11 magic 0080020004000180 nodes 518496 sqs 11
-found bishop magic for g1  6 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for g1  6 shift 11 magic 0300020000810004 nodes 409977 sqs 11
-found bishop magic for h1  7 shift  7 magic 0192001609040208 nodes   1823 sqs  6
-found rook   magic for h1  7 shift 12 magic 0100004080a90002 nodes 630815 sqs 12
-found bishop magic for a2  8 shift  7 magic 0080461220884010 nodes     89 sqs  5
-found rook   magic for a2  8 shift 11 magic 0000800040108029 nodes 416424 sqs 11
-found bishop magic for b2  9 shift  7 magic 0084a40200210810 nodes    104 sqs  5
-found rook   magic for b2  9 shift 10 magic 008c400048201000 nodes 408812 sqs 10
-found bishop magic for c2 10 shift  7 magic 0080404500450510 nodes    196 sqs  5
-found rook   magic for c2 10 shift 10 magic 0021004410200100 nodes 421070 sqs 10
-found bishop magic for d2 11 shift  7 magic 001040c242000001 nodes     43 sqs  5
-found rook   magic for d2 11 shift 10 magic 0001002210000900 nodes 417809 sqs 10
-found bishop magic for e2 12 shift  7 magic 001040c242000001 nodes     43 sqs  5
-found rook   magic for e2 12 shift 10 magic 0180800401800800 nodes 415185 sqs 10
-found bishop magic for f2 13 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for f2 13 shift 10 magic 0090800200810400 nodes 418737 sqs 10
-found bishop magic for g2 14 shift  7 magic 012024d605040400 nodes    118 sqs  5
-found rook   magic for g2 14 shift 10 magic 0003004300020004 nodes 417112 sqs 10
-found bishop magic for h2 15 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for h2 15 shift 11 magic 0001000071000882 nodes 403419 sqs 11
-found bishop magic for a3 16 shift  7 magic 000102024c100440 nodes    141 sqs  5
-found rook   magic for a3 16 shift 11 magic 0080008021400088 nodes 411083 sqs 11
-found bishop magic for b3 17 shift  7 magic 0024042204480100 nodes    122 sqs  5
-found rook   magic for b3 17 shift 10 magic 0080424010002004 nodes 411676 sqs 10
-found bishop magic for c3 18 shift  7 magic 010802100c801210 nodes   1992 sqs  7
-found rook   magic for c3 18 shift 10 magic 0102220032004182 nodes 459586 sqs 10
-found bishop magic for d3 19 shift  7 magic 0106020c01220000 nodes    561 sqs  7
-found rook   magic for d3 19 shift 10 magic 0210018010080080 nodes 436387 sqs 10
-found bishop magic for e3 20 shift  7 magic 0284844400a00000 nodes  12291 sqs  7
-found rook   magic for e3 20 shift 10 magic 0001010010280004 nodes 412493 sqs 10
-found bishop magic for f3 21 shift  7 magic 0000c00201100380 nodes   6660 sqs  7
-found rook   magic for f3 21 shift 10 magic 0003010014000822 nodes 405656 sqs 10
-found bishop magic for g3 22 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for g3 22 shift 10 magic 0000ac0022304809 nodes 422715 sqs 10
-found bishop magic for h3 23 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for h3 23 shift 11 magic 02042200110080c4 nodes 438025 sqs 11
-found bishop magic for a4 24 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for a4 24 shift 11 magic 0030400280248000 nodes 448683 sqs 11
-found bishop magic for b4 25 shift  7 magic 0001620008208a09 nodes    156 sqs  5
-found rook   magic for b4 25 shift 10 magic 0001400240201000 nodes 421900 sqs 10
-found bishop magic for c4 26 shift  7 magic 0002180001080021 nodes   3851 sqs  7
-found rook   magic for c4 26 shift 10 magic 0201110100600041 nodes 432786 sqs 10
-found bishop magic for d4 27 shift  9 magic 0004010008201880 nodes 460539 sqs  9
-found rook   magic for d4 27 shift 10 magic 0210882100500100 nodes 419892 sqs 10
-found bishop magic for e4 28 shift  9 magic 000101001450c000 nodes 451945 sqs  9
-found rook   magic for e4 28 shift 10 magic 0010040080800800 nodes 414792 sqs 10
-found bishop magic for f4 29 shift  7 magic 0204092043101003 nodes   4635 sqs  7
-found rook   magic for f4 29 shift 10 magic 0001001300040098 nodes 428003 sqs 10
-found bishop magic for g4 30 shift  7 magic 0084a40200210810 nodes    104 sqs  5
-found rook   magic for g4 30 shift 10 magic 0024212400020810 nodes 405894 sqs 10
-found bishop magic for h4 31 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for h4 31 shift 11 magic 0000800080004100 nodes 448623 sqs 11
-found bishop magic for a5 32 shift  7 magic 000b018800300808 nodes    255 sqs  5
-found rook   magic for a5 32 shift 11 magic 020a834012800026 nodes 421510 sqs 11
-found bishop magic for b5 33 shift  7 magic 0084a40200210810 nodes    104 sqs  5
-found rook   magic for b5 33 shift 10 magic 0026601000400040 nodes 407158 sqs 10
-found bishop magic for c5 34 shift  7 magic 010a003000020480 nodes   7942 sqs  7
-found rook   magic for c5 34 shift 10 magic 0000200105003041 nodes 421499 sqs 10
-found bishop magic for d5 35 shift  9 magic 0200060180380280 nodes 493559 sqs  9
-found rook   magic for d5 35 shift 10 magic 0203801002800800 nodes 445600 sqs 10
-found bishop magic for e5 36 shift  9 magic 0014090400220028 nodes 447748 sqs  9
-found rook   magic for e5 36 shift 10 magic 0010040080800800 nodes 414792 sqs 10
-found bishop magic for f5 37 shift  7 magic 00840800900200c8 nodes   5337 sqs  7
-found rook   magic for f5 37 shift 10 magic 0023000401000802 nodes 451796 sqs 10
-found bishop magic for g5 38 shift  7 magic 000a022048002201 nodes    202 sqs  5
-found rook   magic for g5 38 shift 10 magic 0000862124005008 nodes 417167 sqs 10
-found bishop magic for h5 39 shift  7 magic 0080461220884010 nodes     89 sqs  5
-found rook   magic for h5 39 shift 11 magic 0001000071000882 nodes 403419 sqs 11
-found bishop magic for a6 40 shift  7 magic 0080461220884010 nodes     89 sqs  5
-found rook   magic for a6 40 shift 11 magic 000090a440008000 nodes 413068 sqs 11
-found bishop magic for b6 41 shift  7 magic 0089c0b009005002 nodes     73 sqs  5
-found rook   magic for b6 41 shift 10 magic 004080c001090022 nodes 400517 sqs 10
-found bishop magic for c6 42 shift  7 magic 0010940208000100 nodes   9437 sqs  7
-found rook   magic for c6 42 shift 10 magic 0200244200820010 nodes 436760 sqs 10
-found bishop magic for d6 43 shift  7 magic 0000424202006028 nodes   9158 sqs  7
-found rook   magic for d6 43 shift 10 magic 0000100008008080 nodes 487695 sqs 10
-found bishop magic for e6 44 shift  7 magic 0001a4100c002080 nodes   5549 sqs  7
-found rook   magic for e6 44 shift 10 magic 0001001008030004 nodes 489778 sqs 10
-found bishop magic for f6 45 shift  7 magic 0003100502000a40 nodes    557 sqs  7
-found rook   magic for f6 45 shift 10 magic 0042002408020010 nodes 470150 sqs 10
-found bishop magic for g6 46 shift  7 magic 00a00900c2000085 nodes    136 sqs  5
-found rook   magic for g6 46 shift 10 magic 000401104a040018 nodes 405350 sqs 10
-found bishop magic for h6 47 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for h6 47 shift 11 magic 00541140a5020004 nodes 409052 sqs 11
-found bishop magic for a7 48 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for a7 48 shift 11 magic 0000800a20400080 nodes 437554 sqs 11
-found bishop magic for b7 49 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for b7 49 shift 10 magic 0026601000400040 nodes 407158 sqs 10
-found bishop magic for c7 50 shift  7 magic 0210044028010004 nodes     85 sqs  5
-found rook   magic for c7 50 shift 10 magic 0021004410200100 nodes 421070 sqs 10
-found bishop magic for d7 51 shift  7 magic 00041e8050110002 nodes     55 sqs  5
-found rook   magic for d7 51 shift 10 magic 0001002210000900 nodes 417809 sqs 10
-found bishop magic for e7 52 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for e7 52 shift 10 magic 008028000500f100 nodes 427776 sqs 10
-found bishop magic for f7 53 shift  7 magic 0089c0b009005002 nodes     73 sqs  5
-found rook   magic for f7 53 shift 10 magic 0014040080020080 nodes 451797 sqs 10
-found bishop magic for g7 54 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for g7 54 shift 10 magic 0000010630080400 nodes 457198 sqs 10
-found bishop magic for h7 55 shift  7 magic 0011080300308084 nodes     90 sqs  5
-found rook   magic for h7 55 shift 11 magic 0070228302640200 nodes 400501 sqs 11
-found bishop magic for a8 56 shift  7 magic 0192001609040208 nodes   1823 sqs  6
-found rook   magic for a8 56 shift 12 magic 000280041046a101 nodes 425036 sqs 12
-found bishop magic for b8 57 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for b8 57 shift 11 magic 001d802014400101 nodes 435659 sqs 11
-found bishop magic for c8 58 shift  7 magic 0040030d90420906 nodes    100 sqs  5
-found rook   magic for c8 58 shift 11 magic 0004441060010009 nodes 439777 sqs 11
-found bishop magic for d8 59 shift  7 magic 00000000018c0120 nodes     65 sqs  5
-found rook   magic for d8 59 shift 11 magic 000044a0b8300101 nodes 409450 sqs 11
-found bishop magic for e8 60 shift  7 magic 001c4062011080a8 nodes     87 sqs  5
-found rook   magic for e8 60 shift 11 magic 0002000488102042 nodes 447796 sqs 11
-found bishop magic for f8 61 shift  7 magic 0289882158450808 nodes     60 sqs  5
-found rook   magic for f8 61 shift 11 magic 0302000c08900122 nodes 411145 sqs 11
-found bishop magic for g8 62 shift  7 magic 0080461220884010 nodes     89 sqs  5
-found rook   magic for g8 62 shift 11 magic 00000c8102500804 nodes 418653 sqs 11
-found bishop magic for h8 63 shift  7 magic 0020081001101121 nodes    247 sqs  6
-found rook   magic for h8 63 shift 12 magic 0000040228834502 nodes 403418 sqs 12
-max shift 12
+generating attacks for bishop
+found bishop magic for a1  0 shift  7 max shift  7 magic 00400a4182001490 nodes    634 sqs  7
+found bishop magic for b1  1 shift  7 max shift  7 magic 0010008829000c00 nodes    708 sqs  7
+found bishop magic for c1  2 shift  7 max shift  7 magic 0044008180080000 nodes    213 sqs  7
+found bishop magic for d1  3 shift  7 max shift  7 magic 0094220020000400 nodes    389 sqs  7
+found bishop magic for e1  4 shift  7 max shift  7 magic 000048d600000100 nodes     67 sqs  7
+found bishop magic for f1  5 shift  7 max shift  7 magic 0004300082601280 nodes    493 sqs  7
+found bishop magic for g1  6 shift  7 max shift  7 magic 0044002208600801 nodes    318 sqs  7
+found bishop magic for h1  7 shift  7 max shift  7 magic 0040602206d64000 nodes   2382 sqs  7
+found bishop magic for a2  8 shift  7 max shift  7 magic 0080461220884010 nodes     89 sqs  7
+found bishop magic for b2  9 shift  7 max shift  7 magic 0044201800848010 nodes    253 sqs  9
+found bishop magic for c2 10 shift  7 max shift  7 magic 0000404084224800 nodes    818 sqs  9
+found bishop magic for d2 11 shift  7 max shift  7 magic 00008802c0400184 nodes    320 sqs  9
+found bishop magic for e2 12 shift  7 max shift  7 magic 0000009040004002 nodes    572 sqs  9
+found bishop magic for f2 13 shift  7 max shift  7 magic 000081c202240021 nodes    327 sqs  9
+found bishop magic for g2 14 shift  7 max shift  7 magic 0001320082011000 nodes    613 sqs  9
+found bishop magic for h2 15 shift  7 max shift  7 magic 000002e024020080 nodes    344 sqs  7
+found bishop magic for a3 16 shift  7 max shift  7 magic 000102024c100440 nodes    141 sqs  7
+found bishop magic for b3 17 shift  7 max shift  7 magic 0001044210020200 nodes   1076 sqs  9
+found bishop magic for c3 18 shift  7 max shift  7 magic 0008040400c40008 nodes  47365 sqs 11
+found bishop magic for d3 19 shift  8 max shift  8 magic 0000800042004800 nodes  59809 sqs 11
+found bishop magic for e3 20 shift  8 max shift  8 magic 0001000020080048 nodes  65634 sqs 11
+found bishop magic for f3 21 shift  8 max shift  8 magic 0000510028004800 nodes  56408 sqs 11
+found bishop magic for g3 22 shift  7 max shift  8 magic 000a000020806100 nodes   1271 sqs  9
+found bishop magic for h3 23 shift  7 max shift  8 magic 000020008c028480 nodes    518 sqs  7
+found bishop magic for a4 24 shift  7 max shift  8 magic 0004040402018680 nodes    463 sqs  7
+found bishop magic for b4 25 shift  7 max shift  8 magic 0009010020380110 nodes   9111 sqs  9
+found bishop magic for c4 26 shift  8 max shift  8 magic 0000100318004150 nodes  55127 sqs 11
+found bishop magic for d4 27 shift 12 max shift 12 magic 0004081404060002 nodes  59311 sqs 13
+found bishop magic for e4 28 shift 10 max shift 12 magic 0000108002100400 nodes  86121 sqs 13
+found bishop magic for f4 29 shift  9 max shift 12 magic 0008008020082000 nodes  60910 sqs 11
+found bishop magic for g4 30 shift  7 max shift 12 magic 00080a4000804440 nodes   1381 sqs  9
+found bishop magic for h4 31 shift  7 max shift 12 magic 0002402042148100 nodes    807 sqs  7
+found bishop magic for a5 32 shift  7 max shift 12 magic 02009040e0080200 nodes    386 sqs  7
+found bishop magic for b5 33 shift  7 max shift 12 magic 0002010090040808 nodes  36060 sqs  9
+found bishop magic for c5 34 shift  9 max shift 12 magic 0000080041220040 nodes  65463 sqs 11
+found bishop magic for d5 35 shift 11 max shift 12 magic 0000022604040100 nodes  72881 sqs 13
+found bishop magic for e5 36 shift 10 max shift 12 magic 0002004010080200 nodes 101944 sqs 13
+found bishop magic for f5 37 shift  8 max shift 12 magic 0008120020411000 nodes  67176 sqs 11
+found bishop magic for g5 38 shift  7 max shift 12 magic 000081c202240021 nodes    327 sqs  9
+found bishop magic for h5 39 shift  7 max shift 12 magic 000a022048002201 nodes    202 sqs  7
+found bishop magic for a6 40 shift  7 max shift 12 magic 0001648a10084840 nodes    335 sqs  7
+found bishop magic for b6 41 shift  7 max shift 12 magic 0000842100802000 nodes  10178 sqs  9
+found bishop magic for c6 42 shift  8 max shift 12 magic 0201010020804200 nodes  61603 sqs 11
+found bishop magic for d6 43 shift  8 max shift 12 magic 0000002458000400 nodes  50520 sqs 11
+found bishop magic for e6 44 shift  7 max shift 12 magic 0000400091000200 nodes  84513 sqs 11
+found bishop magic for f6 45 shift  7 max shift 12 magic 0040080801200040 nodes   7090 sqs 11
+found bishop magic for g6 46 shift  7 max shift 12 magic 0003100502000a40 nodes    557 sqs  9
+found bishop magic for h6 47 shift  7 max shift 12 magic 000102024c100440 nodes    141 sqs  7
+found bishop magic for a7 48 shift  7 max shift 12 magic 0201008043202000 nodes    311 sqs  7
+found bishop magic for b7 49 shift  7 max shift 12 magic 00080c1414040000 nodes    278 sqs  9
+found bishop magic for c7 50 shift  7 max shift 12 magic 0282009040424800 nodes   1231 sqs  9
+found bishop magic for d7 51 shift  7 max shift 12 magic 0084400050120000 nodes    170 sqs  9
+found bishop magic for e7 52 shift  7 max shift 12 magic 0000001002408000 nodes    452 sqs  9
+found bishop magic for f7 53 shift  7 max shift 12 magic 0000042480604000 nodes    656 sqs  9
+found bishop magic for g7 54 shift  7 max shift 12 magic 0070228302640200 nodes    501 sqs  9
+found bishop magic for h7 55 shift  7 max shift 12 magic 0011080300308084 nodes     90 sqs  7
+found bishop magic for a8 56 shift  7 max shift 12 magic 0000440085272000 nodes   2840 sqs  7
+found bishop magic for b8 57 shift  7 max shift 12 magic 02b0010012018200 nodes    398 sqs  7
+found bishop magic for c8 58 shift  7 max shift 12 magic 0200000080802114 nodes    350 sqs  7
+found bishop magic for d8 59 shift  7 max shift 12 magic 0011080300308084 nodes     90 sqs  7
+found bishop magic for e8 60 shift  7 max shift 12 magic 0002090404008205 nodes    279 sqs  7
+found bishop magic for f8 61 shift  7 max shift 12 magic 0020081001101121 nodes    247 sqs  7
+found bishop magic for g8 62 shift  7 max shift 12 magic 0200090d00884010 nodes    504 sqs  7
+found bishop magic for h8 63 shift  7 max shift 12 magic 00400a4182001490 nodes    634 sqs  7
+max shift for bishop = 12
+generating attacks for rook
+found rook   magic for a1  0 shift 14 max shift 14 magic 0004220080104000 nodes  51134 sqs 14
+found rook   magic for b1  1 shift 14 max shift 14 magic 0018004240681000 nodes 100096 sqs 14
+found rook   magic for c1  2 shift 14 max shift 14 magic 0030000205102000 nodes  58012 sqs 14
+found rook   magic for d1  3 shift 14 max shift 14 magic 0200020110208a00 nodes  59976 sqs 14
+found rook   magic for e1  4 shift 13 max shift 14 magic 0200080401008200 nodes  92205 sqs 14
+found rook   magic for f1  5 shift 13 max shift 14 magic 0200080401008200 nodes  92205 sqs 14
+found rook   magic for g1  6 shift 13 max shift 14 magic 0200042060510200 nodes 103964 sqs 14
+found rook   magic for h1  7 shift 14 max shift 14 magic 0010005080281100 nodes  51945 sqs 14
+found rook   magic for a2  8 shift 13 max shift 14 magic 0000f00021081400 nodes  69367 sqs 14
+found rook   magic for b2  9 shift 13 max shift 14 magic 0000020408401000 nodes  98587 sqs 14
+found rook   magic for c2 10 shift 13 max shift 14 magic 0000900220009000 nodes  96128 sqs 14
+found rook   magic for d2 11 shift 13 max shift 14 magic 0000400140041200 nodes  67660 sqs 14
+found rook   magic for e2 12 shift 14 max shift 14 magic 0000080100480340 nodes  65243 sqs 14
+found rook   magic for f2 13 shift 14 max shift 14 magic 0000040100402210 nodes  59315 sqs 14
+found rook   magic for g2 14 shift 12 max shift 14 magic 0054000080420328 nodes 107772 sqs 14
+found rook   magic for h2 15 shift 14 max shift 14 magic 00840800900200c8 nodes  55337 sqs 14
+found rook   magic for a3 16 shift 13 max shift 14 magic 0000580600148000 nodes  60957 sqs 14
+found rook   magic for b3 17 shift 13 max shift 14 magic 0000810200085000 nodes  82541 sqs 14
+found rook   magic for c3 18 shift 13 max shift 14 magic 0000341002100080 nodes  58318 sqs 14
+found rook   magic for d3 19 shift 13 max shift 14 magic 0000011000104080 nodes  60222 sqs 14
+found rook   magic for e3 20 shift 13 max shift 14 magic 0000230001000098 nodes  64026 sqs 14
+found rook   magic for f3 21 shift 14 max shift 14 magic 0000010400002100 nodes  51419 sqs 14
+found rook   magic for g3 22 shift 14 max shift 14 magic 0001084011000080 nodes  54050 sqs 14
+found rook   magic for h3 23 shift 13 max shift 14 magic 0000081000400100 nodes  53823 sqs 14
+found rook   magic for a4 24 shift 13 max shift 14 magic 0001480804001000 nodes  56271 sqs 14
+found rook   magic for b4 25 shift 14 max shift 14 magic 0000040110000200 nodes  53421 sqs 14
+found rook   magic for c4 26 shift 13 max shift 14 magic 0000089061000200 nodes  75704 sqs 14
+found rook   magic for d4 27 shift 13 max shift 14 magic 0000100500024100 nodes  74379 sqs 14
+found rook   magic for e4 28 shift 14 max shift 14 magic 0000044200004a00 nodes  70479 sqs 14
+found rook   magic for f4 29 shift 13 max shift 14 magic 0000005200018108 nodes  54806 sqs 14
+found rook   magic for g4 30 shift 12 max shift 14 magic 0000009400004118 nodes 101223 sqs 14
+found rook   magic for h4 31 shift 13 max shift 14 magic 0000002030080280 nodes  55103 sqs 14
+found rook   magic for a5 32 shift 13 max shift 14 magic 0000081100288000 nodes  71536 sqs 14
+found rook   magic for b5 33 shift 14 max shift 14 magic 0000024200890880 nodes  62101 sqs 14
+found rook   magic for c5 34 shift 13 max shift 14 magic 0208841042000200 nodes  80107 sqs 14
+found rook   magic for d5 35 shift 14 max shift 14 magic 0090018802000120 nodes  56504 sqs 14
+found rook   magic for e5 36 shift 13 max shift 14 magic 0000230001000098 nodes  64026 sqs 14
+found rook   magic for f5 37 shift 13 max shift 14 magic 000002283000c020 nodes  72490 sqs 14
+found rook   magic for g5 38 shift 12 max shift 14 magic 0001004204000288 nodes  66805 sqs 14
+found rook   magic for h5 39 shift 13 max shift 14 magic 0200014002a40010 nodes  51043 sqs 14
+found rook   magic for a6 40 shift 12 max shift 14 magic 00009080c02a8000 nodes  88170 sqs 14
+found rook   magic for b6 41 shift 13 max shift 14 magic 0001080090080200 nodes  76859 sqs 14
+found rook   magic for c6 42 shift 13 max shift 14 magic 0000040e00a02000 nodes  73981 sqs 14
+found rook   magic for d6 43 shift 13 max shift 14 magic 00002c1201000400 nodes  79620 sqs 14
+found rook   magic for e6 44 shift 13 max shift 14 magic 00000218400a1800 nodes  81122 sqs 14
+found rook   magic for f6 45 shift 13 max shift 14 magic 0000040080010400 nodes  61336 sqs 14
+found rook   magic for g6 46 shift 13 max shift 14 magic 0000010120408004 nodes  75659 sqs 14
+found rook   magic for h6 47 shift 13 max shift 14 magic 0000004000220802 nodes  50411 sqs 14
+found rook   magic for a7 48 shift 12 max shift 14 magic 0000832600442a00 nodes  61650 sqs 14
+found rook   magic for b7 49 shift 13 max shift 14 magic 00004081041a1200 nodes  54116 sqs 14
+found rook   magic for c7 50 shift 13 max shift 14 magic 000c702008c00200 nodes  53606 sqs 14
+found rook   magic for d7 51 shift 12 max shift 14 magic 0000200851040200 nodes  61054 sqs 14
+found rook   magic for e7 52 shift 13 max shift 14 magic 0000100140880200 nodes  53446 sqs 14
+found rook   magic for f7 53 shift 12 max shift 14 magic 0200080401008200 nodes  92205 sqs 14
+found rook   magic for g7 54 shift 11 max shift 14 magic 0000020800815400 nodes  64923 sqs 14
+found rook   magic for h7 55 shift 13 max shift 14 magic 0000001842400320 nodes  51916 sqs 14
+found rook   magic for a8 56 shift 13 max shift 14 magic 0000c060218a0012 nodes  64722 sqs 14
+found rook   magic for b8 57 shift 13 max shift 14 magic 0002000480406152 nodes  61644 sqs 14
+found rook   magic for c8 58 shift 13 max shift 14 magic 00000402080940a2 nodes  55547 sqs 14
+found rook   magic for d8 59 shift 13 max shift 14 magic 0000020201181022 nodes  56415 sqs 14
+found rook   magic for e8 60 shift 14 max shift 14 magic 0008012050008402 nodes  50976 sqs 14
+found rook   magic for f8 61 shift 14 max shift 14 magic 00000081120000aa nodes  52335 sqs 14
+found rook   magic for g8 62 shift 12 max shift 14 magic 0000044201080084 nodes  95183 sqs 14
+found rook   magic for h8 63 shift 13 max shift 14 magic 0000008031004022 nodes 125486 sqs 14
+max shift for rook = 14

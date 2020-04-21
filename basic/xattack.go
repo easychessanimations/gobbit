@@ -110,7 +110,7 @@ func SlidingAttack(sq Square, deltas []Delta, occup Bitboard) (Bitboard, []Squar
 	return bb, sqs
 }
 
-func SearchMagic(sq Square, sqs []Square, deltas []Delta) (int, uint64, bool, int) {
+func SearchMagic(sq Square, sqs []Square, deltas []Delta, tries int) (int, uint64, bool, int) {
 	Rand = rand.New(rand.NewSource(1))
 
 	var enum uint64
@@ -120,7 +120,7 @@ func SearchMagic(sq Square, sqs []Square, deltas []Delta) (int, uint64, bool, in
 	nodes := 0
 	for shift := 22; shift > 6; shift-- {
 		found := false
-		for loop := 0; loop < 5000; loop++ {
+		for loop := 0; loop < tries; loop++ {
 			nodes++
 			magic := randMagic() >> 6 //+ uint64(64-shift)<<58
 			hash := make(map[uint64]Bitboard)
@@ -174,12 +174,12 @@ var wizards = []Wizard{
 	{
 		Name:   "bishop",
 		Deltas: BISHOP_DELTAS,
-		Tries:  5000,
+		Tries:  50000,
 	},
 	{
 		Name:   "rook",
 		Deltas: ROOK_DELTAS,
-		Tries:  5000,
+		Tries:  50000,
 	},
 }
 
@@ -189,7 +189,7 @@ func (wiz *Wizard) GenAttacks() {
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
 		_, sqs := SlidingAttack(sq, wiz.Deltas, BbEmpty)
 		//fmt.Println(bb)
-		shift, magic, ok, nodes := SearchMagic(sq, sqs, wiz.Deltas)
+		shift, magic, ok, nodes := SearchMagic(sq, sqs, wiz.Deltas, wiz.Tries)
 		if shift > maxShift {
 			maxShift = shift
 		}
