@@ -217,7 +217,6 @@ func (msq MagicSquare) Key(occup Bitboard) uint64 {
 
 func (ms *Magics) Attack(sq Square, occup Bitboard) Bitboard {
 	msq := ms[sq]
-	fmt.Println("msq", msq)
 	return msq.Entries[msq.Key(occup)]
 }
 
@@ -228,6 +227,10 @@ func BishopMobility(sq Square, occup Bitboard) Bitboard {
 func RookMobility(sq Square, occup Bitboard) Bitboard {
 	return Wizards[ROOK_WIZARD_INDEX].Magics.Attack(sq, occup)
 }
+
+var BishopAttack [BOARD_AREA]Bitboard
+var RookAttack [BOARD_AREA]Bitboard
+var QueenAttack [BOARD_AREA]Bitboard
 
 func init() {
 	/*for _, wiz := range Wizards {
@@ -248,6 +251,13 @@ func init() {
 				key := msq.Key(trb)
 
 				Wizards[wi].Magics[i].Entries[key] = mobility
+			}
+
+			if wi == BISHOP_WIZARD_INDEX {
+				BishopAttack[msq.Square] = BishopMobility(msq.Square, BbEmpty)
+			} else if wi == ROOK_WIZARD_INDEX {
+				RookAttack[msq.Square] = RookMobility(msq.Square, BbEmpty)
+				QueenAttack[msq.Square] = BishopAttack[msq.Square] | RookAttack[msq.Square]
 			}
 		}
 	}

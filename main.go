@@ -15,7 +15,14 @@ func main() {
 	/*fmt.Println(BISHOP_MAGICS)
 	fmt.Println(ROOK_MAGICS)*/
 
-	fmt.Println(TotalMagicEntries)
+	//fmt.Println(TotalMagicEntries)
 
-	fmt.Println(RookMobility(SquareD4, SquareD5.Bitboard()|SquareF4.Bitboard()|SquareD2.Bitboard()|SquareB4.Bitboard()))
+	//fmt.Println(RookMobility(SquareD4, SquareD5.Bitboard()|SquareF4.Bitboard()|SquareD2.Bitboard()|SquareB4.Bitboard()))
+
+	fmt.Println("rook attack b2")
+	fmt.Println(RookAttack[SquareB2])
+	fmt.Println("bishop attack e4")
+	fmt.Println(BishopAttack[SquareE4])
+	fmt.Println("queen attack f7")
+	fmt.Println(QueenAttack[SquareF7])
 }
