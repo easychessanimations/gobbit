@@ -32,5 +32,5 @@ func main() {
 
 	fmt.Println(st.MoveLAN(m))*/
 
-	fmt.Println(st.PslmsForPieceAtSquare(Violent|Quiet, WhiteKnight, SquareE5, st.OccupUs(), st.OccupThem()))
+	fmt.Println(st.Pslms(Violent | Quiet))
 }

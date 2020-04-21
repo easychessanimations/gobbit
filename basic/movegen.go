@@ -109,3 +109,24 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 
 	return []Move{}
 }
+
+func (st State) PslmsForColor(kind MoveKind, color Color) []Move {
+	us := st.ByColor[color]
+	them := st.ByColor[color.Inverse()]
+
+	moves := []Move{}
+
+	usbb := us
+
+	for sq := usbb.Pop(); usbb != 0; sq = usbb.Pop() {
+		p := st.PieceAtSquare(sq)
+
+		moves = append(moves, st.PslmsForPieceAtSquare(kind, p, sq, us, them)...)
+	}
+
+	return moves
+}
+
+func (st State) Pslms(kind MoveKind) []Move {
+	return st.PslmsForColor(kind, st.Turn)
+}
