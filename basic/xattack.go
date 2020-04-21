@@ -186,6 +186,9 @@ var Wizards = []Wizard{
 	},
 }
 
+const BISHOP_WIZARD_INDEX = 0
+const ROOK_WIZARD_INDEX = 1
+
 func (wiz *Wizard) GenAttacks() {
 	fmt.Println("generating attacks for", wiz.Name)
 	maxShift := 0
@@ -206,8 +209,46 @@ func (wiz *Wizard) GenAttacks() {
 	fmt.Println("max shift for", wiz.Name, "=", maxShift)
 }
 
+var TotalMagicEntries int = 0
+
+func (msq MagicSquare) Key(occup Bitboard) uint64 {
+	return (msq.Magic * uint64(occup)) >> (64 - msq.Shift)
+}
+
+func (ms *Magics) Attack(sq Square, occup Bitboard) Bitboard {
+	msq := ms[sq]
+	fmt.Println("msq", msq)
+	return msq.Entries[msq.Key(occup)]
+}
+
+func BishopMobility(sq Square, occup Bitboard) Bitboard {
+	return Wizards[BISHOP_WIZARD_INDEX].Magics.Attack(sq, occup)
+}
+
+func RookMobility(sq Square, occup Bitboard) Bitboard {
+	return Wizards[ROOK_WIZARD_INDEX].Magics.Attack(sq, occup)
+}
+
 func init() {
 	/*for _, wiz := range Wizards {
 		wiz.GenAttacks()
 	}*/
+
+	for wi := 0; wi < len(Wizards); wi++ {
+		for i, msq := range Wizards[wi].Magics {
+			size := 1 << msq.Shift
+			Wizards[wi].Magics[i].Entries = make([]Bitboard, size)
+			TotalMagicEntries += size
+			_, sqs := SlidingAttack(msq.Square, Wizards[wi].Deltas, BbEmpty)
+			var enum uint64
+			for enum = 0; enum < 1<<len(sqs); enum++ {
+				trb := Translate(sqs, enum)
+
+				mobility, _ := SlidingAttack(msq.Square, Wizards[wi].Deltas, trb)
+				key := msq.Key(trb)
+
+				Wizards[wi].Magics[i].Entries[key] = mobility
+			}
+		}
+	}
 }

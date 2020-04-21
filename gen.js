@@ -201,13 +201,14 @@ let magics_go = `
 import "fmt"
 
 type MagicSquare struct{
-    Square Square
-    Shift  int
-    Magic  uint64
+    Square  Square
+    Shift   int
+    Magic   uint64
+    Entries []Bitboard
 }
 
 func (msq MagicSquare) String() string{
-    return fmt.Sprintf("MagicSquare %v %2d %016X", msq.Square, msq.Shift, msq.Magic)
+    return fmt.Sprintf("MagicSquare %v %2d %016X %d", msq.Square, msq.Shift, msq.Magic, len(msq.Entries))
 }
 
 type Magics [BOARD_AREA]MagicSquare`
@@ -215,7 +216,7 @@ type Magics [BOARD_AREA]MagicSquare`
 for(let kind in magics){
     magics_go += "\n\nvar " + kind.toUpperCase() + "_MAGICS = Magics{\n"
     for(let msq of magics[kind]){
-        magics_go += `   {Square${msq.squareUci.toUpperCase()}, ${msq.shift.padStart(3, " ")}, 0x${msq.magic.toLowerCase()}},\n`
+        magics_go += `   {Square${msq.squareUci.toUpperCase()}, ${msq.shift.padStart(3, " ")}, 0x${msq.magic.toLowerCase()}, []Bitboard{}},\n`
     }
     magics_go += "}"
 }
