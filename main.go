@@ -10,6 +10,8 @@ func main() {
 	st := State{}
 	st.Init(VariantEightPiece)
 
+	//fmt.Println(st)
+
 	//fmt.Println(st.PrettyPrintString())
 
 	/*fmt.Println(BISHOP_MAGICS)
@@ -26,7 +28,9 @@ func main() {
 	fmt.Println("queen attack f7")
 	fmt.Println(QueenAttack[SquareF7])*/
 
-	m := MakeMoveFT(SquareG1, SquareF3)
+	/*m := MakeMoveFT(SquareG1, SquareF3)
 
-	fmt.Println(st.MoveLAN(m))
+	fmt.Println(st.MoveLAN(m))*/
+
+	fmt.Println(st.PslmsForPieceAtSquare(Violent|Quiet, WhiteQueen, SquareE4, st.OccupUs(), st.OccupThem()))
 }

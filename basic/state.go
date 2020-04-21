@@ -53,6 +53,8 @@ type State struct {
 	HasDisabledMove   bool
 	DisableFromSquare Square
 	DisableToSquare   Square
+	ByFigure          [FigureArraySize]Bitboard
+	ByColor           [ColorArraySize]Bitboard
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -301,6 +303,8 @@ func (st *State) ParsePlacementString(ps string) error {
 					rank--
 				}
 				if rank < 0 {
+					st.CalculateOccupancy()
+
 					return nil
 				}
 			}
@@ -320,4 +324,32 @@ func (st State) MoveLAN(move Move) string {
 	fromPiece := st.PieceAtSquare(move.FromSq())
 
 	return fromPiece.SanSymbol() + move.String()
+}
+
+func (st *State) CalculateOccupancy() {
+	st.ByFigure = [FigureArraySize]Bitboard{}
+	st.ByColor = [ColorArraySize]Bitboard{}
+
+	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
+		bb := sq.Bitboard()
+
+		p := st.PieceAtSquare(sq)
+
+		if p != NoPiece {
+			fig := FigureOf[p]
+
+			col := ColorOf[p]
+
+			st.ByFigure[fig] |= bb
+			st.ByColor[col] |= bb
+		}
+	}
+}
+
+func (st State) OccupUs() Bitboard {
+	return st.ByColor[st.Turn]
+}
+
+func (st State) OccupThem() Bitboard {
+	return st.ByColor[st.Turn.Inverse()]
 }

@@ -220,12 +220,24 @@ func (ms *Magics) Attack(sq Square, occup Bitboard) Bitboard {
 	return msq.Entries[msq.Key(occup)]
 }
 
-func BishopMobility(sq Square, occup Bitboard) Bitboard {
-	return Wizards[BISHOP_WIZARD_INDEX].Magics.Attack(sq, occup)
+func BishopMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	attack := Wizards[BISHOP_WIZARD_INDEX].Magics.Attack(sq, (occupUs|occupThem)&BishopAttack[sq])
+	if !kind.IsViolent() {
+		attack &^= occupThem
+	}
+	return attack &^ occupUs
 }
 
-func RookMobility(sq Square, occup Bitboard) Bitboard {
-	return Wizards[ROOK_WIZARD_INDEX].Magics.Attack(sq, occup)
+func RookMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	attack := Wizards[ROOK_WIZARD_INDEX].Magics.Attack(sq, (occupUs|occupThem)&RookAttack[sq])
+	if !kind.IsViolent() {
+		attack &^= occupThem
+	}
+	return attack &^ occupUs
+}
+
+func QueenMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	return BishopMobility(kind, sq, occupUs, occupThem) | RookMobility(kind, sq, occupUs, occupThem)
 }
 
 var BishopAttack [BOARD_AREA]Bitboard
@@ -254,9 +266,9 @@ func init() {
 			}
 
 			if wi == BISHOP_WIZARD_INDEX {
-				BishopAttack[msq.Square] = BishopMobility(msq.Square, BbEmpty)
+				BishopAttack[msq.Square] = BishopMobility(Violent|Quiet, msq.Square, BbEmpty, BbEmpty)
 			} else if wi == ROOK_WIZARD_INDEX {
-				RookAttack[msq.Square] = RookMobility(msq.Square, BbEmpty)
+				RookAttack[msq.Square] = RookMobility(Violent|Quiet, msq.Square, BbEmpty, BbEmpty)
 				QueenAttack[msq.Square] = BishopAttack[msq.Square] | RookAttack[msq.Square]
 			}
 		}

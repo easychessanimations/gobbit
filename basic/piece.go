@@ -23,11 +23,11 @@ const (
    LancerNW         = Figure(15)
    Sentry           = Figure(16)
    Jailer           = Figure(17)
+   FigureArraySize  = int(iota)
 )
 
 const FigureMinValue = Pawn
 const FigureMaxValue = Jailer
-const FigureArraySize = FigureMaxValue - FigureMinValue + 1
 
 const LancerMinValue = LancerN
 const LancerMaxValue = LancerNW
@@ -105,17 +105,29 @@ var FigureOf [36]Figure
 
 type Color int
 
-const (   
-   Black   =  Color(0) 
-   White   =  Color(1)
-   NoColor =  Color(2)
+const (
+	Black = Color(iota)
+	White
+	NoColor
+	ColorArraySize = int(iota)
 )
 
 const COLOR_MASK = White
 
 const ColorMinValue = 0
 const ColorMaxValue = NoColor
-const ColorArraySize = ColorMaxValue - ColorMinValue + 1
+
+func (color Color) Inverse() Color{
+    if color == White{
+        return Black
+    }
+
+    if color == Black{
+        return White
+    }
+
+    return NoColor
+}
 
 // ColorOf tells the color of a Piece
 var ColorOf [36]Color

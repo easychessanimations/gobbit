@@ -67,6 +67,41 @@ func MakeMoveFT(fromSq, toSq Square) Move {
 	return Move(fromSq + toSq<<TO_SQUARE_SHIFT)
 }
 
-func (st State) PslmsForPieceAtSquare() {
+type MoveKind int
 
+const (
+	NoMove = MoveKind(iota)
+	Quiet
+	Violent
+)
+
+func (mk MoveKind) IsQuiet() bool {
+	return mk&Quiet != 0
+}
+
+func (mk MoveKind) IsViolent() bool {
+	return mk&Violent != 0
+}
+
+func (st State) GenBitboardMoves(sq Square, mobility Bitboard) []Move {
+	moves := []Move{}
+
+	for toSq := mobility.Pop(); toSq != 0; toSq = mobility.Pop() {
+		moves = append(moves, MakeMoveFT(sq, toSq))
+	}
+
+	return moves
+}
+
+func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard) []Move {
+	switch FigureOf[p] {
+	case Bishop:
+		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem))
+	case Rook:
+		return st.GenBitboardMoves(sq, RookMobility(kind, sq, occupUs, occupThem))
+	case Queen:
+		return st.GenBitboardMoves(sq, QueenMobility(kind, sq, occupUs, occupThem))
+	}
+
+	return []Move{}
 }
