@@ -168,18 +168,21 @@ type Wizard struct {
 	Name   string
 	Deltas []Delta
 	Tries  int
+	Magics Magics
 }
 
-var wizards = []Wizard{
+var Wizards = []Wizard{
 	{
 		Name:   "bishop",
 		Deltas: BISHOP_DELTAS,
 		Tries:  50000,
+		Magics: BISHOP_MAGICS,
 	},
 	{
 		Name:   "rook",
 		Deltas: ROOK_DELTAS,
 		Tries:  50000,
+		Magics: ROOK_MAGICS,
 	},
 }
 
@@ -204,7 +207,7 @@ func (wiz *Wizard) GenAttacks() {
 }
 
 func init() {
-	/*for _, wiz := range wizards {
+	/*for _, wiz := range Wizards {
 		wiz.GenAttacks()
 	}*/
 }
