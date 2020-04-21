@@ -311,3 +311,13 @@ func (st *State) ParsePlacementString(ps string) error {
 
 	return fmt.Errorf("too few pieces in placement string")
 }
+
+func (st State) PieceAtSquare(sq Square) Piece {
+	return st.Pieces[RankOf[sq]][FileOf[sq]]
+}
+
+func (st State) MoveLAN(move Move) string {
+	fromPiece := st.PieceAtSquare(move.FromSq())
+
+	return fromPiece.SanSymbol() + move.String()
+}
