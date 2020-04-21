@@ -40,6 +40,8 @@ func GenAttackSquares(sq Square, normFunc func(Square, Square) (Delta, bool)) ([
 		middle = ^BbBorder
 	}
 
+	middle = BbFull
+
 	bb := BbEmpty
 
 	var testSq Square
@@ -76,7 +78,39 @@ func randMagic() uint64 {
 	return r << 1
 }
 
-func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
+func SlidingAttack(sq Square, deltas []Delta, occup Bitboard) (Bitboard, []Square) {
+	bb := BbEmpty
+
+	sqs := []Square{}
+
+	for _, delta := range deltas {
+		testSq := sq
+
+		rank := RankOf[testSq] + delta.dRank
+		file := FileOf[testSq] + delta.dFile
+
+		ok := true
+
+		for rank >= 0 && rank < NUM_RANKS && file >= 0 && file < NUM_FILES && ok {
+			testSq = RankFile[rank][file]
+
+			bb |= testSq.Bitboard()
+
+			sqs = append(sqs, testSq)
+
+			rank += delta.dRank
+			file += delta.dFile
+
+			if (testSq.Bitboard() & occup) != 0 {
+				ok = false
+			}
+		}
+	}
+
+	return bb, sqs
+}
+
+func SearchMagic(sq Square, sqs []Square, deltas []Delta) (int, uint64, bool, int) {
 	Rand = rand.New(rand.NewSource(1))
 
 	var enum uint64
@@ -86,22 +120,23 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 	nodes := 0
 	for shift := 22; shift > 6; shift-- {
 		found := false
-		for loop := 0; loop < 400000; loop++ {
+		for loop := 0; loop < 5000; loop++ {
 			nodes++
 			magic := randMagic() >> 6 //+ uint64(64-shift)<<58
-			hash := make(map[uint64]uint64)
+			hash := make(map[uint64]Bitboard)
 			coll := 0
 			for enum = 0; enum < 1<<len(sqs); enum++ {
-				tr := uint64(Translate(sqs, enum))
-				key := (magic * tr) >> (64 - shift)
-				mask, foundKey := hash[key]
+				trb := Translate(sqs, enum)
+				mobility, _ := SlidingAttack(sq, deltas, trb)
+				key := (magic * uint64(trb)) >> (64 - shift)
+				storedMobility, foundKey := hash[key]
 				if foundKey {
-					if mask != tr {
+					if storedMobility != mobility {
 						coll++
 						break
 					}
 				} else {
-					hash[key] = tr
+					hash[key] = mobility
 				}
 				//fmt.Println(Translate(sqs, enum))
 				//fmt.Println()
@@ -126,33 +161,50 @@ func SearchMagic(sq Square, sqs []Square) (int, uint64, bool, int) {
 	return 0, 0, false, nodes
 }
 
-func init() {
+var BISHOP_DELTAS = []Delta{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}
+var ROOK_DELTAS = []Delta{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+
+type Wizard struct {
+	Name   string
+	Deltas []Delta
+	Tries  int
+}
+
+var wizards = []Wizard{
+	{
+		Name:   "bishop",
+		Deltas: BISHOP_DELTAS,
+		Tries:  5000,
+	},
+	{
+		Name:   "rook",
+		Deltas: ROOK_DELTAS,
+		Tries:  5000,
+	},
+}
+
+func (wiz *Wizard) GenAttacks() {
+	fmt.Println("generating attacks for", wiz.Name)
 	maxShift := 0
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
-		sqs, _ := GenAttackSquares(sq, NormalizedBishopDirection)
+		_, sqs := SlidingAttack(sq, wiz.Deltas, BbEmpty)
 		//fmt.Println(bb)
-		shift, magic, ok, nodes := SearchMagic(sq, sqs)
+		shift, magic, ok, nodes := SearchMagic(sq, sqs, wiz.Deltas)
 		if shift > maxShift {
 			maxShift = shift
 		}
 		if ok {
-			fmt.Printf("found bishop magic for %v %2d shift %2d magic %016x nodes %6d sqs %2d\n", sq, sq, shift, magic, nodes, len(sqs))
+			fmt.Printf("found %-6s magic for %v %2d shift %2d max shift %2d magic %016x nodes %6d sqs %2d\n", wiz.Name, sq, sq, shift, maxShift, magic, nodes, len(sqs))
 		} else {
-			fmt.Println("Failed", sq)
-			break
-		}
-		sqs, _ = GenAttackSquares(sq, NormalizedRookDirection)
-		//fmt.Println(bb)
-		shift, magic, ok, nodes = SearchMagic(sq, sqs)
-		if shift > maxShift {
-			maxShift = shift
-		}
-		if ok {
-			fmt.Printf("found rook   magic for %v %2d shift %2d magic %016x nodes %6d sqs %2d\n", sq, sq, shift, magic, nodes, len(sqs))
-		} else {
-			fmt.Println("Failed", sq)
+			fmt.Println("failed", wiz.Name, "at", sq)
 			break
 		}
 	}
-	fmt.Println("max shift", maxShift)
+	fmt.Println("max shift for", wiz.Name, "=", maxShift)
+}
+
+func init() {
+	for _, wiz := range wizards {
+		wiz.GenAttacks()
+	}
 }
