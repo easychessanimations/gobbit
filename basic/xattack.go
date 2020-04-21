@@ -279,6 +279,25 @@ func JumpAttack(sq Square, deltas []Delta) Bitboard {
 	return bb
 }
 
+var PawnStartRank = []Rank{6, 1}
+var PromotionRank = []Rank{0, 7}
+var PawnDir = []Rank{-1, 1}
+
+type PawnInfoItem struct {
+	CheckSq Square
+	Move    Move
+}
+
+type PawnInfo struct {
+	Dir      Rank
+	Pushes   []PawnInfoItem
+	Captures []PawnInfoItem
+}
+
+type ColorPawnInfo [2]PawnInfo
+
+var PawnInfos [BOARD_AREA]ColorPawnInfo
+
 func init() {
 	/*for _, wiz := range Wizards {
 		wiz.GenAttacks()
@@ -305,6 +324,55 @@ func init() {
 
 				KnightAttack[msq.Square] = JumpAttack(msq.Square, KNIGHT_DELTAS)
 				KingAttack[msq.Square] = JumpAttack(msq.Square, KING_DELTAS)
+
+				cpi := ColorPawnInfo{}
+
+				for color := Black; color <= White; color++ {
+					dir := PawnDir[color]
+
+					pi := PawnInfo{
+						Dir: dir,
+					}
+
+					rank := RankOf[msq.Square]
+					file := FileOf[msq.Square]
+
+					startRank := PawnStartRank[color]
+					promRank := PromotionRank[color]
+
+					if rank != promRank {
+						// pawn not on promotion rank can go forward
+						pushOneSq := RankFile[rank+dir][file]
+						pi.Pushes = append(pi.Pushes, PawnInfoItem{
+							CheckSq: pushOneSq,
+							Move:    MakeMoveFT(msq.Square, pushOneSq),
+						})
+
+						var dFile File
+						for dFile = -1; dFile <= 1; dFile++ {
+							nf := file + dFile
+							if nf >= 0 && nf < NUM_FILES {
+								captSq := RankFile[rank+dir][nf]
+								pi.Captures = append(pi.Captures, PawnInfoItem{
+									CheckSq: captSq,
+									Move:    MakeMoveFT(msq.Square, captSq),
+								})
+							}
+						}
+					}
+					if rank == startRank {
+						// pawn not on start rank can be pushed by two squares
+						pushTwoSq := RankFile[rank+2*dir][file]
+						pi.Pushes = append(pi.Pushes, PawnInfoItem{
+							CheckSq: pushTwoSq,
+							Move:    MakeMoveFT(msq.Square, pushTwoSq),
+						})
+					}
+
+					cpi[color] = pi
+				}
+
+				PawnInfos[msq.Square] = cpi
 			} else if wi == ROOK_WIZARD_INDEX {
 				RookAttack[msq.Square] = RookMobility(Violent|Quiet, msq.Square, BbEmpty, BbEmpty)
 				QueenAttack[msq.Square] = BishopAttack[msq.Square] | RookAttack[msq.Square]

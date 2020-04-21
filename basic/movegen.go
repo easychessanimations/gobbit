@@ -93,6 +93,32 @@ func (st State) GenBitboardMoves(sq Square, mobility Bitboard) []Move {
 	return moves
 }
 
+func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard) []Move {
+	pi := PawnInfos[sq][color]
+
+	moves := []Move{}
+
+	if kind&Violent != 0 {
+		for _, captInfo := range pi.Captures {
+			if (captInfo.CheckSq.Bitboard() & occupThem) != 0 {
+				moves = append(moves, captInfo.Move)
+			}
+		}
+	}
+
+	if kind&Quiet != 0 {
+		for _, pushInfo := range pi.Pushes {
+			if (pushInfo.CheckSq.Bitboard() & (occupUs | occupThem)) == 0 {
+				moves = append(moves, pushInfo.Move)
+			} else {
+				break
+			}
+		}
+	}
+
+	return moves
+}
+
 func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard) []Move {
 	switch FigureOf[p] {
 	case Bishop:
@@ -105,6 +131,8 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 		return st.GenBitboardMoves(sq, KnightMobility(kind, sq, occupUs, occupThem))
 	case King:
 		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem))
+	case Pawn:
+		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem)
 	}
 
 	return []Move{}

@@ -2,8 +2,8 @@ package basic
 
 // Delta is a square vector
 type Delta struct {
-	dRank int
-	dFile int
+	dRank Rank
+	dFile File
 }
 
 // NormalizedBishopDirection tells the normalized bishop direction from fromSq to toSq
@@ -17,7 +17,7 @@ func NormalizedBishopDirection(fromSq, toSq Square) (Delta, bool) {
 		return Delta{}, false
 	}
 
-	if dRank*dRank != dFile*dFile {
+	if dRank*dRank != Rank(dFile*dFile) {
 		// not a bishop direction
 		return Delta{}, false
 	}
@@ -69,19 +69,19 @@ func (sq Square) Bitboard() Bitboard {
 var RankFile [NUM_RANKS][NUM_FILES]Square
 
 // FileOf tells the file of a square
-var FileOf [BOARD_AREA]int
+var FileOf [BOARD_AREA]File
 
 // RankOf tells the rank of a square
-var RankOf [BOARD_AREA]int
+var RankOf [BOARD_AREA]Rank
 
 // Rank tells the rank of a square
-func (sq Square) Rank() int {
-	return int((sq & Square(RANK_MASK)) >> RANK_SHIFT_IN_BITS)
+func (sq Square) Rank() Rank {
+	return Rank((sq & Square(RANK_MASK)) >> RANK_SHIFT_IN_BITS)
 }
 
 // File tells the file of a square
-func (sq Square) File() int {
-	return int(sq & Square(FILE_MASK))
+func (sq Square) File() File {
+	return File(sq & Square(FILE_MASK))
 }
 
 // UCI tells the UCI representation of a square
@@ -103,9 +103,11 @@ func (sq Square) String() string {
 
 func init() {
 	UCIToSquare = make(map[string]Square)
-	for rank := 0; rank < NUM_RANKS; rank++ {
-		for file := 0; file < NUM_FILES; file++ {
-			sq := rank*NUM_FILES + file
+	var rank Rank
+	var file File
+	for rank = 0; rank < NUM_RANKS; rank++ {
+		for file = 0; file < NUM_FILES; file++ {
+			sq := rank*NUM_FILES + Rank(file)
 			RankFile[rank][file] = Square(sq)
 			FileOf[sq] = file
 			RankOf[sq] = rank
