@@ -343,6 +343,7 @@ func init() {
 					if rank != promRank {
 						// pawn not on promotion rank can go forward
 						pushOneSq := RankFile[rank+dir][file]
+
 						pi.Pushes = append(pi.Pushes, PawnInfoItem{
 							CheckSq: pushOneSq,
 							Move:    MakeMoveFT(msq.Square, pushOneSq),

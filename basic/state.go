@@ -55,6 +55,8 @@ type State struct {
 	DisableToSquare   Square
 	ByFigure          [FigureArraySize]Bitboard
 	ByColor           [ColorArraySize]Bitboard
+	Ply               int
+	Move              Move
 }
 
 // CastlingRights.String() reports castling rights in fen format

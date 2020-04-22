@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	. "github.com/easychessanimations/gobbit/basic"
 )
 
@@ -32,5 +30,15 @@ func main() {
 
 	fmt.Println(st.MoveLAN(m))*/
 
-	fmt.Println(st.Pslms(Violent | Quiet))
+	//fmt.Println(st.Pslms(Violent | Quiet))
+
+	pos := Position{}
+
+	pos.Init(VariantEightPiece)
+
+	//fmt.Println(pos.PrettyPrintString())
+
+	//fmt.Println(pos.Current().GenerateMoves())
+
+	pos.Perf(6)
 }
