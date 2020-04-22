@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"os"
+	"strings"
+
 	. "github.com/easychessanimations/gobbit/basic"
 )
 
@@ -40,5 +44,21 @@ func main() {
 
 	//fmt.Println(pos.Current().GenerateMoves())
 
-	pos.Perf(6)
+	//pos.Perf(6)
+
+	pos.Print()
+
+	scan := bufio.NewScanner(os.Stdin)
+
+	for scan.Scan() {
+		line := scan.Text()
+
+		command := strings.TrimSpace(line)
+
+		if command == "x" || command == "q" || command == "quit" {
+			break
+		} else {
+			pos.ExecCommand(command)
+		}
+	}
 }

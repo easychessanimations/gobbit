@@ -40,6 +40,15 @@ const (
 type ColorCastlingRights [2]bool
 type CastlingRights [2]ColorCastlingRights
 
+type MoveBuffItem struct {
+	Move Move
+	Uci  string
+	Lan  string
+	San  string
+}
+
+type MoveBuff []MoveBuffItem
+
 // State records the state of a position
 type State struct {
 	Variant           Variant
@@ -57,6 +66,7 @@ type State struct {
 	ByColor           [ColorArraySize]Bitboard
 	Ply               int
 	Move              Move
+	MoveBuff          MoveBuff
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -204,11 +214,38 @@ func (st *State) ParseTurnString(ts string) {
 	}
 }
 
+func (st *State) GenMoveBuff() {
+	st.MoveBuff = MoveBuff{}
+
+	ms := st.GenerateMoves()
+
+	for _, move := range ms {
+		st.MoveBuff = append(st.MoveBuff, MoveBuffItem{
+			Move: move,
+			Lan:  st.MoveLAN(move),
+		})
+	}
+}
+
+func (mb MoveBuff) PrettyPrintString() string {
+	buff := []string{}
+
+	for i, mbi := range mb {
+		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.Lan))
+	}
+
+	return strings.Join(buff, " ")
+}
+
 // PrettyPrintString returns the state pretty print string
 func (st State) PrettyPrintString() string {
 	buff := st.PrettyPlacementString()
 
-	buff += "\n" + VariantInfos[st.Variant].DisplayName + " : " + st.ReportFen()
+	buff += "\n" + VariantInfos[st.Variant].DisplayName + " : " + st.ReportFen() + "\n"
+
+	st.GenMoveBuff()
+
+	buff += "\n" + st.MoveBuff.PrettyPrintString()
 
 	return buff
 }

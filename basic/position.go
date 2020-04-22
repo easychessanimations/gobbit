@@ -113,3 +113,31 @@ func (pos *Position) Perf(depth int) {
 
 	fmt.Println(elapsed, pos.Nodes)
 }
+
+func (pos *Position) Print() {
+	fmt.Println(pos.PrettyPrintString())
+}
+
+func (pos *Position) ExecCommand(command string) {
+	t := Tokenizer{command}
+	i := t.GetInt()
+
+	pos.Current().GenMoveBuff()
+
+	mb := pos.Current().MoveBuff
+
+	if i != 0 {
+		i--
+		if i < len(mb) {
+			pos.Push(mb[i].Move)
+			pos.Print()
+		}
+	} else if command == "d" {
+		if pos.StatePtr > 0 {
+			pos.Pop()
+			pos.Print()
+		} else {
+			fmt.Println("warning : no move to delete")
+		}
+	}
+}
