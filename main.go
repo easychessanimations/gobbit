@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 
@@ -46,6 +47,8 @@ func main() {
 
 	//pos.Perf(6)
 
+	//fmt.Println(PieceMaterialTablesString())
+
 	pos.Print()
 
 	scan := bufio.NewScanner(os.Stdin)
@@ -57,6 +60,12 @@ func main() {
 
 		if command == "x" || command == "q" || command == "quit" {
 			break
+		} else if command == "h" || command == "help" {
+			fmt.Println("h, help = help")
+			fmt.Println("x, q, quit = quit")
+			fmt.Println("pmt = print material table")
+		} else if command == "pmt" {
+			fmt.Println(PieceMaterialTablesString())
 		} else {
 			pos.ExecCommand(command)
 		}
