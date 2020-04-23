@@ -67,6 +67,7 @@ type State struct {
 	Ply               int
 	Move              Move
 	MoveBuff          MoveBuff
+	Material          [ColorArraySize]Accum
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -237,11 +238,20 @@ func (mb MoveBuff) PrettyPrintString() string {
 	return strings.Join(buff, " ")
 }
 
+func (st State) MaterialPOV() Accum {
+	if st.Turn == White {
+		return st.Material[NoColor]
+	}
+	return st.Material[NoColor].Mult(-1)
+}
+
 // PrettyPrintString returns the state pretty print string
 func (st State) PrettyPrintString() string {
 	buff := st.PrettyPlacementString()
 
 	buff += "\n" + VariantInfos[st.Variant].DisplayName + " : " + st.ReportFen() + "\n"
+
+	buff += fmt.Sprintf("\nMaterial White %v , Black %v , Balance %v , POV %v\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV())
 
 	st.GenMoveBuff()
 
@@ -342,7 +352,7 @@ func (st *State) ParsePlacementString(ps string) error {
 					rank--
 				}
 				if rank < 0 {
-					st.CalculateOccupancy()
+					st.CalculateOccupancyAndMaterial()
 
 					return nil
 				}
@@ -365,9 +375,12 @@ func (st State) MoveLAN(move Move) string {
 	return fromPiece.SanSymbol() + move.String()
 }
 
-func (st *State) CalculateOccupancy() {
+func (st *State) CalculateOccupancyAndMaterial() {
 	st.ByFigure = [FigureArraySize]Bitboard{}
 	st.ByColor = [ColorArraySize]Bitboard{}
+
+	st.Material[White] = Accum{}
+	st.Material[Black] = Accum{}
 
 	for sq := SquareMinValue; sq <= SquareMaxValue; sq++ {
 		bb := sq.Bitboard()
@@ -381,8 +394,16 @@ func (st *State) CalculateOccupancy() {
 
 			st.ByFigure[fig] |= bb
 			st.ByColor[col] |= bb
+
+			p := ColorFigure[col][fig]
+
+			mat := GetMaterialForPieceAtSquare(p, sq)
+
+			st.Material[col].Merge(mat)
 		}
 	}
+
+	st.Material[NoColor] = st.Material[White].Sub(st.Material[Black])
 }
 
 func (st State) OccupUs() Bitboard {

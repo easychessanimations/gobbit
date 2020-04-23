@@ -12,6 +12,24 @@ type Accum struct {
 	E Score
 }
 
+func (acc *Accum) Merge(otherAcc Accum) {
+	acc.M += otherAcc.M
+	acc.E += otherAcc.E
+}
+
+func (acc *Accum) UnMerge(otherAcc Accum) {
+	acc.M -= otherAcc.M
+	acc.E -= otherAcc.E
+}
+
+func (acc Accum) Sub(otherAcc Accum) Accum {
+	return Accum{acc.M - otherAcc.M, acc.E - otherAcc.E}
+}
+
+func (acc Accum) Mult(s Score) Accum {
+	return Accum{acc.M * s, acc.E * s}
+}
+
 func (acc Accum) String() string {
 	return fmt.Sprintf("M %3d E %3d", acc.M, acc.E)
 }
@@ -76,6 +94,10 @@ func PieceMaterialTablesString() string {
 }
 
 const NUM_LANCER_DIRECTIONS = 8
+
+func GetMaterialForPieceAtSquare(p Piece, sq Square) Accum {
+	return PieceMaterialTables[p][sq]
+}
 
 func init() {
 	for color := Black; color <= White; color++ {

@@ -29,6 +29,10 @@ func (pos Position) PrettyPrintString() string {
 	return buff
 }
 
+func (st *State) UpdateMaterialBalance() {
+	st.Material[NoColor] = st.Material[White].Sub(st.Material[Black])
+}
+
 func (st *State) Put(p Piece, sq Square) {
 	if p == NoPiece {
 		return
@@ -38,9 +42,17 @@ func (st *State) Put(p Piece, sq Square) {
 
 	sqbb := sq.Bitboard()
 
-	st.ByColor[ColorOf[p]] |= sqbb
+	color := ColorOf[p]
+
+	st.ByColor[color] |= sqbb
 
 	st.ByFigure[FigureOf[p]] |= sqbb
+
+	mat := PieceMaterialTables[p][sq]
+
+	st.Material[color].Merge(mat)
+
+	st.UpdateMaterialBalance()
 }
 
 func (st *State) Remove(sq Square) {
@@ -48,11 +60,19 @@ func (st *State) Remove(sq Square) {
 
 	p := st.PieceAtSquare(sq)
 
+	color := ColorOf[p]
+
 	sqbb := sq.Bitboard()
 
-	st.ByColor[ColorOf[p]] &^= sqbb
+	st.ByColor[color] &^= sqbb
 
 	st.ByFigure[FigureOf[p]] &^= sqbb
+
+	mat := PieceMaterialTables[p][sq]
+
+	st.Material[color].UnMerge(mat)
+
+	st.UpdateMaterialBalance()
 }
 
 func (st *State) MakeMove(move Move) {
