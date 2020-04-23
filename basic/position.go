@@ -80,7 +80,11 @@ func (st *State) MakeMove(move Move) {
 
 	st.Remove(move.FromSq())
 
-	st.Put(p, move.ToSq())
+	if move.MoveType() == Promotion {
+		st.Put(move.PromotionPiece(), move.ToSq())
+	} else {
+		st.Put(p, move.ToSq())
+	}
 
 	st.Move = move
 
@@ -131,7 +135,7 @@ func (pos *Position) Perf(depth int) {
 
 	elapsed := time.Now().Sub(start)
 
-	fmt.Println(elapsed, pos.Nodes)
+	fmt.Printf("elapsed %v , nodes %v , nps %.3f Mn/s\n", elapsed, pos.Nodes, float32(pos.Nodes)/(float32(elapsed)/1e9)/1e6)
 }
 
 func (pos *Position) Print() {
@@ -159,5 +163,7 @@ func (pos *Position) ExecCommand(command string) {
 		} else {
 			fmt.Println("warning : no move to delete")
 		}
+	} else if command == "perf" {
+		pos.Perf(4)
 	}
 }

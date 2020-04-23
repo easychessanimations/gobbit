@@ -165,6 +165,7 @@ var BISHOP_DELTAS = []Delta{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}
 var ROOK_DELTAS = []Delta{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
 var KNIGHT_DELTAS = []Delta{{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}}
 var KING_DELTAS = append(BISHOP_DELTAS, ROOK_DELTAS...)
+var LANCER_DELTAS = []Delta{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}
 
 type Wizard struct {
 	Name   string
@@ -242,6 +243,14 @@ func QueenMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboa
 	return BishopMobility(kind, sq, occupUs, occupThem) | RookMobility(kind, sq, occupUs, occupThem)
 }
 
+func LancerMobility(kind MoveKind, ld int, sq Square, occupUs, occupThem Bitboard) Bitboard {
+	attack := QueenMobility(kind, sq, BbEmpty, occupThem) & LancerAttack[sq][ld]
+	if !kind.IsViolent() {
+		attack &^= occupThem
+	}
+	return attack &^ occupUs
+}
+
 func KnightMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboard {
 	attack := KnightAttack[sq]
 	if !kind.IsViolent() {
@@ -263,6 +272,7 @@ var RookAttack [BOARD_AREA]Bitboard
 var QueenAttack [BOARD_AREA]Bitboard
 var KnightAttack [BOARD_AREA]Bitboard
 var KingAttack [BOARD_AREA]Bitboard
+var LancerAttack [BOARD_AREA][NUM_LANCER_DIRECTIONS]Bitboard
 
 func JumpAttack(sq Square, deltas []Delta) Bitboard {
 	bb := BbEmpty
@@ -324,6 +334,12 @@ func init() {
 
 				KnightAttack[msq.Square] = JumpAttack(msq.Square, KNIGHT_DELTAS)
 				KingAttack[msq.Square] = JumpAttack(msq.Square, KING_DELTAS)
+
+				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
+					deltas := []Delta{LANCER_DELTAS[ld]}
+					bb, _ := SlidingAttack(msq.Square, deltas, BbEmpty)
+					LancerAttack[msq.Square][ld] = bb
+				}
 
 				cpi := ColorPawnInfo{}
 

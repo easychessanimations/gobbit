@@ -6,6 +6,7 @@ type MoveType uint8
 
 const (
 	Normal = MoveType(iota)
+	Promotion
 )
 
 const SQUARE_MASK = (1 << SQUARE_STORAGE_SIZE_IN_BITS) - 1
@@ -67,6 +68,10 @@ func MakeMoveFT(fromSq, toSq Square) Move {
 	return Move(fromSq + toSq<<TO_SQUARE_SHIFT)
 }
 
+func MakeMoveFTP(fromSq, toSq Square, pp Piece) Move {
+	return Move(fromSq) + Move(toSq)<<TO_SQUARE_SHIFT + Move(pp)<<PROMOTION_PIECE_SHIFT + Move(Promotion)<<MOVE_TYPE_SHIFT
+}
+
 type MoveKind int
 
 const (
@@ -88,6 +93,26 @@ func (st State) GenBitboardMoves(sq Square, mobility Bitboard) []Move {
 
 	for toSq := mobility.Pop(); toSq != 0; toSq = mobility.Pop() {
 		moves = append(moves, MakeMoveFT(sq, toSq))
+	}
+
+	return moves
+}
+
+func MakeLancer(color Color, ld int) Piece {
+	return ColorFigure[color][LancerMinValue+Figure(ld)]
+}
+
+func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDir bool) []Move {
+	moves := []Move{}
+
+	for toSq := mobility.Pop(); toSq != 0; toSq = mobility.Pop() {
+		if keepDir {
+			moves = append(moves, MakeMoveFTP(sq, toSq, st.PieceAtSquare(sq)))
+		} else {
+			for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
+				moves = append(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)))
+			}
+		}
 	}
 
 	return moves
@@ -119,6 +144,10 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	return moves
 }
 
+func (l Piece) LancerDirection() int {
+	return int(FigureOf[l]) & LANCER_DIRECTION_MASK
+}
+
 func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard) []Move {
 	switch FigureOf[p] {
 	case Bishop:
@@ -133,6 +162,12 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem))
 	case Pawn:
 		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem)
+	case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
+		return st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false)
+	case Sentry:
+		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem))
+	case Jailer:
+		return st.GenBitboardMoves(sq, BishopMobility(kind&^Violent, sq, occupUs, occupThem))
 	}
 
 	return []Move{}

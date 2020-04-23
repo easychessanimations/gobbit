@@ -369,10 +369,28 @@ func (st State) PieceAtSquare(sq Square) Piece {
 	return st.Pieces[RankOf[sq]][FileOf[sq]]
 }
 
+func (st State) IsCapture(move Move) bool {
+	return st.PieceAtSquare(move.ToSq()) != NoPiece
+}
+
 func (st State) MoveLAN(move Move) string {
 	fromPiece := st.PieceAtSquare(move.FromSq())
 
-	return fromPiece.SanSymbol() + move.String()
+	buff := fromPiece.SanLetter() + move.FromSq().UCI()
+
+	if st.IsCapture(move) {
+		buff += "x"
+	} else {
+		buff += "-"
+	}
+
+	buff += move.ToSq().UCI()
+
+	if move.MoveType() == Promotion {
+		buff += "=" + move.PromotionPiece().SanSymbol()
+	}
+
+	return buff
 }
 
 func (st *State) CalculateOccupancyAndMaterial() {
