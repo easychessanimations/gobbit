@@ -66,6 +66,10 @@ func main() {
 			fmt.Println("pmt = print material table")
 		} else if command == "pmt" {
 			fmt.Println(PieceMaterialTablesString())
+		} else if command == "g" {
+			go pos.Search(5)
+		} else if command == "s" {
+			pos.SearchStopped = true
 		} else {
 			pos.ExecCommand(command)
 		}

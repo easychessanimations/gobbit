@@ -64,6 +64,16 @@ func (move Move) String() string {
 	return buff
 }
 
+func (move Move) UCI() string {
+	buff := move.FromSq().UCI() + move.ToSq().UCI()
+
+	if move.MoveType() == Promotion {
+		buff += SymbolOf[FigureOf[move.PromotionPiece()]]
+	}
+
+	return buff
+}
+
 func MakeMoveFT(fromSq, toSq Square) Move {
 	return Move(fromSq + toSq<<TO_SQUARE_SHIFT)
 }

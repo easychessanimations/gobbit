@@ -49,6 +49,11 @@ type MoveBuffItem struct {
 
 type MoveBuff []MoveBuffItem
 
+type KingInfo struct {
+	IsCaptured bool
+	Square     Square
+}
+
 // State records the state of a position
 type State struct {
 	Variant           Variant
@@ -68,6 +73,7 @@ type State struct {
 	MoveBuff          MoveBuff
 	Material          [ColorArraySize]Accum
 	Zobrist           uint64
+	KingInfos         [ColorArraySize]KingInfo
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -200,6 +206,7 @@ func (st *State) ParseCastlingRights(crs string) {
 	t.Init(crs)
 
 	st.CastlingRights = t.GetCastlingRights()
+	// TODO: Zobrist
 }
 
 func (st *State) ParseTurnString(ts string) {
@@ -251,7 +258,7 @@ func (st State) PrettyPrintString() string {
 
 	buff += fmt.Sprintf("\n%s : %s : %16X\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist)
 
-	buff += fmt.Sprintf("\nMaterial White %v , Black %v , Balance %v , POV %v\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV())
+	buff += fmt.Sprintf("\nWhite %v , Black %v , Balance %v , POV %v , Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
 
 	st.GenMoveBuff()
 
@@ -342,10 +349,20 @@ func (st *State) ParsePlacementString(ps string) error {
 	rank := LAST_RANK
 	file := 0
 
+	st.Zobrist = 0
+
+	for color := Black; color <= White; color++ {
+		st.KingInfos[color] = KingInfo{
+			IsCaptured: true,
+			Square:     SquareA1,
+		}
+	}
+
 	for ps := t.GetFenPiece(); len(ps) > 0; {
 		if len(ps) > 0 {
 			for _, p := range ps {
-				st.Pieces[rank][file] = p
+				sq := RankFile[rank][file]
+				st.Put(p, sq)
 				file++
 				if file > LAST_FILE {
 					file = 0

@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const INITIAL_MATERIAL = 2 * 4220
+
 type Castle uint
 
 const (
@@ -147,6 +149,7 @@ func (acc Accum) String() string {
 }
 
 var PAWN_VALUE = Accum{100, 120}
+var CENTER_PAWN_VALUE = Accum{150, 120}
 var KNIGHT_VALUE = Accum{300, 300}
 var BISHOP_VALUE = Accum{300, 320}
 var ROOK_VALUE = Accum{500, 520}
@@ -219,6 +222,10 @@ func init() {
 			switch fig {
 			case Pawn:
 				mt.Fill(PAWN_VALUE)
+				mt[SquareE4] = CENTER_PAWN_VALUE
+				mt[SquareE5] = CENTER_PAWN_VALUE
+				mt[SquareD4] = CENTER_PAWN_VALUE
+				mt[SquareD5] = CENTER_PAWN_VALUE
 				PieceMaterialTables[p] = mt.POV(color)
 				break
 			case Knight:

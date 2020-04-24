@@ -8,9 +8,10 @@ import (
 const MAX_STATES = 100
 
 type Position struct {
-	States   [MAX_STATES]State
-	StatePtr int
-	Nodes    int
+	States        [MAX_STATES]State
+	StatePtr      int
+	Nodes         int
+	SearchStopped bool
 }
 
 func (pos *Position) Current() *State {
@@ -55,12 +56,23 @@ func (st *State) Put(p Piece, sq Square) {
 	st.UpdateMaterialBalance()
 
 	st.Zobrist ^= zobristPiece[p][sq]
+
+	if FigureOf[p] == King {
+		st.KingInfos[ColorOf[p]] = KingInfo{
+			IsCaptured: false,
+			Square:     sq,
+		}
+	}
 }
 
 func (st *State) Remove(sq Square) {
-	st.Pieces[RankOf[sq]][FileOf[sq]] = NoPiece
+	if st.Pieces[RankOf[sq]][FileOf[sq]] == NoPiece {
+		return
+	}
 
 	p := st.PieceAtSquare(sq)
+
+	st.Pieces[RankOf[sq]][FileOf[sq]] = NoPiece
 
 	color := ColorOf[p]
 
@@ -77,12 +89,34 @@ func (st *State) Remove(sq Square) {
 	st.UpdateMaterialBalance()
 
 	st.Zobrist ^= zobristPiece[p][sq]
+
+	if FigureOf[p] == King {
+		st.KingInfos[ColorOf[p]] = KingInfo{
+			IsCaptured: true,
+			Square:     SquareA1,
+		}
+	}
+}
+
+const INFINITE_SCORE = Score(20000)
+const MATE_SCORE = Score(10000)
+
+func (pos Position) GameEnd() (bool, Score) {
+	st := pos.Current()
+
+	if st.KingInfos[st.Turn].IsCaptured {
+		return true, -MATE_SCORE + Score(st.Ply)
+	}
+
+	return false, 0
 }
 
 func (st *State) MakeMove(move Move) {
 	p := st.PieceAtSquare(move.FromSq())
 
 	st.Remove(move.FromSq())
+
+	st.Remove(move.ToSq())
 
 	if move.MoveType() == Promotion {
 		st.Put(move.PromotionPiece(), move.ToSq())
