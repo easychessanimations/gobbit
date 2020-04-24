@@ -55,7 +55,6 @@ type State struct {
 	Pieces            [NUM_RANKS][NUM_FILES]Piece
 	Turn              Color
 	CastlingRights    CastlingRights
-	EnPassantSquare   Square
 	EpSquare          Square
 	HalfmoveClock     int
 	FullmoveNumber    int
@@ -68,6 +67,7 @@ type State struct {
 	Move              Move
 	MoveBuff          MoveBuff
 	Material          [ColorArraySize]Accum
+	Zobrist           uint64
 }
 
 // CastlingRights.String() reports castling rights in fen format
@@ -137,7 +137,7 @@ func (st *State) ParseFen(fen string) error {
 	}
 
 	if len(fenParts) > 3 {
-		st.ParseEnPassantSquare(fenParts[3])
+		st.ParseEpSquare(fenParts[3])
 	}
 
 	if len(fenParts) > 4 {
@@ -177,10 +177,10 @@ func (st *State) ParseDisabledMove(dms string) {
 	}
 }
 
-func (st *State) ParseEnPassantSquare(epsqs string) {
+func (st *State) ParseEpSquare(epsqs string) {
 	t := Tokenizer{}
 	t.Init(epsqs)
-	st.EnPassantSquare = t.GetSquare()
+	st.SetEpSquare(t.GetSquare())
 }
 
 func (st *State) ParseHalfmoveClock(hmcs string) {
@@ -208,10 +208,10 @@ func (st *State) ParseTurnString(ts string) {
 
 	color := t.GetColor()
 
-	st.Turn = White
+	st.SetSideToMove(White)
 
 	if color != NoColor {
-		st.Turn = color
+		st.SetSideToMove(color)
 	}
 }
 
@@ -249,7 +249,7 @@ func (st State) MaterialPOV() Accum {
 func (st State) PrettyPrintString() string {
 	buff := st.PrettyPlacementString()
 
-	buff += "\n" + VariantInfos[st.Variant].DisplayName + " : " + st.ReportFen() + "\n"
+	buff += fmt.Sprintf("\n%s : %s : %16X\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist)
 
 	buff += fmt.Sprintf("\nMaterial White %v , Black %v , Balance %v , POV %v\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV())
 
@@ -293,10 +293,10 @@ func (st State) ReportFen() string {
 
 	buff += " " + st.CastlingRights.String()
 
-	if st.EnPassantSquare == SquareA1 {
+	if st.EpSquare == SquareA1 {
 		buff += " -"
 	} else {
-		buff += " " + st.EnPassantSquare.UCI()
+		buff += " " + st.EpSquare.UCI()
 	}
 
 	buff += " " + fmt.Sprintf("%d", st.HalfmoveClock)

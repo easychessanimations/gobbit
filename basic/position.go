@@ -53,6 +53,8 @@ func (st *State) Put(p Piece, sq Square) {
 	st.Material[color].Merge(mat)
 
 	st.UpdateMaterialBalance()
+
+	st.Zobrist ^= zobristPiece[p][sq]
 }
 
 func (st *State) Remove(sq Square) {
@@ -73,6 +75,8 @@ func (st *State) Remove(sq Square) {
 	st.Material[color].UnMerge(mat)
 
 	st.UpdateMaterialBalance()
+
+	st.Zobrist ^= zobristPiece[p][sq]
 }
 
 func (st *State) MakeMove(move Move) {
@@ -90,7 +94,7 @@ func (st *State) MakeMove(move Move) {
 
 	st.Ply++
 
-	st.Turn = st.Turn.Inverse()
+	st.SetSideToMove(st.Turn.Inverse())
 
 	if st.Turn == White {
 		st.FullmoveNumber++
