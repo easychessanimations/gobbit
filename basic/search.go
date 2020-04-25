@@ -36,7 +36,7 @@ func (st State) Score() Score {
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
-	end, score := pos.GameEnd()
+	end, score := pos.GameEnd(abi.CurrentDepth)
 
 	if end {
 		// if game ended, return final score
@@ -126,9 +126,9 @@ func (pos Position) GetPvRec(depthRemaining int, pvSoFar []Move) []Move {
 }
 
 func (pos Position) GetPv(maxDepth int) []Move {
-	pos.StatePtr = 0
+	oldStatePtr := pos.StatePtr
 	pv := pos.GetPvRec(maxDepth, []Move{})
-	pos.StatePtr = 0
+	pos.StatePtr = oldStatePtr
 	return pv
 }
 
@@ -148,6 +148,12 @@ func (pos *Position) PrintBestMove(pv []Move) {
 
 var lastGoodPv []Move
 
+func PrintPvTable() {
+	for zobrist, move := range PvTable {
+		fmt.Printf("%016X %s\n", zobrist, move.UCI())
+	}
+}
+
 func (pos *Position) Search(maxDepth int) {
 	PvTable = make(map[uint64]Move)
 
@@ -164,6 +170,10 @@ func (pos *Position) Search(maxDepth int) {
 		if pos.SearchStopped {
 			pos.PrintBestMove(lastGoodPv)
 			return
+		}
+
+		if depth <= 2 {
+			PrintPvTable()
 		}
 
 		lastGoodPv = pos.GetPv(depth)

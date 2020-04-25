@@ -233,13 +233,18 @@ func (st *State) GenMoveBuff() {
 			Lan:  st.MoveLAN(move),
 		})
 	}
+
+	for i, mbi := range st.MoveBuff {
+		mbi.San = st.MoveToSanBatch(mbi.Move)
+		st.MoveBuff[i] = mbi
+	}
 }
 
 func (mb MoveBuff) PrettyPrintString() string {
 	buff := []string{}
 
 	for i, mbi := range mb {
-		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.Lan))
+		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.San))
 	}
 
 	return strings.Join(buff, " ")
@@ -447,4 +452,70 @@ func (st State) OccupUs() Bitboard {
 
 func (st State) OccupThem() Bitboard {
 	return st.ByColor[st.Turn.Inverse()]
+}
+
+func (st State) MoveToSanBatch(move Move) string {
+	p := st.PieceAtSquare(move.FromSq())
+
+	sanLetter := p.SanLetter()
+
+	orig := move.FromSq().UCI()
+
+	sameRank := false
+	sameFile := false
+	ambig := false
+
+	for _, mbi := range st.MoveBuff {
+		if mbi.Move != move {
+			fromSq := mbi.Move.FromSq()
+			if st.PieceAtSquare(fromSq) == p && mbi.Move.ToSq() == move.ToSq() {
+				ambig = true
+				if FileOf[fromSq] == FileOf[move.FromSq()] {
+					sameFile = true
+				}
+				if RankOf[fromSq] == RankOf[move.FromSq()] {
+					sameRank = true
+				}
+			}
+		}
+	}
+
+	if FigureOf[p] == Pawn {
+		orig = orig[0:1]
+		sanLetter = ""
+	} else if ambig {
+		if sameRank && sameFile {
+			// do nothing, orig already has both rank and file
+		} else if sameFile {
+			// differentiate by rank
+			orig = orig[1:2]
+		} else {
+			// default is differentiate by file
+			orig = orig[0:1]
+		}
+	} else {
+		orig = ""
+	}
+
+	dest := move.ToSq().UCI()
+
+	takes := ""
+
+	if st.IsCapture(move) {
+		takes = "x"
+	} else {
+		if FigureOf[p] == Pawn {
+			orig = ""
+		}
+	}
+
+	prom := ""
+
+	if move.MoveType() == Promotion {
+		prom = "=" + move.PromotionPiece().SanSymbol()
+	}
+
+	check := ""
+
+	return sanLetter + orig + takes + dest + prom + check
 }

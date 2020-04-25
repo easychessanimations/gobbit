@@ -101,11 +101,11 @@ func (st *State) Remove(sq Square) {
 const INFINITE_SCORE = Score(20000)
 const MATE_SCORE = Score(10000)
 
-func (pos Position) GameEnd() (bool, Score) {
+func (pos Position) GameEnd(ply int) (bool, Score) {
 	st := pos.Current()
 
 	if st.KingInfos[st.Turn].IsCaptured {
-		return true, -MATE_SCORE + Score(st.Ply)
+		return true, -MATE_SCORE + Score(ply)
 	}
 
 	return false, 0
@@ -193,6 +193,8 @@ func (pos *Position) ExecCommand(command string) {
 		if i < len(mb) {
 			pos.Push(mb[i].Move)
 			pos.Print()
+		} else {
+			fmt.Println("warning : move index out of range")
 		}
 	} else if command == "d" {
 		if pos.StatePtr > 0 {
@@ -203,5 +205,18 @@ func (pos *Position) ExecCommand(command string) {
 		}
 	} else if command == "perf" {
 		pos.Perf(4)
+	} else {
+		found := false
+		for _, mbi := range pos.Current().MoveBuff {
+			if mbi.San == command {
+				found = true
+				pos.Push(mbi.Move)
+				pos.Print()
+				break
+			}
+		}
+		if !found {
+			fmt.Println("warning : unknown command or illegal move")
+		}
 	}
 }
