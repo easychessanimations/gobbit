@@ -14,7 +14,9 @@ func main() {
 
 	//pos.Init(VariantEightPiece)
 
-	pos.Init(VariantStandard)
+	//pos.Init(VariantStandard)
+	
+	pos.Init(VariantEightPiece)
 
 	//pos.Current().ParseFen("k7/P7/8/K7/8/8/8/8 w KQkq - 0 1")
 
@@ -33,7 +35,7 @@ func main() {
 			fmt.Println("h, help = help")
 			fmt.Println("x, q, quit = quit")
 			fmt.Println("pmt = print material table")
-			fmt.Println("g = go depth 5")
+			fmt.Println("g = go depth 6")
 			fmt.Println("s = stop")
 			fmt.Println("d = del")
 			fmt.Println("f = forward")
@@ -41,7 +43,7 @@ func main() {
 		} else if command == "pmt" {
 			fmt.Println(PieceMaterialTablesString())
 		} else if command == "g" {
-			go pos.Search(5)
+			go pos.Search(6)
 		} else if command == "s" {
 			pos.SearchStopped = true
 		} else if command == "r" {

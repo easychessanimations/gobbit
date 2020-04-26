@@ -33,6 +33,8 @@ func (st State) Score() Score {
 	return Score(scoref)
 }
 
+const ALLOW_FAIL_SOFT = true
+
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -65,6 +67,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 		ms = newMs
 	}
+	
+	bestScore := -INFINITE_SCORE
 
 	for _, move := range ms {
 		pos.Push(move)
@@ -82,6 +86,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			// beta cut
 			return abi.Beta
 		}
+		
+		if score > bestScore{
+			bestScore = score
+		}
 
 		if score > abi.Alpha {
 			// alpha improvement
@@ -90,7 +98,11 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 		}
 	}
 
-	return abi.Alpha
+	if ALLOW_FAIL_SOFT{
+		return bestScore
+	}else{
+		return abi.Alpha
+	}	
 }
 
 func (pos *Position) AlphaBeta(maxDepth int) Score {
