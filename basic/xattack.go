@@ -273,6 +273,7 @@ var QueenAttack [BOARD_AREA]Bitboard
 var KnightAttack [BOARD_AREA]Bitboard
 var KingAttack [BOARD_AREA]Bitboard
 var LancerAttack [BOARD_AREA][NUM_LANCER_DIRECTIONS]Bitboard
+var JailerAdjacent [BOARD_AREA]Bitboard
 
 func JumpAttack(sq Square, deltas []Delta) Bitboard {
 	bb := BbEmpty
@@ -334,6 +335,8 @@ func init() {
 
 				KnightAttack[msq.Square] = JumpAttack(msq.Square, KNIGHT_DELTAS)
 				KingAttack[msq.Square] = JumpAttack(msq.Square, KING_DELTAS)
+
+				JailerAdjacent[msq.Square] = JumpAttack(msq.Square, ROOK_DELTAS)
 
 				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
 					deltas := []Delta{LANCER_DELTAS[ld]}

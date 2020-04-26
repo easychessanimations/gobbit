@@ -1,5 +1,7 @@
 package basic
 
+//import "fmt"
+
 type Move uint32
 
 type MoveType uint8
@@ -98,11 +100,29 @@ func (mk MoveKind) IsViolent() bool {
 	return mk&Violent != 0
 }
 
-func (st State) GenBitboardMoves(sq Square, mobility Bitboard) []Move {
+func (st State) IsSquareJailedForColor(sq Square, color Color) bool{
+	ja := JailerAdjacent[sq]
+
+	if (st.ByFigure[Jailer] & st.ByColor[color.Inverse()] & ja) != 0{
+		return true
+	}
+
+	return false
+}
+
+func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
+	if jailColor == NoColor || !st.IsSquareJailedForColor(move.FromSq(), jailColor){
+		return append(moves, move)
+	}
+
+	return moves
+}
+
+func (st State) GenBitboardMoves(sq Square, mobility Bitboard, jailColor Color) []Move {	
 	moves := []Move{}
 
-	for toSq := mobility.Pop(); toSq != 0; toSq = mobility.Pop() {
-		moves = append(moves, MakeMoveFT(sq, toSq))
+	for _, toSq := range mobility.PopAll() {
+		moves = st.AppendMove(moves, MakeMoveFT(sq, toSq), jailColor)
 	}
 
 	return moves
@@ -112,15 +132,15 @@ func MakeLancer(color Color, ld int) Piece {
 	return ColorFigure[color][LancerMinValue+Figure(ld)]
 }
 
-func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDir bool) []Move {
+func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDir bool, jailColor Color) []Move {
 	moves := []Move{}
 
-	for toSq := mobility.Pop(); toSq != 0; toSq = mobility.Pop() {
+	for _, toSq := range mobility.PopAll() {
 		if keepDir {
-			moves = append(moves, MakeMoveFTP(sq, toSq, st.PieceAtSquare(sq)))
+			moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, st.PieceAtSquare(sq)), jailColor)
 		} else {
 			for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
-				moves = append(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)))
+				moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)), jailColor)
 			}
 		}
 	}
@@ -128,7 +148,7 @@ func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDi
 	return moves
 }
 
-func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard) []Move {
+func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move {
 	pi := PawnInfos[sq][color]
 
 	moves := []Move{}
@@ -136,7 +156,7 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	if kind&Violent != 0 {
 		for _, captInfo := range pi.Captures {
 			if (captInfo.CheckSq.Bitboard() & occupThem) != 0 {
-				moves = append(moves, captInfo.Move)
+				moves = st.AppendMove(moves, captInfo.Move, jailColor)
 			}
 		}
 	}
@@ -144,7 +164,7 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	if kind&Quiet != 0 {
 		for _, pushInfo := range pi.Pushes {
 			if (pushInfo.CheckSq.Bitboard() & (occupUs | occupThem)) == 0 {
-				moves = append(moves, pushInfo.Move)
+				moves = st.AppendMove(moves, pushInfo.Move, jailColor)
 			} else {
 				break
 			}
@@ -158,26 +178,26 @@ func (l Piece) LancerDirection() int {
 	return int(FigureOf[l]) & LANCER_DIRECTION_MASK
 }
 
-func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard) []Move {
+func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move {
 	switch FigureOf[p] {
 	case Bishop:
-		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Rook:
-		return st.GenBitboardMoves(sq, RookMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, RookMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Queen:
-		return st.GenBitboardMoves(sq, QueenMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, QueenMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Knight:
-		return st.GenBitboardMoves(sq, KnightMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, KnightMobility(kind, sq, occupUs, occupThem), jailColor)
 	case King:
-		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Pawn:
-		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem)
+		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor)
 	case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
-		return st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false)
+		return st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false, jailColor)
 	case Sentry:
-		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Jailer:
-		return st.GenBitboardMoves(sq, BishopMobility(kind&^Violent, sq, occupUs, occupThem))
+		return st.GenBitboardMoves(sq, RookMobility(kind&^Violent, sq, occupUs, occupThem), jailColor)
 	}
 
 	return []Move{}
@@ -191,16 +211,10 @@ func (st State) PslmsForColor(kind MoveKind, color Color) []Move {
 
 	usbb := us
 
-	ok := usbb != 0
-
-	for ok {
-		sq := usbb.Pop()
-
+	for _, sq := range usbb.PopAll() {
 		p := st.PieceAtSquare(sq)
 
-		moves = append(moves, st.PslmsForPieceAtSquare(kind, p, sq, us, them)...)
-
-		ok = usbb != 0
+		moves = append(moves, st.PslmsForPieceAtSquare(kind, p, sq, us, them, color)...)
 	}
 
 	return moves

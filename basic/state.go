@@ -558,7 +558,15 @@ func (st State) IsChecked(color Color) bool {
 		fig := FigureOf[p]
 
 		if col == color.Inverse() {
-			if fig == Bishop || fig == Rook || fig == Queen {
+			if fig == Queen {
+				return true
+			}
+			_, isBishopDirection := NormalizedBishopDirection(wk, sq)
+			if fig == Bishop && isBishopDirection{
+				return true
+			}
+			_, isRookDirection := NormalizedRookDirection(wk, sq)
+			if fig == Rook && isRookDirection{
 				return true
 			}
 		}
