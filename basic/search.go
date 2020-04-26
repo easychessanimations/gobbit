@@ -172,10 +172,6 @@ func (pos *Position) Search(maxDepth int) {
 			return
 		}
 
-		if depth <= 2 {
-			PrintPvTable()
-		}
-
 		lastGoodPv = pos.GetPv(depth)
 
 		elapsed := float32(time.Now().Sub(start)) / 1e9
