@@ -44,7 +44,7 @@ func (pos Position) Line() string {
 func (pos Position) PrettyPrintString() string {
 	buff := pos.Current().PrettyPrintString()
 
-	buff += fmt.Sprintf("\n\nLine : %s\n", pos.Line())
+	buff += fmt.Sprintf("\n\nLine ( %d ) : %s\n", pos.StatePtr, pos.Line())
 
 	return buff
 }
@@ -159,7 +159,7 @@ func (pos *Position) Push(move Move) {
 
 	pos.StatePtr++
 
-	if pos.StatePtr > pos.MaxStatePtr {
+	if pos.StatePtr > pos.MaxStatePtr || pos.Current().Move != move {
 		pos.MaxStatePtr = pos.StatePtr
 	}
 

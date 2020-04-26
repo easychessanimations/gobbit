@@ -267,7 +267,7 @@ func (st State) PrettyPrintString() string {
 
 	st.GenMoveBuff()
 
-	buff += "\n" + st.MoveBuff.PrettyPrintString()
+	buff += fmt.Sprintf("\nLegal moves ( %d ) : %s", len(st.MoveBuff), st.MoveBuff.PrettyPrintString())
 
 	return buff
 }

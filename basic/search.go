@@ -70,31 +70,47 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	
 	bestScore := -INFINITE_SCORE
 
+	hasMove := false
+
 	for _, move := range ms {
 		pos.Push(move)
 
-		score = -pos.AlphaBetaRec(AlphaBetaInfo{
-			Alpha:        -abi.Beta,
-			Beta:         -abi.Alpha,
-			CurrentDepth: abi.CurrentDepth + 1,
-			MaxDepth:     abi.MaxDepth,
-		})
+		if pos.Current().IsCheckedThem(){
+			pos.Pop()
+		}else{
+			hasMove = true
 
-		pos.Pop()
+			score = -pos.AlphaBetaRec(AlphaBetaInfo{
+				Alpha:        -abi.Beta,
+				Beta:         -abi.Alpha,
+				CurrentDepth: abi.CurrentDepth + 1,
+				MaxDepth:     abi.MaxDepth,
+			})
 
-		if score >= abi.Beta {
-			// beta cut
-			return abi.Beta
+			pos.Pop()
+
+			if score >= abi.Beta {
+				// beta cut
+				return abi.Beta
+			}
+			
+			if score > bestScore{
+				bestScore = score
+			}
+
+			if score > abi.Alpha {
+				// alpha improvement
+				abi.Alpha = score
+				PvTable[st.Zobrist] = move
+			}
 		}
-		
-		if score > bestScore{
-			bestScore = score
-		}
+	}
 
-		if score > abi.Alpha {
-			// alpha improvement
-			abi.Alpha = score
-			PvTable[st.Zobrist] = move
+	if !hasMove{
+		if pos.Current().IsCheckedUs(){
+			return -MATE_SCORE + Score(abi.CurrentDepth)
+		}else{
+			return 0
 		}
 	}
 
