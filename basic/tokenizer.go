@@ -144,6 +144,9 @@ func (t *Tokenizer) GetFenPiece() []Piece {
 				if t.Content[2] == 'e' || t.Content[2] == 'w' {
 					sym = t.Content[:3]
 					t.Content = t.Content[3:]
+				}else{
+					sym = t.Content[:2]
+					t.Content = t.Content[2:]
 				}
 			}
 		} else {

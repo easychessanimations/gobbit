@@ -67,6 +67,7 @@ type State struct {
 	DisableFromSquare Square
 	DisableToSquare   Square
 	ByFigure          [FigureArraySize]Bitboard
+	ByLancer          Bitboard
 	ByColor           [ColorArraySize]Bitboard
 	Ply               int
 	Move              Move
@@ -436,6 +437,10 @@ func (st *State) CalculateOccupancyAndMaterial() {
 			st.ByFigure[fig] |= bb
 			st.ByColor[col] |= bb
 
+			if p.IsLancer(){
+				st.ByLancer |= bb
+			}
+
 			p := ColorFigure[col][fig]
 
 			mat := GetMaterialForPieceAtSquare(p, sq)
@@ -557,7 +562,7 @@ func (st State) IsChecked(color Color) bool {
 		col := ColorOf[p]
 		fig := FigureOf[p]
 
-		if col == color.Inverse() {
+		if col == color.Inverse() && !st.IsSquareJailedForColor(sq, color.Inverse()) {
 			if fig == Queen {
 				return true
 			}
@@ -576,7 +581,7 @@ func (st State) IsChecked(color Color) bool {
 
 	// pawn check
 	for _, captInfo := range pi.Captures {
-		if st.PieceAtSquare(captInfo.CheckSq) == ColorFigure[color.Inverse()][Pawn] {
+		if st.PieceAtSquare(captInfo.CheckSq) == ColorFigure[color.Inverse()][Pawn] && !st.IsSquareJailedForColor(captInfo.CheckSq, color.Inverse()) {
 			return true
 		}
 	}
@@ -584,15 +589,32 @@ func (st State) IsChecked(color Color) bool {
 	na := KnightAttack[wk]
 
 	// knight check
-	if (st.ByColor[color.Inverse()] & st.ByFigure[Knight] & na) != 0 {
-		return true
+	themKnights := st.ByColor[color.Inverse()] & st.ByFigure[Knight] & na
+	for _, sq := range themKnights.PopAll() {
+		if !st.IsSquareJailedForColor(sq, color.Inverse()){
+			return true
+		}		
 	}
 
 	ka := KingAttack[wk]
 
 	// king check
-	if (st.ByColor[color.Inverse()] & st.ByFigure[King] & ka) != 0 {
-		return true
+	themKings := st.ByColor[color.Inverse()] & st.ByFigure[King] & ka
+	for _, sq := range themKings.PopAll() {
+		if !st.IsSquareJailedForColor(sq, color.Inverse()){
+			return true
+		}		
+	}
+
+	// lancer check
+	themLancers := st.ByColor[color.Inverse()] & st.ByLancer
+	for _, sq := range themLancers.PopAll(){
+		ms := st.PslmsForPieceAtSquare(Violent, st.PieceAtSquare(sq), sq, st.ByColor[color.Inverse()], st.ByColor[color], color.Inverse())
+		for _, move := range ms{
+			if move.ToSq() == wk{
+				return true
+			}
+		}
 	}
 
 	return false

@@ -68,6 +68,10 @@ func (st *State) Put(p Piece, sq Square) {
 
 	st.ByFigure[FigureOf[p]] |= sqbb
 
+	if p.IsLancer(){
+		st.ByLancer |= sqbb
+	}
+
 	mat := PieceMaterialTables[p][sq]
 
 	st.Material[color].Merge(mat)
@@ -100,6 +104,10 @@ func (st *State) Remove(sq Square) {
 	st.ByColor[color] &^= sqbb
 
 	st.ByFigure[FigureOf[p]] &^= sqbb
+
+	if p.IsLancer(){
+		st.ByLancer &^= sqbb
+	}
 
 	mat := PieceMaterialTables[p][sq]
 

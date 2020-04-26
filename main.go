@@ -16,9 +16,9 @@ func main() {
 
 	pos.Init(VariantStandard)
 	
-	//pos.Init(VariantEightPiece)
+	pos.Init(VariantEightPiece)
 
-	//pos.Current().ParseFen("k1K5/8/3r4/3J4/8/8/8/8 w KQkq - 0 1")
+	pos.Current().ParseFen("n1K5/J7/8/k7/8/8/8/8 w KQkq - 0 1")
 
 	pos.Print()
 
