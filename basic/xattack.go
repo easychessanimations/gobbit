@@ -366,7 +366,7 @@ func init() {
 						})
 
 						var dFile File
-						for dFile = -1; dFile <= 1; dFile++ {
+						for dFile = -1; dFile <= 1; dFile += 2 {
 							nf := file + dFile
 							if nf >= 0 && nf < NUM_FILES {
 								captSq := RankFile[rank+dir][nf]

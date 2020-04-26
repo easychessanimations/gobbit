@@ -182,6 +182,17 @@ func (bb *Bitboard) Pop() Square {
 	return Square(bits.TrailingZeros64(uint64(sq)) & 0x3f)
 }
 
+// PopAll pops all set squares from the bitboard
+func (bb *Bitboard) PopAll() []Square {
+	sqs := []Square{}
+
+	for *bb != BbEmpty {
+		sqs = append(sqs, bb.Pop())
+	}
+
+	return sqs
+}
+
 // String return the string representation of a bitboard
 func (bb Bitboard) String() string {
 	buff := "**********\n"

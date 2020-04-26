@@ -213,3 +213,26 @@ func (st State) Pslms(kind MoveKind) []Move {
 func (st State) GenerateMoves() []Move {
 	return st.Pslms(Violent | Quiet)
 }
+
+func (st State) LegalMoves(stopAtFirst bool) []Move {
+	lms := []Move{}
+
+	for _, move := range st.GenerateMoves() {
+		newSt := st
+		newSt.MakeMove(move)
+		if !newSt.IsCheckedThem() {
+			lms = append(lms, move)
+		}
+		if stopAtFirst {
+			if len(lms) > 0 {
+				return lms
+			}
+		}
+	}
+
+	return lms
+}
+
+func (st State) HasLegalMove() bool {
+	return len(st.LegalMoves(true)) > 0
+}

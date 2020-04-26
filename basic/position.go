@@ -2,6 +2,7 @@ package basic
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -10,6 +11,7 @@ const MAX_STATES = 100
 type Position struct {
 	States        [MAX_STATES]State
 	StatePtr      int
+	MaxStatePtr   int
 	Nodes         int
 	SearchStopped bool
 }
@@ -24,8 +26,25 @@ func (pos *Position) Init(variant Variant) {
 	pos.Current().Ply = 0
 }
 
+func (pos Position) Line() string {
+	sans := []string{}
+
+	for ptr := 1; ptr <= pos.StatePtr; ptr++ {
+		prevSt := pos.States[ptr-1]
+		san := prevSt.MoveToSan(pos.States[ptr].Move)
+		if prevSt.Turn == White {
+			san = fmt.Sprintf("%d. %s", prevSt.FullmoveNumber, san)
+		}
+		sans = append(sans, san)
+	}
+
+	return strings.Join(sans, " ")
+}
+
 func (pos Position) PrettyPrintString() string {
 	buff := pos.Current().PrettyPrintString()
+
+	buff += fmt.Sprintf("\n\nLine : %s\n", pos.Line())
 
 	return buff
 }
@@ -58,7 +77,7 @@ func (st *State) Put(p Piece, sq Square) {
 	st.Zobrist ^= zobristPiece[p][sq]
 
 	if FigureOf[p] == King {
-		st.KingInfos[ColorOf[p]] = KingInfo{
+		st.KingInfos[color] = KingInfo{
 			IsCaptured: false,
 			Square:     sq,
 		}
@@ -140,6 +159,10 @@ func (pos *Position) Push(move Move) {
 
 	pos.StatePtr++
 
+	if pos.StatePtr > pos.MaxStatePtr {
+		pos.MaxStatePtr = pos.StatePtr
+	}
+
 	pos.States[pos.StatePtr] = oldState
 
 	pos.Current().MakeMove(move)
@@ -202,6 +225,13 @@ func (pos *Position) ExecCommand(command string) {
 			pos.Print()
 		} else {
 			fmt.Println("warning : no move to delete")
+		}
+	} else if command == "f" {
+		if pos.StatePtr < pos.MaxStatePtr {
+			pos.StatePtr++
+			pos.Print()
+		} else {
+			fmt.Println("warning : no move forward")
 		}
 	} else if command == "perf" {
 		pos.Perf(4)

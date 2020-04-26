@@ -225,7 +225,7 @@ func (st *State) ParseTurnString(ts string) {
 func (st *State) GenMoveBuff() {
 	st.MoveBuff = MoveBuff{}
 
-	ms := st.GenerateMoves()
+	ms := st.LegalMoves(false)
 
 	for _, move := range ms {
 		st.MoveBuff = append(st.MoveBuff, MoveBuffItem{
@@ -367,6 +367,7 @@ func (st *State) ParsePlacementString(ps string) error {
 		if len(ps) > 0 {
 			for _, p := range ps {
 				sq := RankFile[rank][file]
+				st.Pieces[rank][file] = NoPiece
 				st.Put(p, sq)
 				file++
 				if file > LAST_FILE {
@@ -454,6 +455,12 @@ func (st State) OccupThem() Bitboard {
 	return st.ByColor[st.Turn.Inverse()]
 }
 
+func (st *State) MoveToSan(move Move) string {
+	st.GenMoveBuff()
+
+	return st.MoveToSanBatch(move)
+}
+
 func (st State) MoveToSanBatch(move Move) string {
 	p := st.PieceAtSquare(move.FromSq())
 
@@ -517,5 +524,76 @@ func (st State) MoveToSanBatch(move Move) string {
 
 	check := ""
 
+	newSt := st
+
+	newSt.MakeMove(move)
+
+	if newSt.IsCheckedUs() {
+		check = "+"
+
+		if !newSt.HasLegalMove() {
+			check = "#"
+		}
+	} else if !newSt.HasLegalMove() {
+		check = "="
+	}
+
 	return sanLetter + orig + takes + dest + prom + check
+}
+
+func (st State) IsChecked(color Color) bool {
+	if st.KingInfos[color].IsCaptured {
+		return true
+	}
+
+	wk := st.KingInfos[color].Square
+
+	qm := QueenMobility(Violent, wk, st.ByColor[color], st.ByColor[color.Inverse()])
+
+	// bishop, rook, queen
+	for _, sq := range qm.PopAll() {
+		p := st.PieceAtSquare(sq)
+
+		col := ColorOf[p]
+		fig := FigureOf[p]
+
+		if col == color.Inverse() {
+			if fig == Bishop || fig == Rook || fig == Queen {
+				return true
+			}
+		}
+	}
+
+	pi := PawnInfos[wk][color]
+
+	// pawn check
+	for _, captInfo := range pi.Captures {
+		if st.PieceAtSquare(captInfo.CheckSq) == ColorFigure[color.Inverse()][Pawn] {
+			return true
+		}
+	}
+
+	na := KnightAttack[wk]
+
+	// knight check
+	if (st.ByColor[color.Inverse()] & st.ByFigure[Knight] & na) != 0 {
+		return true
+	}
+
+	ka := KingAttack[wk]
+
+	// king check
+	if (st.ByColor[color.Inverse()] & st.ByFigure[King] & ka) != 0 {
+		return true
+	}
+
+	return false
+}
+
+func (st State) IsCheckedUs() bool {
+	return st.IsChecked(st.Turn)
+}
+
+func (st State) IsCheckedThem() bool {
+	return st.IsChecked(st.Turn.Inverse())
 }
