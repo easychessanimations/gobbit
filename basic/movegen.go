@@ -9,6 +9,7 @@ type MoveType uint8
 const (
 	Normal = MoveType(iota)
 	Promotion
+	SentryPush
 )
 
 const SQUARE_MASK = (1 << SQUARE_STORAGE_SIZE_IN_BITS) - 1
@@ -71,6 +72,8 @@ func (move Move) UCI() string {
 
 	if move.MoveType() == Promotion {
 		buff += SymbolOf[FigureOf[move.PromotionPiece()]]
+	} else if move.MoveType() == SentryPush {
+		buff += SymbolOf[FigureOf[move.PromotionPiece()]] + "@" + move.PromotionSquare().UCI()
 	}
 
 	return buff
@@ -82,6 +85,10 @@ func MakeMoveFT(fromSq, toSq Square) Move {
 
 func MakeMoveFTP(fromSq, toSq Square, pp Piece) Move {
 	return Move(fromSq) + Move(toSq)<<TO_SQUARE_SHIFT + Move(pp)<<PROMOTION_PIECE_SHIFT + Move(Promotion)<<MOVE_TYPE_SHIFT
+}
+
+func MakeMoveFTPS(fromSq, toSq Square, pp Piece, ps Square) Move {
+	return Move(fromSq) + Move(toSq)<<TO_SQUARE_SHIFT + Move(pp)<<PROMOTION_PIECE_SHIFT + Move(ps)<<PROMOTION_SQUARE_SHIFT + Move(SentryPush)<<MOVE_TYPE_SHIFT
 }
 
 type MoveKind int
@@ -148,7 +155,7 @@ func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDi
 	return moves
 }
 
-func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move {
+func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard, jailColor Color, disablePushByTwo bool) []Move {
 	pi := PawnInfos[sq][color]
 
 	moves := []Move{}
@@ -165,6 +172,9 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 		for _, pushInfo := range pi.Pushes {
 			if (pushInfo.CheckSq.Bitboard() & (occupUs | occupThem)) == 0 {
 				moves = st.AppendMove(moves, pushInfo.Move, jailColor)
+				if disablePushByTwo{
+					break
+				}
 			} else {
 				break
 			}
@@ -176,6 +186,56 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 
 func (l Piece) LancerDirection() int {
 	return int(FigureOf[l]) & LANCER_DIRECTION_MASK
+}
+
+func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move{
+	moves := []Move{}
+
+	if jailColor != NoColor{
+		if st.IsSquareJailedForColor(sq, color){
+			return moves
+		}
+	}
+
+	if kind & Quiet != 0{
+		moves = append(moves, st.GenBitboardMoves(sq, BishopMobility(Quiet, sq, occupUs, occupThem), jailColor)...)
+	}
+
+	if kind & Violent != 0{
+		// remove sentry for move generation
+		sentry := st.PieceAtSquare(sq)
+		st.Remove(sq)
+
+		mob := BishopMobility(Violent, sq, occupUs, occupThem)		
+
+		for _, pushSq := range mob.PopAll(){
+			pushPiece := st.PieceAtSquare(pushSq)
+
+			pushFig := FigureOf[pushPiece]
+
+			pushMoves := []Move{}
+
+			if pushFig == Pawn{				
+				// pawn handled separately, not to allow push by two
+				pushMoves = append(pushMoves, st.GenPawnMoves(Violent|Quiet, color, pushSq, occupUs, occupThem, NoColor, true)...)
+			}else if pushFig == Sentry{
+				// pushed sentry should not push
+				pushMoves = append(pushMoves, st.GenSentryMoves(Quiet, color, pushSq, occupUs, occupThem, NoColor)...)
+			}else{
+				// all the rest
+				pushMoves = append(pushMoves, st.PslmsForPieceAtSquare(Violent|Quiet, ColorFigure[color][pushFig], pushSq, occupUs, occupThem, NoColor)...)
+			}
+
+			for _, pushMove := range pushMoves{
+				moves = append(moves, MakeMoveFTPS(sq, pushSq, pushPiece, pushMove.ToSq()))
+			}
+		}
+
+		// put back sentry
+		st.Put(sentry, sq)
+	}
+
+	return moves
 }
 
 func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move {
@@ -191,11 +251,11 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 	case King:
 		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem), jailColor)
 	case Pawn:
-		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor)
+		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor, false)
 	case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
 		return st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false, jailColor)
 	case Sentry:
-		return st.GenBitboardMoves(sq, BishopMobility(kind, sq, occupUs, occupThem), jailColor)
+		return st.GenSentryMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor)
 	case Jailer:
 		return st.GenBitboardMoves(sq, RookMobility(kind&^Violent, sq, occupUs, occupThem), jailColor)
 	}

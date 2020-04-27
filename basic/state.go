@@ -412,6 +412,8 @@ func (st State) MoveLAN(move Move) string {
 
 	if move.MoveType() == Promotion {
 		buff += "=" + move.PromotionPiece().SanSymbol()
+	}else if move.MoveType() == SentryPush {
+		buff += "=" + move.PromotionPiece().SanSymbol() + "@" + move.PromotionSquare().UCI()
 	}
 
 	return buff
@@ -477,18 +479,25 @@ func (st State) MoveToSanBatch(move Move) string {
 	sameFile := false
 	ambig := false
 
+	seenFromSq := make(map[Square]bool)
+
 	for _, mbi := range st.MoveBuff {
-		if mbi.Move != move {
-			fromSq := mbi.Move.FromSq()
-			if st.PieceAtSquare(fromSq) == p && mbi.Move.ToSq() == move.ToSq() {
-				ambig = true
-				if FileOf[fromSq] == FileOf[move.FromSq()] {
-					sameFile = true
+		if mbi.Move != move {			
+			fromSq := mbi.Move.FromSq()			
+			_, seen := seenFromSq[fromSq]
+			if !seen{
+				seenFromSq[fromSq] = true
+
+				if st.PieceAtSquare(fromSq) == p && mbi.Move.ToSq() == move.ToSq() {
+					ambig = true
+					if FileOf[fromSq] == FileOf[move.FromSq()] {
+						sameFile = true
+					}
+					if RankOf[fromSq] == RankOf[move.FromSq()] {
+						sameRank = true
+					}
 				}
-				if RankOf[fromSq] == RankOf[move.FromSq()] {
-					sameRank = true
-				}
-			}
+			}			
 		}
 	}
 
@@ -525,6 +534,10 @@ func (st State) MoveToSanBatch(move Move) string {
 
 	if move.MoveType() == Promotion {
 		prom = "=" + move.PromotionPiece().SanSymbol()
+	}
+
+	if move.MoveType() == SentryPush {
+		prom = "=" + move.PromotionPiece().SanSymbol() + "@" + move.PromotionSquare().UCI()
 	}
 
 	check := ""
@@ -612,6 +625,17 @@ func (st State) IsChecked(color Color) bool {
 		ms := st.PslmsForPieceAtSquare(Violent, st.PieceAtSquare(sq), sq, st.ByColor[color.Inverse()], st.ByColor[color], color.Inverse())
 		for _, move := range ms{
 			if move.ToSq() == wk{
+				return true
+			}
+		}
+	}
+
+	// sentry check
+	themSentries := st.ByColor[color.Inverse()] & st.ByFigure[Sentry]
+	for _, sq := range themSentries.PopAll() {		
+		sentryMoves := st.GenSentryMoves(Violent, color.Inverse(), sq, st.ByColor[color.Inverse()], st.ByColor[color], color)
+		for _, sm := range sentryMoves{
+			if sm.PromotionSquare() == wk{
 				return true
 			}
 		}

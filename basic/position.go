@@ -141,12 +141,18 @@ func (pos Position) GameEnd(ply int) (bool, Score) {
 func (st *State) MakeMove(move Move) {
 	p := st.PieceAtSquare(move.FromSq())
 
+	top := st.PieceAtSquare(move.ToSq())
+
 	st.Remove(move.FromSq())
 
 	st.Remove(move.ToSq())
 
 	if move.MoveType() == Promotion {
 		st.Put(move.PromotionPiece(), move.ToSq())
+	} else if move.MoveType() == SentryPush{
+		st.Put(p, move.ToSq())
+		st.Remove(move.PromotionSquare())
+		st.Put(top, move.PromotionSquare())
 	} else {
 		st.Put(p, move.ToSq())
 	}

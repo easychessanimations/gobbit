@@ -46,8 +46,7 @@ func GenAttackSquares(sq Square, normFunc func(Square, Square) (Delta, bool)) ([
 
 	var testSq Square
 
-	for middle != 0 {
-		testSq = middle.Pop()
+	for _, testSq = range middle.PopAll() {		
 		_, ok := normFunc(sq, testSq)
 		if ok {
 			sqs = append(sqs, testSq)
@@ -228,6 +227,9 @@ func BishopMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitbo
 	if !kind.IsViolent() {
 		attack &^= occupThem
 	}
+	if !kind.IsQuiet(){
+		attack &= occupThem
+	}
 	return attack &^ occupUs
 }
 
@@ -235,6 +237,9 @@ func RookMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboar
 	attack := Wizards[ROOK_WIZARD_INDEX].Magics.Attack(sq, (occupUs|occupThem)&RookAttack[sq])
 	if !kind.IsViolent() {
 		attack &^= occupThem
+	}
+	if !kind.IsQuiet(){
+		attack &= occupThem
 	}
 	return attack &^ occupUs
 }
@@ -248,6 +253,9 @@ func LancerMobility(kind MoveKind, ld int, sq Square, occupUs, occupThem Bitboar
 	if !kind.IsViolent() {
 		attack &^= occupThem
 	}
+	if !kind.IsQuiet(){
+		attack &= occupThem
+	}
 	return attack &^ occupUs
 }
 
@@ -256,6 +264,9 @@ func KnightMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitbo
 	if !kind.IsViolent() {
 		attack &^= occupThem
 	}
+	if !kind.IsQuiet(){
+		attack &= occupThem
+	}
 	return attack &^ occupUs
 }
 
@@ -263,6 +274,9 @@ func KingMobility(kind MoveKind, sq Square, occupUs, occupThem Bitboard) Bitboar
 	attack := KingAttack[sq]
 	if !kind.IsViolent() {
 		attack &^= occupThem
+	}
+	if !kind.IsQuiet(){
+		attack &= occupThem
 	}
 	return attack &^ occupUs
 }
