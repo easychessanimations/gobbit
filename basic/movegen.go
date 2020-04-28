@@ -117,9 +117,24 @@ func (st State) IsSquareJailedForColor(sq Square, color Color) bool{
 	return false
 }
 
+func (st State) PromotionFigures() []Figure{
+	promFigures := []Figure{Queen, Rook, Bishop, Knight}
+	if st.Variant == VariantEightPiece{
+		return append(promFigures, []Figure{LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW, Sentry, Jailer}...)
+	}
+	return promFigures
+}
+
 func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 	if jailColor == NoColor || !st.IsSquareJailedForColor(move.FromSq(), jailColor){
-		return append(moves, move)
+		p := st.PieceAtSquare(move.FromSq())
+		if FigureOf[p] == Pawn && RankOf[move.ToSq()] == PromotionRank[ColorOf[p]]{
+			for _, fig := range st.PromotionFigures(){
+				moves = append(moves, MakeMoveFTP(move.FromSq(), move.ToSq(), ColorFigure[ColorOf[p]][fig]))
+			}
+		}else{
+			return append(moves, move)
+		}
 	}
 
 	return moves

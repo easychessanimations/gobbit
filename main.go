@@ -18,7 +18,7 @@ func main() {
 	
 	pos.Init(VariantEightPiece)
 
-	//pos.Current().ParseFen("jlsesqkb1r/pppppppp/7n/8/3P4/8/PPP1PPPP/JLneSQKBNR w KQkq - 0 2 -")
+	//pos.Current().ParseFen("jlsesqkb1r/ppppppPp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -")
 
 	pos.Print()
 

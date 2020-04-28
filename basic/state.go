@@ -245,7 +245,11 @@ func (mb MoveBuff) PrettyPrintString() string {
 	buff := []string{}
 
 	for i, mbi := range mb {
-		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.San))
+		newLine := ""
+		if (i+1) % 8 == 0{
+			newLine = "\n"
+		}
+		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.San) + newLine)		
 	}
 
 	return strings.Join(buff, " ")
@@ -268,7 +272,7 @@ func (st State) PrettyPrintString() string {
 
 	st.GenMoveBuff()
 
-	buff += fmt.Sprintf("\nLegal moves ( %d ) : %s", len(st.MoveBuff), st.MoveBuff.PrettyPrintString())
+	buff += fmt.Sprintf("\nLegal moves ( %d ) :\n %s", len(st.MoveBuff), st.MoveBuff.PrettyPrintString())
 
 	return buff
 }
