@@ -398,7 +398,7 @@ func (st State) PieceAtSquare(sq Square) Piece {
 }
 
 func (st State) IsCapture(move Move) bool {
-	return st.PieceAtSquare(move.ToSq()) != NoPiece
+	return st.PieceAtSquare(move.ToSq()) != NoPiece || (FigureOf[st.PieceAtSquare(move.FromSq())] == Pawn && move.ToSq() == st.EpSquare)
 }
 
 func (st State) MoveLAN(move Move) string {

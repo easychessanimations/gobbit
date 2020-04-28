@@ -176,8 +176,8 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	moves := []Move{}
 
 	if kind&Violent != 0 {
-		for _, captInfo := range pi.Captures {
-			if (captInfo.CheckSq.Bitboard() & occupThem) != 0 {
+		for _, captInfo := range pi.Captures {			
+			if (captInfo.CheckSq.Bitboard() & occupThem) != 0 || captInfo.CheckSq == st.EpSquare {				
 				moves = st.AppendMove(moves, captInfo.Move, jailColor)
 			}
 		}

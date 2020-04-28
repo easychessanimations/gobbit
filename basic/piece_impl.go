@@ -12,6 +12,11 @@ func (p Piece) Color() Color {
 	return Color(p & Piece(COLOR_MASK))
 }
 
+// ColorInverse tells the color inverse of a piece
+func (p Piece) ColorInverse() Piece{
+	return ColorFigure[ColorOf[p].Inverse()][FigureOf[p]]
+}
+
 // SanSymbol tells the SAN symbol of a Piece ( letter always upper case )
 func (p Piece) SanSymbol() string {
 	sym := SymbolOf[FigureOf[p]]

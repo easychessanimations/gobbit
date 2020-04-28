@@ -163,6 +163,44 @@ func (st *State) MakeMove(move Move) {
 
 	st.SetSideToMove(st.Turn.Inverse())
 
+	st.HalfmoveClock++
+
+	oldEpSq := st.EpSquare
+
+	st.SetEpSquare(SquareA1)
+
+	if FigureOf[p] == Pawn{
+		st.HalfmoveClock = 0
+
+		rankDiff := RankOf[move.ToSq()] - RankOf[move.FromSq()]
+
+		if rankDiff > 1 || rankDiff < -1{
+			// push by two
+			pi := PawnInfos[move.FromSq()][ColorOf[p]]
+
+			for _, checkEp := range pi.CheckEps{
+				if st.PieceAtSquare(checkEp) == p.ColorInverse(){
+					st.SetEpSquare(pi.PushOneSq)
+					break
+				}
+			}
+		}
+
+		if move.ToSq() == oldEpSq{
+			var dir Rank = 1
+			if ColorOf[p] == White{
+				dir = -1
+			}
+			epClSq := RankFile[RankOf[move.ToSq()]+dir][FileOf[move.ToSq()]]
+			fmt.Println(epClSq)
+			st.Remove(epClSq)
+		}
+	}
+
+	if top != NoPiece{
+		st.HalfmoveClock = 0
+	}
+
 	if st.Turn == White {
 		st.FullmoveNumber++
 	}

@@ -309,14 +309,16 @@ var PromotionRank = []Rank{0, 7}
 var PawnDir = []Rank{-1, 1}
 
 type PawnInfoItem struct {
-	CheckSq Square
-	Move    Move
+	CheckSq   Square
+	Move      Move
 }
 
 type PawnInfo struct {
-	Dir      Rank
-	Pushes   []PawnInfoItem
-	Captures []PawnInfoItem
+	Dir       Rank
+	Pushes    []PawnInfoItem
+	Captures  []PawnInfoItem
+	PushOneSq Square
+	CheckEps  []Square
 }
 
 type ColorPawnInfo [2]PawnInfo
@@ -377,6 +379,8 @@ func init() {
 						// pawn not on promotion rank can go forward
 						pushOneSq := RankFile[rank+dir][file]
 
+						pi.PushOneSq = pushOneSq
+
 						pi.Pushes = append(pi.Pushes, PawnInfoItem{
 							CheckSq: pushOneSq,
 							Move:    MakeMoveFT(msq.Square, pushOneSq),
@@ -397,10 +401,20 @@ func init() {
 					if rank == startRank {
 						// pawn not on start rank can be pushed by two squares
 						pushTwoSq := RankFile[rank+2*dir][file]
+
 						pi.Pushes = append(pi.Pushes, PawnInfoItem{
-							CheckSq: pushTwoSq,
-							Move:    MakeMoveFT(msq.Square, pushTwoSq),
+							CheckSq:   pushTwoSq,
+							Move:      MakeMoveFT(msq.Square, pushTwoSq),
 						})
+
+						var dFile File
+						for dFile = -1; dFile <= 1; dFile += 2 {
+							nf := file + dFile
+							if nf >= 0 && nf < NUM_FILES {
+								checkEpSq := RankFile[rank+2*dir][nf]
+								pi.CheckEps = append(pi.CheckEps, checkEpSq)
+							}
+						}	
 					}
 
 					cpi[color] = pi
