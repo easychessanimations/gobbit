@@ -497,26 +497,19 @@ func (st State) MoveToSanBatch(move Move) string {
 	sameFile := false
 	ambig := false
 
-	seenFromSq := make(map[Square]bool)
+	for _, mbi := range st.MoveBuff {		
+		fromSq := mbi.Move.FromSq()						
+		toSq := mbi.Move.ToSq()
 
-	for _, mbi := range st.MoveBuff {
-		if mbi.Move != move {			
-			fromSq := mbi.Move.FromSq()			
-			_, seen := seenFromSq[fromSq]
-			if !seen{
-				seenFromSq[fromSq] = true
-
-				if st.PieceAtSquare(fromSq) == p && mbi.Move.ToSq() == move.ToSq() {
-					ambig = true
-					if FileOf[fromSq] == FileOf[move.FromSq()] {
-						sameFile = true
-					}
-					if RankOf[fromSq] == RankOf[move.FromSq()] {
-						sameRank = true
-					}
-				}
-			}			
-		}
+		if st.PieceAtSquare(fromSq) == p && toSq == move.ToSq() && fromSq != move.FromSq() {
+			ambig = true
+			if FileOf[fromSq] == FileOf[move.FromSq()] {
+				sameFile = true
+			}
+			if RankOf[fromSq] == RankOf[move.FromSq()] {
+				sameRank = true
+			}					
+		}					
 	}
 
 	if FigureOf[p] == Pawn {

@@ -182,12 +182,12 @@ func MakeLancer(color Color, ld int) Piece {
 	return ColorFigure[color][LancerMinValue+Figure(ld)]
 }
 
-func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDir bool, jailColor Color) []Move {
+func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDir bool, lancerDir int, jailColor Color) []Move {
 	moves := []Move{}
 
 	for _, toSq := range mobility.PopAll() {
 		if keepDir {
-			moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, st.PieceAtSquare(sq)), jailColor)
+			moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, lancerDir)), jailColor)
 		} else {
 			for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
 				moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)), jailColor)
@@ -271,11 +271,11 @@ func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, o
 			}else if pushPiece.IsLancer(){
 				// lancer has special moves
 				// normal moves keeping own direction
-				pushMoves = append(pushMoves, st.GenLancerMoves(pushCol, pushSq, LancerMobility(Violent|Quiet, pushPiece.LancerDirection(), pushSq, occupUs, occupThem), true, NoColor)...)
-				// nudge to adjacent squares
-				pushLd := pushPiece.LancerDirection()				
+				lancerDir := pushPiece.LancerDirection()
+				pushMoves = append(pushMoves, st.GenLancerMoves(pushCol, pushSq, LancerMobility(Violent|Quiet, lancerDir, pushSq, occupUs, occupThem), true, lancerDir, NoColor)...)
+				// nudge to adjacent squares				
 				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++{
-					if ld != pushLd{
+					if ld != lancerDir{
 						targetSq, ok := st.AddDeltaToSquare(pushSq, LANCER_DELTAS[ld])						
 						if ok{
 							moves = append(moves, MakeMoveFTPS(sq, pushSq, ColorFigure[pushCol][LancerN + Figure(ld)], targetSq))
@@ -314,7 +314,18 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 	case Pawn:
 		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor, false)
 	case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
-		return st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false, jailColor)
+		moves := st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, p.LancerDirection(), sq, occupUs, occupThem), false, 0, jailColor)
+		// nudged lancer has special moves
+		if st.HasDisabledMove{
+			if st.DisableFromSquare == sq{
+				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++{
+					if ld != p.LancerDirection(){
+						moves = append(moves, st.GenLancerMoves(ColorOf[p], sq, LancerMobility(kind, ld, sq, occupUs, occupThem), true, ld, jailColor)...)
+					}
+				}				
+			}
+		}
+		return moves
 	case Sentry:
 		return st.GenSentryMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor)
 	case Jailer:
