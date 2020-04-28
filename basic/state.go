@@ -77,6 +77,20 @@ type State struct {
 	KingInfos         [ColorArraySize]KingInfo
 }
 
+func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
+	rank := RankOf[sq]
+	file := FileOf[sq]
+	
+	newRank := rank + delta.dRank
+	newFile := file + delta.dFile
+
+	if newRank >= 0 && newRank < NUM_RANKS && newFile >= 0 && newFile < NUM_FILES{
+		return RankFile[newRank][newFile], true
+	}
+
+	return sq, false
+}
+
 // CastlingRights.String() reports castling rights in fen format
 func (crs CastlingRights) String() string {
 	buff := ""
@@ -246,7 +260,7 @@ func (mb MoveBuff) PrettyPrintString() string {
 
 	for i, mbi := range mb {
 		newLine := ""
-		if (i+1) % 8 == 0{
+		if (i+1) % 7 == 0{
 			newLine = "\n"
 		}
 		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.San) + newLine)		

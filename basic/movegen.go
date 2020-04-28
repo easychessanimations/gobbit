@@ -126,11 +126,39 @@ func (st State) PromotionFigures() []Figure{
 }
 
 func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
-	if jailColor == NoColor || !st.IsSquareJailedForColor(move.FromSq(), jailColor){
-		p := st.PieceAtSquare(move.FromSq())
-		if FigureOf[p] == Pawn && RankOf[move.ToSq()] == PromotionRank[ColorOf[p]]{
+	p := st.PieceAtSquare(move.FromSq())
+
+	fromFig := FigureOf[p]
+	fromCol := ColorOf[p]
+
+	if st.HasDisabledMove{
+		if move.FromSq() == st.DisableFromSquare{
+			// quick check for exact match, that'll do it for jumping pieces
+			if move.ToSq() == st.DisableToSquare{
+				return moves
+			}
+			// check sliding pieces
+			disabledBishopDir, hasDisabledBishopDir := NormalizedBishopDirection(st.DisableFromSquare, st.DisableToSquare)
+			disabledRookDir, hasDisabledRookDir := NormalizedBishopDirection(st.DisableFromSquare, st.DisableToSquare)
+			moveBishopDir, moveHasBishopDir := NormalizedBishopDirection(move.FromSq(), move.ToSq())
+			moveRookDir, moveHasRookDir := NormalizedRookDirection(move.FromSq(), move.ToSq())
+			if hasDisabledBishopDir && moveHasBishopDir{
+				if disabledBishopDir == moveBishopDir{
+					return moves
+				}
+			}
+			if hasDisabledRookDir && moveHasRookDir{
+				if disabledRookDir == moveRookDir{
+					return moves
+				}
+			}
+		}
+	}
+
+	if jailColor == NoColor || !st.IsSquareJailedForColor(move.FromSq(), jailColor){		
+		if fromFig == Pawn && RankOf[move.ToSq()] == PromotionRank[fromCol]{
 			for _, fig := range st.PromotionFigures(){
-				moves = append(moves, MakeMoveFTP(move.FromSq(), move.ToSq(), ColorFigure[ColorOf[p]][fig]))
+				moves = append(moves, MakeMoveFTP(move.FromSq(), move.ToSq(), ColorFigure[fromCol][fig]))
 			}
 		}else{
 			return append(moves, move)
@@ -221,12 +249,16 @@ func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, o
 		sentry := st.PieceAtSquare(sq)
 		st.Remove(sq)
 
+		// remove sentry from occupation
+		occupUs &^= sq.Bitboard()
+
 		mob := BishopMobility(Violent, sq, occupUs, occupThem)		
 
 		for _, pushSq := range mob.PopAll(){
 			pushPiece := st.PieceAtSquare(pushSq)
 
 			pushFig := FigureOf[pushPiece]
+			pushCol := ColorOf[pushPiece]
 
 			pushMoves := []Move{}
 
@@ -236,9 +268,23 @@ func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, o
 			}else if pushFig == Sentry{
 				// pushed sentry should not push
 				pushMoves = append(pushMoves, st.GenSentryMoves(Quiet, color, pushSq, occupUs, occupThem, NoColor)...)
+			}else if pushPiece.IsLancer(){
+				// lancer has special moves
+				// normal moves keeping own direction
+				pushMoves = append(pushMoves, st.GenLancerMoves(pushCol, pushSq, LancerMobility(Violent|Quiet, pushPiece.LancerDirection(), pushSq, occupUs, occupThem), true, NoColor)...)
+				// nudge to adjacent squares
+				pushLd := pushPiece.LancerDirection()				
+				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++{
+					if ld != pushLd{
+						targetSq, ok := st.AddDeltaToSquare(pushSq, LANCER_DELTAS[ld])						
+						if ok{
+							moves = append(moves, MakeMoveFTPS(sq, pushSq, ColorFigure[pushCol][LancerN + Figure(ld)], targetSq))
+						}
+					}
+				}
 			}else{
 				// all the rest
-				pushMoves = append(pushMoves, st.PslmsForPieceAtSquare(Violent|Quiet, ColorFigure[color][pushFig], pushSq, occupUs, occupThem, NoColor)...)
+				pushMoves = append(pushMoves, st.PslmsForPieceAtSquare(Violent|Quiet, ColorFigure[color][pushFig], pushSq, occupUs, occupThem, NoColor)...)				
 			}
 
 			for _, pushMove := range pushMoves{

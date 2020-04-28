@@ -147,12 +147,19 @@ func (st *State) MakeMove(move Move) {
 
 	st.Remove(move.ToSq())
 
+	st.HasDisabledMove = false
+
 	if move.MoveType() == Promotion {
 		st.Put(move.PromotionPiece(), move.ToSq())
 	} else if move.MoveType() == SentryPush{
 		st.Put(p, move.ToSq())
+
 		st.Remove(move.PromotionSquare())
-		st.Put(top, move.PromotionSquare())
+		st.Put(move.PromotionPiece(), move.PromotionSquare())
+
+		st.DisableFromSquare = move.PromotionSquare()
+		st.DisableToSquare = move.ToSq()
+		st.HasDisabledMove = true
 	} else {
 		st.Put(p, move.ToSq())
 	}
@@ -231,7 +238,7 @@ func (pos *Position) PerfRec(remDepth int) {
 		return
 	}
 
-	for _, move := range pos.Current().GenerateMoves() {
+	for _, move := range pos.Current().LegalMoves(false) {
 		pos.Push(move)
 		//fmt.Println(pos.PrettyPrintString())
 		pos.PerfRec(remDepth - 1)
