@@ -198,8 +198,7 @@ func (st *State) MakeMove(move Move) {
 			if ColorOf[p] == White{
 				dir = -1
 			}
-			epClSq := RankFile[RankOf[move.ToSq()]+dir][FileOf[move.ToSq()]]
-			fmt.Println(epClSq)
+			epClSq := RankFile[RankOf[move.ToSq()]+dir][FileOf[move.ToSq()]]			
 			st.Remove(epClSq)
 		}
 	}
