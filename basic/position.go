@@ -176,6 +176,14 @@ func (st *State) MakeMove(move Move) {
 
 	st.SetEpSquare(SquareA1)
 
+	if FigureOf[p] == King{
+		// if king was moved, delete all castling rights
+		newCastlingRights := st.CastlingRights
+		newCastlingRights[ColorOf[p]][CastlingSideKing].CanCastle = false
+		newCastlingRights[ColorOf[p]][CastlingSideQueen].CanCastle = false
+		st.SetCastlingAbility(newCastlingRights)
+	}
+
 	if FigureOf[p] == Pawn{
 		st.HalfmoveClock = 0
 

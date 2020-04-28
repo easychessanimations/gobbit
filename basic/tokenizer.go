@@ -70,16 +70,16 @@ func (t *Tokenizer) GetCastlingRights() CastlingRights {
 		c := t.Content[0]
 
 		if c == 'K' {
-			ccrs[White][CastlingSideKing] = true
+			ccrs[White][CastlingSideKing].CanCastle = true
 			t.Content = t.Content[1:]
 		} else if c == 'Q' {
-			ccrs[White][CastlingSideQueen] = true
+			ccrs[White][CastlingSideQueen].CanCastle = true
 			t.Content = t.Content[1:]
 		} else if c == 'k' {
-			ccrs[Black][CastlingSideKing] = true
+			ccrs[Black][CastlingSideKing].CanCastle = true
 			t.Content = t.Content[1:]
 		} else if c == 'q' {
-			ccrs[Black][CastlingSideQueen] = true
+			ccrs[Black][CastlingSideQueen].CanCastle = true
 			t.Content = t.Content[1:]
 		} else {
 			return ccrs

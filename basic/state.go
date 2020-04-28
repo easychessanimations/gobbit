@@ -37,7 +37,13 @@ const (
 	CastlingSideQueen
 )
 
-type ColorCastlingRights [2]bool
+type CastlingRight struct{
+	CanCastle     bool
+	RookOrigSq    Square
+	RookOrigPiece Piece
+}
+
+type ColorCastlingRights [2]CastlingRight
 type CastlingRights [2]ColorCastlingRights
 
 type MoveBuffItem struct {
@@ -95,19 +101,19 @@ func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
 func (crs CastlingRights) String() string {
 	buff := ""
 
-	if crs[White][CastlingSideKing] {
+	if crs[White][CastlingSideKing].CanCastle {
 		buff += "K"
 	}
 
-	if crs[White][CastlingSideQueen] {
+	if crs[White][CastlingSideQueen].CanCastle {
 		buff += "Q"
 	}
 
-	if crs[Black][CastlingSideKing] {
+	if crs[Black][CastlingSideKing].CanCastle {
 		buff += "k"
 	}
 
-	if crs[Black][CastlingSideQueen] {
+	if crs[Black][CastlingSideQueen].CanCastle {
 		buff += "q"
 	}
 
@@ -220,8 +226,8 @@ func (st *State) ParseCastlingRights(crs string) {
 	t := Tokenizer{}
 	t.Init(crs)
 
-	st.CastlingRights = t.GetCastlingRights()
-	// TODO: Zobrist
+	newCastlingRights := t.GetCastlingRights()
+	st.SetCastlingAbility(newCastlingRights)
 }
 
 func (st *State) ParseTurnString(ts string) {

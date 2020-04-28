@@ -8,27 +8,7 @@ import (
 
 const INITIAL_MATERIAL = 2 * 4220
 
-type Castle uint
-
-const (
-	// WhiteOO indicates that White can castle on King side
-	WhiteOO Castle = 1 << iota
-	// WhiteOOO indicates that White can castle on Queen side
-	WhiteOOO
-	// BlackOO indicates that Black can castle on King side
-	BlackOO
-	// BlackOOO indicates that Black can castle on Queen side
-	BlackOOO
-
-	// NoCastle indicates no castling rights
-	NoCastle Castle = 0
-	// AnyCastle indicates all castling rights
-	AnyCastle Castle = WhiteOO | WhiteOOO | BlackOO | BlackOOO
-
-	CastleArraySize = int(AnyCastle + 1)
-	CastleMinValue  = NoCastle
-	CastleMaxValue  = AnyCastle
-)
+const CastleArraySize = 4
 
 // the zobrist* arrays contain magic numbers used for Zobrist hashing
 // more information on Zobrist hashing can be found in the paper:
@@ -48,9 +28,44 @@ func (st *State) GetZobrist() uint64 {
 	return 0x4204fa763da3abeb
 }
 
+const (
+	CastleWhiteKingIndex = iota
+	CastleWhiteQueenIndex
+	CastleBlackKingIndex
+	CastleBlackQueenIndex
+)
+
 // SetCastlingAbility sets the side to move, correctly updating the Zobrist key
-func (st *State) SetCastlingAbility(castle Castle) {
-	// TODO
+func (st *State) SetCastlingAbility(newCastlingRighs CastlingRights) {
+	// unmark old castling rights if any
+	if st.CastlingRights[White][CastlingSideKing].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleWhiteKingIndex]
+	}	
+	if st.CastlingRights[White][CastlingSideQueen].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleWhiteQueenIndex]
+	}	
+	if st.CastlingRights[Black][CastlingSideKing].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleBlackKingIndex]
+	}	
+	if st.CastlingRights[Black][CastlingSideQueen].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleBlackQueenIndex]
+	}	
+
+	// mark new castling rights
+	if newCastlingRighs[White][CastlingSideKing].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleWhiteKingIndex]
+	}	
+	if newCastlingRighs[White][CastlingSideQueen].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleWhiteQueenIndex]
+	}	
+	if newCastlingRighs[Black][CastlingSideKing].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleBlackKingIndex]
+	}	
+	if newCastlingRighs[Black][CastlingSideQueen].CanCastle{
+		st.Zobrist ^= zobristCastle[CastleBlackQueenIndex]
+	}	
+
+	st.CastlingRights = newCastlingRighs
 }
 
 // SetSideToMove sets the side to move, correctly updating the Zobrist key
@@ -99,19 +114,8 @@ func initZobristEnpassant(f func() uint64) {
 
 func initZobristCastle(f func() uint64) {
 	r := [...]uint64{f(), f(), f(), f()}
-	for i := CastleMinValue; i <= CastleMaxValue; i++ {
-		if i&WhiteOO != 0 {
-			zobristCastle[i] ^= r[0]
-		}
-		if i&WhiteOOO != 0 {
-			zobristCastle[i] ^= r[1]
-		}
-		if i&BlackOO != 0 {
-			zobristCastle[i] ^= r[2]
-		}
-		if i&BlackOOO != 0 {
-			zobristCastle[i] ^= r[3]
-		}
+	for i := 0; i < 4; i++ {
+		zobristCastle[i] ^= r[i]
 	}
 }
 
