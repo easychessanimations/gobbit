@@ -136,6 +136,13 @@ func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 	fromFig := FigureOf[p]
 	fromCol := ColorOf[p]
 
+	if move.MoveType() == SentryPush{
+		// for sentry push target square and promotion square have to differ
+		if move.ToSq() == move.PromotionSquare(){
+			return moves
+		}
+	}
+
 	if st.HasDisabledMove{
 		if move.FromSq() == st.DisableFromSquare{
 			// quick check for exact match, that'll do it for jumping pieces
@@ -329,22 +336,28 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 		kCol := ColorOf[p]
 		ccr := st.CastlingRights[kCol]
 		wk := st.KingInfos[kCol].Square
-		for side := CastlingSideKing; side <= CastlingSideQueen; side++{
-			betweenOrigEmpty := true
+		for side := CastlingSideKing; side <= CastlingSideQueen; side++{			
 			cr := ccr[side]
-			for _, testSq := range cr.BetweenOrigSquares{
-				if st.PieceAtSquare(testSq) != NoPiece && testSq != wk && testSq != cr.RookOrigSq {
-					betweenOrigEmpty = false
-					break
+			if cr.CanCastle{
+				betweenOrigEmpty := true
+				for _, testSq := range cr.BetweenOrigSquares{
+					if st.PieceAtSquare(testSq) != NoPiece && testSq != wk && testSq != cr.RookOrigSq {
+						betweenOrigEmpty = false
+						break
+					}
 				}
-			}
-			if betweenOrigEmpty{
-				checksOk := true
-				// TODO: detect checks
-				if checksOk{
-					moves = append(moves, MakeMoveFTC(wk, cr.RookOrigSq))
-				}				
-			}
+				if betweenOrigEmpty{
+					checksOk := true
+					// TODO: detect checks
+					if checksOk{
+						moves = append(moves, MakeMoveFTC(wk, cr.RookOrigSq))
+					}				
+				}
+			}			
+		}
+		if st.IsSquareJailedForColor(wk, kCol){
+			// jailed king has pass move			
+			moves = append(moves, MakeMoveFT(wk, wk))
 		}
 		return moves
 	case Pawn:

@@ -256,8 +256,9 @@ func (st *State) PopulateCastlingRights(crs CastlingRights) CastlingRights{
 					betweenSquares = append(betweenSquares, testSq)
 
 					testP := st.PieceAtSquare(testSq)
+					testCol := ColorOf[testP]
 					testFig := FigureOf[testP]
-					if st.IsCastlingPartner(testFig){
+					if st.IsCastlingPartner(testFig) && testCol == color{
 						foundCastlingPartner = true
 						crs[color][side].RookOrigSq = testSq
 						crs[color][side].RookOrigPiece = testP						

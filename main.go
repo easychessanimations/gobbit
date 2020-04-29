@@ -12,13 +12,11 @@ import (
 func main() {
 	pos := Position{}
 
-	//pos.Init(VariantEightPiece)
-
-	pos.Init(VariantStandard)
+	//pos.Init(VariantStandard)
 	
 	pos.Init(VariantEightPiece)
 
-	//pos.Current().ParseFen("jlsesqkb1r/ppppppPp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -")
+	//pos.Current().ParseFen("kJ6/8/K7/8/8/8/8/8 w KQkq - 0 1 -")
 
 	pos.Print()
 
