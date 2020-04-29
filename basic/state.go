@@ -38,9 +38,10 @@ const (
 )
 
 type CastlingRight struct{
-	CanCastle     bool
-	RookOrigSq    Square
-	RookOrigPiece Piece
+	CanCastle          bool
+	RookOrigSq         Square
+	RookOrigPiece      Piece
+	BetweenOrigSquares []Square
 }
 
 type ColorCastlingRights [2]CastlingRight
@@ -248,14 +249,19 @@ func (st *State) PopulateCastlingRights(crs CastlingRights) CastlingRights{
 			for side := CastlingSideKing; side <= CastlingSideQueen; side++{
 				dir := File(1 - (2 * side))
 				foundCastlingPartner := false
+				betweenSquares := []Square{}
 				for testFile := FileOf[wk]; testFile >= 0 && testFile < NUM_FILES; testFile += dir{					
 					testSq := RankFile[cRank][testFile]
+
+					betweenSquares = append(betweenSquares, testSq)
+
 					testP := st.PieceAtSquare(testSq)
 					testFig := FigureOf[testP]
 					if st.IsCastlingPartner(testFig){
 						foundCastlingPartner = true
 						crs[color][side].RookOrigSq = testSq
 						crs[color][side].RookOrigPiece = testP						
+						crs[color][side].BetweenOrigSquares = betweenSquares
 					}					
 				}
 				if !foundCastlingPartner{
@@ -620,6 +626,14 @@ func (st State) MoveToSanBatch(move Move) string {
 		}
 	} else if !newSt.HasLegalMove() {
 		check = "="
+	}
+
+	if move.MoveType() == Castling{
+		if FileOf[move.FromSq()] < FileOf[move.ToSq()]{
+			return "O-O" + check
+		}else{
+			return "O-O-O" + check
+		}
 	}
 
 	return sanLetter + orig + takes + dest + prom + check

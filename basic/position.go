@@ -162,6 +162,14 @@ func (st *State) MakeMove(move Move) {
 		st.DisableFromSquare = move.PromotionSquare()
 		st.DisableToSquare = move.ToSq()
 		st.HasDisabledMove = true
+	} else if move.MoveType() == Castling{		
+		side := CastlingSideKing		
+		if FileOf[move.ToSq()] < FileOf[move.FromSq()]{
+			side = CastlingSideQueen
+		}
+		cts := st.CastlingTargetSquares(pCol, side)
+		st.Put(p, cts[0])
+		st.Put(st.CastlingRights[pCol][side].RookOrigPiece, cts[1])
 	} else {
 		st.Put(p, move.ToSq())
 	}

@@ -10,6 +10,7 @@ const (
 	Normal = MoveType(iota)
 	Promotion
 	SentryPush
+	Castling
 )
 
 const SQUARE_MASK = (1 << SQUARE_STORAGE_SIZE_IN_BITS) - 1
@@ -89,6 +90,10 @@ func MakeMoveFTP(fromSq, toSq Square, pp Piece) Move {
 
 func MakeMoveFTPS(fromSq, toSq Square, pp Piece, ps Square) Move {
 	return Move(fromSq) + Move(toSq)<<TO_SQUARE_SHIFT + Move(pp)<<PROMOTION_PIECE_SHIFT + Move(ps)<<PROMOTION_SQUARE_SHIFT + Move(SentryPush)<<MOVE_TYPE_SHIFT
+}
+
+func MakeMoveFTC(fromSq, toSq Square) Move {
+	return Move(fromSq) + Move(toSq)<<TO_SQUARE_SHIFT + Move(Castling)<<MOVE_TYPE_SHIFT
 }
 
 type MoveKind int
@@ -299,6 +304,16 @@ func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, o
 	return moves
 }
 
+func (st State) CastlingTargetSquares(color Color, side int) [2]Square{
+	cRank := st.CastlingRank(color)
+
+	if side == CastlingSideKing{
+		return [2]Square{RankFile[cRank][FileG], RankFile[cRank][FileF]}
+	}else{
+		return [2]Square{RankFile[cRank][FileC], RankFile[cRank][FileD]}	
+	}
+}
+
 func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs, occupThem Bitboard, jailColor Color) []Move {
 	switch FigureOf[p] {
 	case Bishop:
@@ -310,7 +325,28 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 	case Knight:
 		return st.GenBitboardMoves(sq, KnightMobility(kind, sq, occupUs, occupThem), jailColor)
 	case King:
-		return st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem), jailColor)
+		moves := st.GenBitboardMoves(sq, KingMobility(kind, sq, occupUs, occupThem), jailColor)
+		kCol := ColorOf[p]
+		ccr := st.CastlingRights[kCol]
+		wk := st.KingInfos[kCol].Square
+		for side := CastlingSideKing; side <= CastlingSideQueen; side++{
+			betweenOrigEmpty := true
+			cr := ccr[side]
+			for _, testSq := range cr.BetweenOrigSquares{
+				if st.PieceAtSquare(testSq) != NoPiece && testSq != wk && testSq != cr.RookOrigSq {
+					betweenOrigEmpty = false
+					break
+				}
+			}
+			if betweenOrigEmpty{
+				checksOk := true
+				// TODO: detect checks
+				if checksOk{
+					moves = append(moves, MakeMoveFTC(wk, cr.RookOrigSq))
+				}				
+			}
+		}
+		return moves
 	case Pawn:
 		return st.GenPawnMoves(kind, ColorOf[p], sq, occupUs, occupThem, jailColor, false)
 	case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
