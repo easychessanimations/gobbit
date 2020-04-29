@@ -162,7 +162,7 @@ var BISHOP_VALUE = Accum{300, 320}
 var ROOK_VALUE = Accum{500, 520}
 var QUEEN_VALUE = Accum{900, 920}
 var LANCER_VALUE = Accum{700, 720}
-var LANCER_HOME_BONUS = Accum{100, 0}
+var LANCER_HOME_BONUS = Accum{300, 0}
 var SENTRY_VALUE = Accum{320, 320}
 var JAILER_VALUE = Accum{400, 420}
 
