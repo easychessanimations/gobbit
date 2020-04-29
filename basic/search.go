@@ -25,35 +25,32 @@ const TRANSPOSITION_TABLE_KEY_SIZE_IN_BITS = 26
 const TRANSPOSITION_TABLE_SIZE = 1 << TRANSPOSITION_TABLE_KEY_SIZE_IN_BITS
 const TRANSPOSITION_TABLE_KEY_MASK = TRANSPOSITION_TABLE_SIZE - 1
 
-type TranspositionTable struct{
-	Entries [TRANSPOSITION_TABLE_SIZE]TranspositionTableEntry
-}
+var TranspTable [TRANSPOSITION_TABLE_SIZE]TranspositionTableEntry
 
-func (trt *TranspositionTable) Key(zobrist uint64) uint64{
+func TranspositionTableKey(zobrist uint64) uint64{
 	return zobrist & TRANSPOSITION_TABLE_KEY_MASK
 }
 
-func (trt *TranspositionTable) Get(zobrist uint64) (TranspositionTableEntry, bool){
-	key := trt.Key(zobrist)
-	entry := trt.Entries[key]
+func TranspGet(zobrist uint64) (TranspositionTableEntry, bool){
+	entry := TranspTable[TranspositionTableKey(zobrist)]
 	if entry.Zobrist == zobrist{
 		return entry, true
 	}
 	return entry, false
 }
 
-func (trt *TranspositionTable) Set(zobrist uint64, entry TranspositionTableEntry){
-	oldEntry, ok := trt.Get(zobrist)
+func TranspSet(zobrist uint64, entry TranspositionTableEntry){
+	oldEntry, ok := TranspGet(zobrist)
 	if ok{
 		if entry.RemDepth > oldEntry.RemDepth{
-			trt.Entries[trt.Key(zobrist)] = entry
+			entry.Zobrist = zobrist
+			TranspTable[TranspositionTableKey(zobrist)] = entry
 		}
 	}else{
-		trt.Entries[trt.Key(zobrist)] = entry
+		entry.Zobrist = zobrist
+		TranspTable[TranspositionTableKey(zobrist)] = entry
 	}
 }
-
-var TranspTable TranspositionTable
 
 func (st State) Score() Score {
 	mat := st.Material[White]
@@ -83,7 +80,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	st := pos.Current()
 
 	if ALLOW_TRANSPOSITION_TABLE{
-		entry, ok := TranspTable.Get(st.Zobrist)
+		entry, ok := TranspGet(st.Zobrist)
 
 		if ok{
 			if entry.RemDepth >= abi.MaxDepth - abi.CurrentDepth{
@@ -139,11 +136,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				MaxDepth:     abi.MaxDepth,
 			})
 
-			if ALLOW_TRANSPOSITION_TABLE{
-				TranspTable.Set(pos.Zobrist(), TranspositionTableEntry{
+			if ALLOW_TRANSPOSITION_TABLE && abi.CurrentDepth < 3  {	
+				TranspSet(pos.Zobrist(), TranspositionTableEntry{
 					Score: -score,
 					RemDepth: abi.MaxDepth - abi.CurrentDepth - 1,
-					Zobrist: pos.Zobrist(),
 				})
 			}
 
@@ -246,7 +242,7 @@ func (pos *Position) Search(maxDepth int) {
 	PvTable = make(map[uint64]Move)
 
 	if ALLOW_TRANSPOSITION_TABLE{
-		TranspTable = TranspositionTable{}
+		TranspTable = [TRANSPOSITION_TABLE_SIZE]TranspositionTableEntry{}
 	}
 
 	lastGoodPv = []Move{}
