@@ -155,6 +155,8 @@ func (acc Accum) String() string {
 var PAWN_VALUE = Accum{100, 120}
 var CENTER_PAWN_VALUE = Accum{150, 120}
 var KNIGHT_VALUE = Accum{300, 300}
+var KNIGHT_ON_EDGE_DEDUCTION = Accum{50, 50}
+var KNIGHT_CLOSE_TO_EDGE_DEDUCTION = Accum{25, 25}
 var BISHOP_VALUE = Accum{300, 320}
 var ROOK_VALUE = Accum{500, 520}
 var QUEEN_VALUE = Accum{900, 920}
@@ -219,6 +221,8 @@ func GetMaterialForPieceAtSquare(p Piece, sq Square) Accum {
 }
 
 func init() {
+	var rank Rank
+	var file File
 	for color := Black; color <= White; color++ {
 		for fig := FigureMinValue; fig <= FigureMaxValue; fig++ {
 			p := ColorFigure[color][fig]
@@ -233,7 +237,23 @@ func init() {
 				PieceMaterialTables[p] = mt.POV(color)
 				break
 			case Knight:
-				mt.Fill(KNIGHT_VALUE)
+				mt.Fill(KNIGHT_VALUE)				
+				for rank = 0; rank < NUM_RANKS; rank++{
+					mt[RankFile[rank][0]].UnMerge(KNIGHT_ON_EDGE_DEDUCTION)
+					mt[RankFile[rank][LAST_FILE]].UnMerge(KNIGHT_ON_EDGE_DEDUCTION)
+					if rank > 0 && rank < LAST_RANK{
+						mt[RankFile[rank][1]].UnMerge(KNIGHT_CLOSE_TO_EDGE_DEDUCTION)
+						mt[RankFile[rank][LAST_FILE-1]].UnMerge(KNIGHT_CLOSE_TO_EDGE_DEDUCTION)
+					}
+				}
+				for file = 0; file < NUM_FILES; file++{
+					mt[RankFile[0][file]].UnMerge(KNIGHT_ON_EDGE_DEDUCTION)
+					mt[RankFile[LAST_RANK][file]].UnMerge(KNIGHT_ON_EDGE_DEDUCTION)
+					if file > 0 && file < LAST_FILE{
+						mt[RankFile[1][file]].UnMerge(KNIGHT_CLOSE_TO_EDGE_DEDUCTION)
+						mt[RankFile[LAST_RANK-1][file]].UnMerge(KNIGHT_CLOSE_TO_EDGE_DEDUCTION)	
+					}
+				}
 				PieceMaterialTables[p] = mt.POV(color)
 				break
 			case Bishop:
