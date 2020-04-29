@@ -225,10 +225,10 @@ func (st *State) ParseFullmoveNumber(fmns string) {
 
 func (st State) CastlingRank(color Color) Rank{
 	if color == White{
-		return 0
+		return Rank1
 	}
 
-	return LAST_RANK
+	return Rank8
 }
 
 func (st State) IsCastlingPartner(fig Figure) bool{

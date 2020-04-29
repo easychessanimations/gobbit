@@ -1,6 +1,10 @@
 package basic
 
-//import "fmt"
+import "fmt"
+
+func FmtDummy(){
+	fmt.Println("")
+}
 
 type Move uint32
 
@@ -347,11 +351,55 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 					}
 				}
 				if betweenOrigEmpty{
-					checksOk := true
-					// TODO: detect checks
+					// remove king for tests
+					st.Remove(wk)
+
+					checksOk := true					
+
+					cts := st.CastlingTargetSquares(kCol, side)
+
+					kt := cts[0]
+
+					fileDir := File(1)
+					if FileOf[kt] < FileOf[wk]{
+						fileDir = File(-1)
+					}
+
+					testRank := RankOf[wk]
+					testFile := FileOf[wk]
+
+					ok := true
+
+					for ok {
+						testSq := RankFile[testRank][testFile]
+						
+						st.Remove(testSq)
+						st.Put(p, testSq)
+
+						// now king is on test square
+						if st.IsChecked(kCol){
+							checksOk = false
+						}
+
+						st.Remove(testSq)
+
+						if !checksOk{
+							break
+						}
+
+						if testSq == kt{
+							ok = false
+						}else{
+							testFile += fileDir
+						}
+					}
+
 					if checksOk{
 						moves = append(moves, MakeMoveFTC(wk, cr.RookOrigSq))
-					}				
+					}		
+
+					// put back king
+					st.Put(p, wk)		
 				}
 			}			
 		}
