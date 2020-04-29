@@ -154,6 +154,7 @@ func (acc Accum) String() string {
 
 var PAWN_VALUE = Accum{100, 120}
 var CENTER_PAWN_VALUE = Accum{150, 120}
+var SEMI_CENTER_PAWN_VALUE = Accum{125, 120}
 var KNIGHT_VALUE = Accum{300, 300}
 var KNIGHT_ON_EDGE_DEDUCTION = Accum{50, 50}
 var KNIGHT_CLOSE_TO_EDGE_DEDUCTION = Accum{25, 25}
@@ -161,6 +162,7 @@ var BISHOP_VALUE = Accum{300, 320}
 var ROOK_VALUE = Accum{500, 520}
 var QUEEN_VALUE = Accum{900, 920}
 var LANCER_VALUE = Accum{700, 720}
+var LANCER_HOME_BONUS = Accum{100, 0}
 var SENTRY_VALUE = Accum{320, 320}
 var JAILER_VALUE = Accum{400, 420}
 
@@ -220,6 +222,17 @@ func GetMaterialForPieceAtSquare(p Piece, sq Square) Accum {
 	return PieceMaterialTables[p][sq]
 }
 
+const (
+	LANCER_DIRECTION_N = iota
+	LANCER_DIRECTION_NE
+	LANCER_DIRECTION_E
+	LANCER_DIRECTION_SE
+	LANCER_DIRECTION_S
+	LANCER_DIRECTION_SW
+	LANCER_DIRECTION_W
+	LANCER_DIRECTION_NW
+)
+
 func init() {
 	var rank Rank
 	var file File
@@ -234,6 +247,8 @@ func init() {
 				mt[SquareE5] = CENTER_PAWN_VALUE
 				mt[SquareD4] = CENTER_PAWN_VALUE
 				mt[SquareD5] = CENTER_PAWN_VALUE
+				mt[SquareC3] = SEMI_CENTER_PAWN_VALUE
+				mt[SquareE3] = SEMI_CENTER_PAWN_VALUE
 				PieceMaterialTables[p] = mt.POV(color)
 				break
 			case Knight:
@@ -281,6 +296,15 @@ func init() {
 				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
 					p = ColorFigure[color][int(LancerMinValue)+ld]
 					mt.Fill(LANCER_VALUE)
+					pstr := Rank2
+					if color == Black{
+						pstr = Rank7
+					}					
+					for file = 0; file < NUM_FILES; file++{
+						if ( file < 6 && ld == LANCER_DIRECTION_E ) || ( file > 2 && ld == LANCER_DIRECTION_W ){
+							mt[RankFile[pstr][file]].Merge(LANCER_HOME_BONUS)
+						}						
+					}
 					PieceMaterialTables[p] = mt
 				}
 			}

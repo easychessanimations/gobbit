@@ -320,12 +320,18 @@ func (st *State) GenMoveBuff() {
 func (mb MoveBuff) PrettyPrintString() string {
 	buff := []string{}
 
+	cumul := 0
+
 	for i, mbi := range mb {
-		newLine := ""
-		if (i+1) % 7 == 0{
+		newLine := ""		
+		item := fmt.Sprintf("%d. %s", i+1, mbi.San)
+		cumul += len(item)
+		if cumul > 70 && i != len(mb)-1{
+			cumul = 0
 			newLine = "\n"
 		}
-		buff = append(buff, fmt.Sprintf("%d. %s", i+1, mbi.San) + newLine)		
+		buff = append(buff, item + newLine)		
+		
 	}
 
 	return strings.Join(buff, " ")

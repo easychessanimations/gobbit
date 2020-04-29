@@ -342,7 +342,7 @@ func (st State) PslmsForPieceAtSquare(kind MoveKind, p Piece, sq Square, occupUs
 		wk := st.KingInfos[kCol].Square
 		for side := CastlingSideKing; side <= CastlingSideQueen; side++{			
 			cr := ccr[side]
-			if cr.CanCastle{
+			if cr.CanCastle && !st.IsSquareJailedForColor(cr.RookOrigSq, kCol){
 				betweenOrigEmpty := true
 				for _, testSq := range cr.BetweenOrigSquares{
 					if st.PieceAtSquare(testSq) != NoPiece && testSq != wk && testSq != cr.RookOrigSq {
