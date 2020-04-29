@@ -222,12 +222,61 @@ func (st *State) ParseFullmoveNumber(fmns string) {
 	st.FullmoveNumber = t.GetInt()
 }
 
+func (st State) CastlingRank(color Color) Rank{
+	if color == White{
+		return 0
+	}
+
+	return LAST_RANK
+}
+
+func (st State) IsCastlingPartner(fig Figure) bool{
+	return fig == Rook || fig == Jailer
+}
+
+// PopulateCastlingRights determines castling rights information based on piece placement
+// also does sanity check
+func (st *State) PopulateCastlingRights(crs CastlingRights) CastlingRights{
+	for color := Black; color <= White; color++{
+		wk := st.KingInfos[color].Square		
+		cRank := st.CastlingRank(color)
+		if RankOf[wk] != cRank{
+			// king is on illegal rank, delete castling rights
+			crs[color][CastlingSideKing].CanCastle = false
+			crs[color][CastlingSideQueen].CanCastle = false
+		}else{
+			for side := CastlingSideKing; side <= CastlingSideQueen; side++{
+				dir := File(1 - (2 * side))
+				foundCastlingPartner := false
+				for testFile := FileOf[wk]; testFile >= 0 && testFile < NUM_FILES; testFile += dir{					
+					testSq := RankFile[cRank][testFile]
+					testP := st.PieceAtSquare(testSq)
+					testFig := FigureOf[testP]
+					if st.IsCastlingPartner(testFig){
+						foundCastlingPartner = true
+						crs[color][side].RookOrigSq = testSq
+						crs[color][side].RookOrigPiece = testP						
+					}					
+				}
+				if !foundCastlingPartner{
+					crs[color][side].CanCastle = false
+				}
+			}
+		}		
+	}
+
+	return crs
+}
+
 func (st *State) ParseCastlingRights(crs string) {
 	t := Tokenizer{}
 	t.Init(crs)
 
 	newCastlingRights := t.GetCastlingRights()
-	st.SetCastlingAbility(newCastlingRights)
+
+	populatedCastlingRights := st.PopulateCastlingRights(newCastlingRights)
+
+	st.SetCastlingAbility(populatedCastlingRights)
 }
 
 func (st *State) ParseTurnString(ts string) {

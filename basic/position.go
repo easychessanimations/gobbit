@@ -141,6 +141,8 @@ func (pos Position) GameEnd(ply int) (bool, Score) {
 func (st *State) MakeMove(move Move) {
 	p := st.PieceAtSquare(move.FromSq())
 
+	pCol := ColorOf[p]
+
 	top := st.PieceAtSquare(move.ToSq())
 
 	st.Remove(move.FromSq())
@@ -176,12 +178,25 @@ func (st *State) MakeMove(move Move) {
 
 	st.SetEpSquare(SquareA1)
 
+	newCastlingRights := st.CastlingRights
+
 	if FigureOf[p] == King{
 		// if king was moved, delete all castling rights
-		newCastlingRights := st.CastlingRights
-		newCastlingRights[ColorOf[p]][CastlingSideKing].CanCastle = false
-		newCastlingRights[ColorOf[p]][CastlingSideQueen].CanCastle = false
+		newCastlingRights[pCol][CastlingSideKing].CanCastle = false
+		newCastlingRights[pCol][CastlingSideQueen].CanCastle = false
+
 		st.SetCastlingAbility(newCastlingRights)
+	}else{
+		// check if castling partner was moved or captured, if so, delete castling right on that side
+		for side := CastlingSideKing; side <= CastlingSideQueen; side++{
+			testSq := newCastlingRights[pCol][side].RookOrigSq
+
+			if move.FromSq() == testSq || move.ToSq() == testSq{
+				newCastlingRights[pCol][side].CanCastle = false
+
+				st.SetCastlingAbility(newCastlingRights)
+			}
+		}
 	}
 
 	if FigureOf[p] == Pawn{
