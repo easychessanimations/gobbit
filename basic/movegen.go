@@ -134,7 +134,7 @@ func (st State) PromotionFigures() []Figure{
 	return promFigures
 }
 
-func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
+func (st State) AppendMove(moves *[]Move, move Move, jailColor Color){	
 	p := st.PieceAtSquare(move.FromSq())
 
 	fromFig := FigureOf[p]
@@ -143,7 +143,7 @@ func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 	if move.MoveType() == SentryPush{
 		// for sentry push target square and promotion square have to differ
 		if move.ToSq() == move.PromotionSquare(){
-			return moves
+			return
 		}
 	}
 
@@ -151,7 +151,7 @@ func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 		if move.FromSq() == st.DisableFromSquare{
 			// quick check for exact match, that'll do it for jumping pieces
 			if move.ToSq() == st.DisableToSquare{
-				return moves
+				return
 			}
 			// check sliding pieces
 			disabledBishopDir, hasDisabledBishopDir := NormalizedBishopDirection(st.DisableFromSquare, st.DisableToSquare)
@@ -160,12 +160,12 @@ func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 			moveRookDir, moveHasRookDir := NormalizedRookDirection(move.FromSq(), move.ToSq())
 			if hasDisabledBishopDir && moveHasBishopDir{
 				if disabledBishopDir == moveBishopDir{
-					return moves
+					return
 				}
 			}
 			if hasDisabledRookDir && moveHasRookDir{
 				if disabledRookDir == moveRookDir{
-					return moves
+					return
 				}
 			}
 		}
@@ -174,21 +174,22 @@ func (st State) AppendMove(moves []Move, move Move, jailColor Color) []Move{
 	if jailColor == NoColor || !st.IsSquareJailedForColor(move.FromSq(), jailColor){		
 		if fromFig == Pawn && RankOf[move.ToSq()] == PromotionRank[fromCol]{
 			for _, fig := range st.PromotionFigures(){
-				moves = append(moves, MakeMoveFTP(move.FromSq(), move.ToSq(), ColorFigure[fromCol][fig]))
+				*moves = append(*moves, MakeMoveFTP(move.FromSq(), move.ToSq(), ColorFigure[fromCol][fig]))
 			}
 		}else{
-			return append(moves, move)
+			*moves = append(*moves, move)
+			return
 		}
 	}
 
-	return moves
+	return
 }
 
 func (st State) GenBitboardMoves(sq Square, mobility Bitboard, jailColor Color) []Move {	
 	moves := []Move{}
 
 	for _, toSq := range mobility.PopAll() {
-		moves = st.AppendMove(moves, MakeMoveFT(sq, toSq), jailColor)
+		st.AppendMove(&moves, MakeMoveFT(sq, toSq), jailColor)
 	}
 
 	return moves
@@ -203,10 +204,10 @@ func (st State) GenLancerMoves(color Color, sq Square, mobility Bitboard, keepDi
 
 	for _, toSq := range mobility.PopAll() {
 		if keepDir {
-			moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, lancerDir)), jailColor)
+			st.AppendMove(&moves, MakeMoveFTP(sq, toSq, MakeLancer(color, lancerDir)), jailColor)
 		} else {
 			for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++ {
-				moves = st.AppendMove(moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)), jailColor)
+				st.AppendMove(&moves, MakeMoveFTP(sq, toSq, MakeLancer(color, ld)), jailColor)
 			}
 		}
 	}
@@ -222,7 +223,7 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	if kind&Violent != 0 {
 		for _, captInfo := range pi.Captures {			
 			if (captInfo.CheckSq.Bitboard() & occupThem) != 0 || captInfo.CheckSq == st.EpSquare {				
-				moves = st.AppendMove(moves, captInfo.Move, jailColor)
+				st.AppendMove(&moves, captInfo.Move, jailColor)
 			}
 		}
 	}
@@ -230,7 +231,7 @@ func (st State) GenPawnMoves(kind MoveKind, color Color, sq Square, occupUs, occ
 	if kind&Quiet != 0 {
 		for _, pushInfo := range pi.Pushes {
 			if (pushInfo.CheckSq.Bitboard() & (occupUs | occupThem)) == 0 {
-				moves = st.AppendMove(moves, pushInfo.Move, jailColor)
+				st.AppendMove(&moves, pushInfo.Move, jailColor)
 				if disablePushByTwo{
 					break
 				}
@@ -454,7 +455,8 @@ func (st State) Pslms(kind MoveKind) []Move {
 }
 
 func (st State) GenerateMoves() []Move {
-	return st.Pslms(Violent | Quiet)
+	//return st.Pslms(Violent | Quiet)
+	return append(st.Pslms(Violent), st.Pslms(Quiet)...)
 }
 
 func (st State) LegalMoves(stopAtFirst bool) []Move {

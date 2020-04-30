@@ -74,6 +74,8 @@ const ALLOW_FAIL_SOFT = false
 
 const ALLOW_TRANSPOSITION_TABLE = true
 
+const TRANSPOSITION_TABLE_MAX_DEPTH = 5
+
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -136,7 +138,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				MaxDepth:     abi.MaxDepth,
 			})
 
-			if ALLOW_TRANSPOSITION_TABLE && abi.CurrentDepth < 3  {	
+			if ALLOW_TRANSPOSITION_TABLE && abi.CurrentDepth < TRANSPOSITION_TABLE_MAX_DEPTH  {	
 				TranspSet(pos.Zobrist(), TranspositionTableEntry{
 					Score: -score,
 					RemDepth: abi.MaxDepth - abi.CurrentDepth - 1,
