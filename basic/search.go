@@ -13,43 +13,12 @@ type AlphaBetaInfo struct {
 	MaxDepth     int
 }
 
-var PvTable map[uint64]Move
+var PvTable map[uint64][]Move
 
 type TranspositionTableEntry struct{
 	Score    Score
 	RemDepth int
 	Zobrist  uint64
-}
-
-const TRANSPOSITION_TABLE_KEY_SIZE_IN_BITS = 26
-const TRANSPOSITION_TABLE_SIZE = 1 << TRANSPOSITION_TABLE_KEY_SIZE_IN_BITS
-const TRANSPOSITION_TABLE_KEY_MASK = TRANSPOSITION_TABLE_SIZE - 1
-
-var TranspTable [TRANSPOSITION_TABLE_SIZE]TranspositionTableEntry
-
-func TranspositionTableKey(zobrist uint64) uint64{
-	return zobrist & TRANSPOSITION_TABLE_KEY_MASK
-}
-
-func TranspGet(zobrist uint64) (TranspositionTableEntry, bool){
-	entry := TranspTable[TranspositionTableKey(zobrist)]
-	if entry.Zobrist == zobrist{
-		return entry, true
-	}
-	return entry, false
-}
-
-func TranspSet(zobrist uint64, entry TranspositionTableEntry){
-	oldEntry, ok := TranspGet(zobrist)
-	if ok{
-		if entry.RemDepth > oldEntry.RemDepth{
-			entry.Zobrist = zobrist
-			TranspTable[TranspositionTableKey(zobrist)] = entry
-		}
-	}else{
-		entry.Zobrist = zobrist
-		TranspTable[TranspositionTableKey(zobrist)] = entry
-	}
 }
 
 func (st State) Score() Score {
@@ -76,26 +45,10 @@ func (st State) Score() Score {
 	return score
 }
 
-const ALLOW_FAIL_SOFT = false
-
-const ALLOW_TRANSPOSITION_TABLE = true
-
-const TRANSPOSITION_TABLE_MAX_DEPTH = 5
-
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
 	st := pos.Current()
-
-	if ALLOW_TRANSPOSITION_TABLE{
-		entry, ok := TranspGet(st.Zobrist)
-
-		if ok{
-			if entry.RemDepth >= abi.MaxDepth - abi.CurrentDepth{
-				return entry.Score
-			}
-		}
-	}
 
 	end, score := pos.GameEnd(abi.CurrentDepth)
 
@@ -108,24 +61,6 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 		// if reached max depth or search stopped, return material score
 		return st.Score()
 	}
-
-	ms := st.GenerateMoves()
-
-	pvMove, ok := PvTable[pos.Zobrist()]
-
-	if ok {
-		newMs := []Move{pvMove}
-
-		for _, testMove := range ms {
-			if testMove != pvMove {
-				newMs = append(newMs, testMove)
-			}
-		}
-
-		ms = newMs
-	}
-	
-	bestScore := -INFINITE_SCORE
 
 	hasMove := false
 
@@ -152,28 +87,28 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				MaxDepth:     abi.MaxDepth,
 			})
 
-			if ALLOW_TRANSPOSITION_TABLE && abi.CurrentDepth < TRANSPOSITION_TABLE_MAX_DEPTH  {	
-				TranspSet(pos.Zobrist(), TranspositionTableEntry{
-					Score: -score,
-					RemDepth: abi.MaxDepth - abi.CurrentDepth - 1,
-				})
-			}
-
 			pos.Pop()
-
-			if score >= abi.Beta {
-				// beta cut
-				return abi.Beta
-			}
-			
-			if score > bestScore{
-				bestScore = score
-			}
 
 			if score > abi.Alpha {
 				// alpha improvement
 				abi.Alpha = score
-				PvTable[st.Zobrist] = move
+				pvMoves, ok := PvTable[st.Zobrist]
+				if ok{
+					newPvMoves := []Move{move}
+					for _, testMove := range pvMoves{
+						if testMove != move{
+							newPvMoves = append(newPvMoves, testMove)
+						}
+					}
+					PvTable[st.Zobrist] = newPvMoves
+				}else{
+					PvTable[st.Zobrist] = []Move{move}
+				}					
+			}
+
+			if score >= abi.Beta {
+				// beta cut
+				return abi.Beta
 			}
 		}
 	}
@@ -186,11 +121,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 		}
 	}
 
-	if ALLOW_FAIL_SOFT{
-		return bestScore
-	}else{
-		return abi.Alpha
-	}	
+	return abi.Alpha
 }
 
 func (pos *Position) AlphaBeta(maxDepth int) Score {
@@ -215,11 +146,11 @@ func (pos Position) GetPvRec(depthRemaining int, pvSoFar []Move) []Move {
 		return pvSoFar
 	}
 
-	move, ok := PvTable[pos.Zobrist()]
+	moves, ok := PvTable[pos.Zobrist()]
 
 	if ok {
-		pos.Push(move)
-		return pos.GetPvRec(depthRemaining-1, append(pvSoFar, move))
+		pos.Push(moves[0])
+		return pos.GetPvRec(depthRemaining-1, append(pvSoFar, moves[0]))
 	}
 
 	return pvSoFar
@@ -249,17 +180,13 @@ func (pos *Position) PrintBestMove(pv []Move) {
 var lastGoodPv []Move
 
 func PrintPvTable() {
-	for zobrist, move := range PvTable {
-		fmt.Printf("%016X %s\n", zobrist, move.UCI())
+	for zobrist, moves := range PvTable {
+		fmt.Printf("%016X %s\n", zobrist, moves[0].UCI())
 	}
 }
 
 func (pos *Position) Search(maxDepth int) {
-	PvTable = make(map[uint64]Move)
-
-	if ALLOW_TRANSPOSITION_TABLE{
-		TranspTable = [TRANSPOSITION_TABLE_SIZE]TranspositionTableEntry{}
-	}
+	PvTable = make(map[uint64][]Move)
 
 	lastGoodPv = []Move{}
 

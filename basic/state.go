@@ -83,9 +83,8 @@ type State struct {
 	Zobrist           uint64
 	KingInfos         [ColorArraySize]KingInfo
 	StackPhase        int
-	StackBuff         []Move
-	StackHasPvMove    bool
-	StackPvMove       Move
+	StackBuff         []Move	
+	StackPvMoves      []Move
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
@@ -341,8 +340,8 @@ func (mb MoveBuff) PrettyPrintString() string {
 	return strings.Join(buff, " ")
 }
 
-const MOBILITY_MULTIPLIER = 10
-const ATTACK_MULTIPLIER = 50
+const MOBILITY_MULTIPLIER = 5
+const ATTACK_MULTIPLIER = 25
 
 func (st State) MobilityBalance() Accum{
 	return st.MobilityForColor(White).Sub(st.MobilityForColor(Black))

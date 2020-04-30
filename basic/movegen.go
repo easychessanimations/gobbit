@@ -20,6 +20,7 @@ const (
 // stack phases
 const (
 	GenPv = iota
+	PopPv
 	GenViolent
 	PopViolent
 	GenQuiet
@@ -28,8 +29,7 @@ const (
 )
 
 func (st *State) InitStack(){
-	st.StackPhase = GenPv
-	st.StackHasPvMove = false
+	st.StackPhase = GenPv	
 }
 
 func (st *State) PopStackBuff() (Move, bool){
@@ -42,8 +42,12 @@ func (st *State) PopStackBuff() (Move, bool){
 	move := st.StackBuff[l-1]
 	st.StackBuff = st.StackBuff[0:l-1]
 
-	if st.StackHasPvMove && move == st.StackPvMove{
-		return st.PopStackBuff()
+	if len(st.StackPvMoves) > 0{
+		for _, testMove := range st.StackPvMoves{
+			if move == testMove{
+				return st.PopStackBuff()		
+			}
+		}
 	}
 
 	return move, true
@@ -51,12 +55,21 @@ func (st *State) PopStackBuff() (Move, bool){
 
 func (st *State) PopStack() Move{
 	if st.StackPhase == GenPv{
-		pvMove, ok := PvTable[st.Zobrist]
-		if ok{
-			st.StackPhase = GenViolent
-			st.StackHasPvMove = true
-			st.StackPvMove = pvMove
-			return pvMove
+		pvMoves, ok := PvTable[st.Zobrist]
+		if ok{			
+			st.StackPvMoves = pvMoves
+			st.StackPhase = PopPv			
+		}else{			
+			st.StackPvMoves = []Move{}
+			st.StackPhase = GenViolent			
+		}
+	}
+
+	if st.StackPhase == PopPv{
+		if len(st.StackPvMoves) > 0{
+			move := st.StackPvMoves[0]
+			st.StackPvMoves = st.StackPvMoves[1:]
+			return move
 		}else{
 			st.StackPhase = GenViolent
 		}
@@ -227,7 +240,7 @@ func (st State) AppendMove(moves *[]Move, move Move, jailColor Color){
 		}
 	}
 
-	if st.HasDisabledMove{
+	if st.HasDisabledMove && fromFig != Pawn{
 		if move.FromSq() == st.DisableFromSquare{
 			// quick check for exact match, that'll do it for jumping pieces
 			if move.ToSq() == st.DisableToSquare{
