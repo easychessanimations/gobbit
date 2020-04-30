@@ -341,6 +341,58 @@ func (mb MoveBuff) PrettyPrintString() string {
 	return strings.Join(buff, " ")
 }
 
+const MOBILITY_MULTIPLIER = 10
+const ATTACK_MULTIPLIER = 50
+
+func (st State) MobilityBalance() Accum{
+	return st.MobilityForColor(White).Sub(st.MobilityForColor(Black))
+}
+
+func (st State) MobilityPOV() Accum{
+	mobBal := st.MobilityBalance()
+
+	if st.Turn == White{
+		return mobBal
+	}
+
+	return mobBal.Mult(-1)
+}
+
+func (st State) MobilityForColor(color Color) Accum{
+	occupUs := st.ByColor[color]
+	occupThem := st.ByColor[color.Inverse()]
+	mobility := Accum{}
+	for _, sq := range st.ByColor[color].PopAll(){
+		if !st.IsSquareJailedForColor(sq, color){
+			p := st.PieceAtSquare(sq)
+			fig := FigureOf[p]
+			var mob Bitboard
+			switch fig{
+			case Knight:
+				mob = KnightMobility(Violent|Quiet, sq, occupUs, occupThem)
+				break
+			// approximate sentry as bishop
+			case Bishop, Sentry:
+				mob = BishopMobility(Violent|Quiet, sq, occupUs, occupThem)
+				break
+			// approximate jailer as rook
+			case Rook, Jailer:
+				mob = RookMobility(Violent|Quiet, sq, occupUs, occupThem)
+				break
+			case Queen:
+				mob = QueenMobility(Violent|Quiet, sq, occupUs, occupThem)
+				break
+			case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
+				mob = LancerMobility(Violent|Quiet, p.LancerDirection(), sq, occupUs, occupThem)
+				break
+			}			
+			attack := mob & KingArea[sq]
+			mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attack.Count() * ATTACK_MULTIPLIER)})
+		}		
+	}
+	return mobility
+}
+
 func (st State) MaterialPOV() Accum {
 	if st.Turn == White {
 		return st.Material[NoColor]
@@ -354,7 +406,12 @@ func (st State) PrettyPrintString() string {
 
 	buff += fmt.Sprintf("\n%s : %s : %16X\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist)
 
-	buff += fmt.Sprintf("\nWhite %v , Black %v , Balance %v , POV %v , Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
+	buff += fmt.Sprintf("\nMat White %v , Black %v , Balance %v , POV %v , Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
+
+	mobW := st.MobilityForColor(White)
+	mobB := st.MobilityForColor(Black)
+
+	buff += fmt.Sprintf("Mob White %v , Black %v , Balance %v , POV %v\n", mobW, mobB, st.MobilityBalance(), st.MobilityPOV())
 
 	st.GenMoveBuff()
 

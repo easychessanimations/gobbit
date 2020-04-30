@@ -67,7 +67,13 @@ func (st State) Score() Score {
 
 	scoref := mf*phase + (1-phase)*ef
 
-	return Score(scoref)
+	score := Score(scoref)
+
+	mob := st.MobilityPOV()
+
+	score += mob.M + mob.E
+
+	return score
 }
 
 const ALLOW_FAIL_SOFT = false

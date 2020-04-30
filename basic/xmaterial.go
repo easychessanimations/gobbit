@@ -149,7 +149,7 @@ func (acc Accum) Mult(s Score) Accum {
 }
 
 func (acc Accum) String() string {
-	return fmt.Sprintf("M %3d E %3d", acc.M, acc.E)
+	return fmt.Sprintf("M %4d E %4d", acc.M, acc.E)
 }
 
 var PAWN_VALUE = Accum{100, 120}
