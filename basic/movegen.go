@@ -17,6 +17,86 @@ const (
 	Castling
 )
 
+// stack phases
+const (
+	GenPv = iota
+	GenViolent
+	PopViolent
+	GenQuiet
+	PopQuiet
+	GenDone
+)
+
+func (st *State) InitStack(){
+	st.StackPhase = GenPv
+	st.StackHasPvMove = false
+}
+
+func (st *State) PopStackBuff() (Move, bool){
+	l := len(st.StackBuff)
+
+	if l <= 0{
+		return Move(0), false
+	}
+
+	move := st.StackBuff[l-1]
+	st.StackBuff = st.StackBuff[0:l-1]
+
+	if st.StackHasPvMove && move == st.StackPvMove{
+		return st.PopStackBuff()
+	}
+
+	return move, true
+}
+
+func (st *State) PopStack() Move{
+	if st.StackPhase == GenPv{
+		pvMove, ok := PvTable[st.Zobrist]
+		if ok{
+			st.StackPhase = GenViolent
+			st.StackHasPvMove = true
+			st.StackPvMove = pvMove
+			return pvMove
+		}else{
+			st.StackPhase = GenViolent
+		}
+	}
+
+	if st.StackPhase == GenViolent{
+		st.StackBuff = st.Pslms(Violent)
+		st.StackPhase = PopViolent
+	}
+
+	if st.StackPhase == PopViolent{
+		move, ok := st.PopStackBuff()
+		if ok{
+			return move
+		}else{
+			st.StackPhase = GenQuiet
+		}
+	}
+
+	if st.StackPhase == GenQuiet{
+		st.StackBuff = st.Pslms(Quiet)
+		st.StackPhase = PopQuiet
+	}
+
+	if st.StackPhase == PopQuiet{
+		move, ok := st.PopStackBuff()
+		if ok{
+			return move
+		}else{
+			st.StackPhase = GenDone
+		}
+	}
+
+	if st.StackPhase == GenDone{
+		return Move(0)
+	}
+
+	panic("invalid stack phase")
+}
+
 const SQUARE_MASK = (1 << SQUARE_STORAGE_SIZE_IN_BITS) - 1
 
 const PIECE_STORAGE_SIZE_IN_BITS = 6

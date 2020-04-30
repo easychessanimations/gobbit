@@ -74,7 +74,7 @@ const ALLOW_FAIL_SOFT = false
 
 const ALLOW_TRANSPOSITION_TABLE = true
 
-const TRANSPOSITION_TABLE_MAX_DEPTH = 5
+const TRANSPOSITION_TABLE_MAX_DEPTH = 4
 
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
@@ -123,11 +123,19 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 	hasMove := false
 
-	for _, move := range ms {
-		pos.Push(move)
+	st.InitStack()
 
-		if pos.Current().IsCheckedThem(){
-			pos.Pop()
+	for st.StackPhase != GenDone {
+		move := st.PopStack()
+
+		if st.StackPhase != GenDone{
+			pos.Push(move)
+		}
+
+		if st.StackPhase == GenDone || pos.Current().IsCheckedThem(){
+			if st.StackPhase != GenDone{
+				pos.Pop()
+			}			
 		}else{
 			hasMove = true
 

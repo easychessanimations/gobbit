@@ -82,6 +82,10 @@ type State struct {
 	Material          [ColorArraySize]Accum
 	Zobrist           uint64
 	KingInfos         [ColorArraySize]KingInfo
+	StackPhase        int
+	StackBuff         []Move
+	StackHasPvMove    bool
+	StackPvMove       Move
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
