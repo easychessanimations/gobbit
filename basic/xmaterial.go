@@ -163,6 +163,7 @@ var ROOK_VALUE = Accum{500, 520}
 var QUEEN_VALUE = Accum{900, 920}
 var LANCER_VALUE = Accum{700, 720}
 var LANCER_HOME_BONUS = Accum{100, 0}
+var LANCER_FACING_OUT_VALUE = Accum{0, 0}
 var SENTRY_VALUE = Accum{320, 320}
 var JAILER_VALUE = Accum{400, 420}
 
@@ -299,12 +300,18 @@ func init() {
 					pstr := Rank2
 					if color == Black{
 						pstr = Rank7
-					}					
+					}		
+					delta := LANCER_DELTAS[ld]			
 					for file = 0; file < NUM_FILES; file++{
 						if ( file < 6 && ld == LANCER_DIRECTION_E ) || ( file > 2 && ld == LANCER_DIRECTION_W ){
 							mt[RankFile[pstr][file]].Merge(LANCER_HOME_BONUS)
 						}						
-					}
+						for rank = 0; rank < NUM_RANKS; rank++{
+							if (file == 0 && delta.dFile < 0) || (file == LAST_FILE && delta.dFile > 0) || (rank == 0 && delta.dRank < 0) || (rank == LAST_RANK && delta.dRank > 0){
+								mt[RankFile[rank][file]] = LANCER_FACING_OUT_VALUE
+							}
+						}
+					}					
 					PieceMaterialTables[p] = mt
 				}
 			}
