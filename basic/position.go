@@ -151,6 +151,16 @@ func (pos Position) GameEnd(ply int) (bool, Score) {
 }
 
 func (st *State) MakeMove(move Move) {
+	if move.MoveType() == Null{
+		st.SetSideToMove(st.Turn.Inverse())
+
+		if st.Turn == White {
+			st.FullmoveNumber++
+		}
+
+		return
+	}
+
 	p := st.PieceAtSquare(move.FromSq())
 
 	pCol := ColorOf[p]

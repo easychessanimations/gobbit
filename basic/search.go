@@ -45,6 +45,8 @@ func (st State) Score() Score {
 	return score
 }
 
+const NULL_MOVE_PRUNING_MIN_DEPTH = 3
+
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -64,7 +66,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 	hasMove := false
 
-	st.InitStack()
+	// https://www.chessprogramming.org/Null_Move_Pruning
+	allowNMP := pos.NullMovePruning && abi.CurrentDepth > NULL_MOVE_PRUNING_MIN_DEPTH
+
+	st.InitStack(allowNMP)
 
 	for st.StackPhase != GenDone {
 		move := st.PopStack()
@@ -92,22 +97,25 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			if score > abi.Alpha {
 				// alpha improvement
 				abi.Alpha = score
-				pvMoves, ok := PvTable[st.Zobrist]
-				if ok{
-					newPvMoves := []Move{move}
-					for _, testMove := range pvMoves{
-						if testMove != move{
-							newPvMoves = append(newPvMoves, testMove)
+
+				if move.MoveType() != Null{
+					pvMoves, ok := PvTable[st.Zobrist]
+					if ok{
+						newPvMoves := []Move{move}
+						for _, testMove := range pvMoves{
+							if testMove != move{
+								newPvMoves = append(newPvMoves, testMove)
+							}
 						}
-					}
-					PvTable[st.Zobrist] = newPvMoves
-				}else{
-					PvTable[st.Zobrist] = []Move{move}
-				}					
+						PvTable[st.Zobrist] = newPvMoves
+					}else{
+						PvTable[st.Zobrist] = []Move{move}
+					}					
+				}				
 			}
 
 			if score >= abi.Beta {
-				// beta cut
+				// beta cut				
 				return abi.Beta
 			}
 		}

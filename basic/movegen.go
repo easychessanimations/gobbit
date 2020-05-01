@@ -15,11 +15,13 @@ const (
 	Promotion
 	SentryPush
 	Castling
+	Null
 )
 
 // stack phases
 const (
-	GenPv = iota
+	PopNull = iota
+	GenPv
 	PopPv
 	GenViolent
 	PopViolent
@@ -28,8 +30,12 @@ const (
 	GenDone
 )
 
-func (st *State) InitStack(){
+func (st *State) InitStack(nmp bool){	
 	st.StackPhase = GenPv	
+
+	if nmp{
+		st.StackPhase = PopNull
+	}
 }
 
 func (st *State) PopStackBuff() (Move, bool){
@@ -53,7 +59,19 @@ func (st *State) PopStackBuff() (Move, bool){
 	return move, true
 }
 
+const NullMove = Move(Null) << MOVE_TYPE_SHIFT
+
 func (st *State) PopStack() Move{
+	if st.StackPhase == PopNull{
+		st.StackPhase = GenPv
+
+		_, hasPvMove := PvTable[st.Zobrist]
+
+		if !hasPvMove{			
+			return NullMove
+		}
+	}
+
 	if st.StackPhase == GenPv{
 		pvMoves, ok := PvTable[st.Zobrist]
 		if ok{			

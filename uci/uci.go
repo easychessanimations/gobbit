@@ -46,8 +46,6 @@ func (uci *Uci) SetOption(name, value string){
 
 			if name == "UCI_Variant"{
 				uci.SetVariant(VariantNameToVariant(value))
-
-				uci.Pos.Print()
 			}
 
 			if name == "Null Move Pruning"{
@@ -217,6 +215,12 @@ func (uci Uci) Welcome(){
 }
 
 func (uci *Uci) ProcessConfigLine(line string){
+	if line[0:2] == "//"{
+		fmt.Println("--", line[2:])
+		return
+	}else{
+		fmt.Println("++", line)
+	}
 	uci.ExecUciCommandLine(line)	
 }
 
