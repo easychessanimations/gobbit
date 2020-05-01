@@ -166,6 +166,11 @@ func (st *State) Init(variant Variant) {
 	st.ParseFen(VariantInfos[st.Variant].StartFen)
 }
 
+// Reset resets the starting position
+func (st *State) Reset(){
+	st.Init(st.Variant)
+}
+
 // ParseFen sets up state from a fen
 func (st *State) ParseFen(fen string) error {
 	fenParts := strings.Split(fen, " ")
@@ -333,9 +338,21 @@ func (st *State) GenMoveBuff() {
 	}
 
 	for i, mbi := range st.MoveBuff {
-		mbi.San = st.MoveToSanBatch(mbi.Move)
+		mbi.San = st.MoveToSanBatch(mbi.Move)		
+		mbi.Uci = mbi.Move.UCI()
 		st.MoveBuff[i] = mbi
 	}
+}
+
+func (st *State) UciToMove(uci string) (Move, bool){
+	st.GenMoveBuff()
+	for _, mbi := range st.MoveBuff{
+		if mbi.Uci == uci{
+			return mbi.Move, true
+		}
+	}
+
+	return Move(0), false
 }
 
 func (mb MoveBuff) PrettyPrintString() string {

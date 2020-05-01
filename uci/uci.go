@@ -79,6 +79,61 @@ func (uci *Uci) ExecSetOptionCommand(t *Tokenizer){
 	uci.SetOption(name, value)
 }
 
+func (uci *Uci) ExecPositionCommand(t *Tokenizer){
+	token, ok := t.GetToken()
+
+	if !ok{
+		fmt.Println("missing position specifier")
+		return
+	}
+	if token == "startpos" || token == "s"{
+		uci.Pos.Reset()				
+	}else if token == "fen" || token == "f"{
+		fenParts := t.GetTokensUpTo("moves")
+		if len(fenParts) < 4{
+			fmt.Println("too few fen fields")
+			return
+		}
+		uci.Pos.ParseFen(strings.Join(fenParts, " "))
+	}else{
+		fmt.Println("unknown position specifier")		
+	}
+
+	moves := t.GetTokensUpTo("")
+
+	for _, move := range moves{
+		uci.Pos.PushUci(move)
+	}
+
+	uci.Pos.Print()
+}
+
+func (uci *Uci) ExecGoCommand(t *Tokenizer){
+	depth := DEFAULT_DEPTH
+
+	for true{
+		token, ok := t.GetToken()
+
+		if !ok{
+			break
+		}
+
+		if token == "depth"{
+			parsedDepth := t.GetInt()
+
+			if parsedDepth >= 1{
+				depth = parsedDepth
+			}
+		}
+
+		if token == "infinite"{
+			depth = SEARCH_MAX_DEPTH
+		}
+	}
+
+	go uci.Pos.Search(depth)
+}
+
 func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	alias, ok := uci.Aliases[commandLine]
 
@@ -109,13 +164,17 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		fmt.Println("b = to begin")
 	}else if command == "uci"{
 		uci.ExecUciCommand()
+	}else if command == "position" || command == "p"{
+		uci.ExecPositionCommand(&t)
+	}else if command == "go"{
+		uci.ExecGoCommand(&t)
 	}else if command == "setoption"{
 		uci.ExecSetOptionCommand(&t)
 	} else if command == "pmt" {
 		fmt.Println(PieceMaterialTablesString())
 	} else if command == "g" {
 		go uci.Pos.Search(10)
-	} else if command == "s" {
+	} else if command == "s" || command == "stop" {
 		uci.Pos.SearchStopped = true
 	} else if command == "b" {
 		uci.Pos.StatePtr = 0

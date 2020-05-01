@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-const MAX_STATES = 100
+const SEARCH_MAX_DEPTH = 100
+
+const MAX_STATES = SEARCH_MAX_DEPTH + 1
 
 type Position struct {
 	States        [MAX_STATES]State
@@ -24,6 +26,15 @@ func (pos *Position) Init(variant Variant) {
 	pos.StatePtr = 0
 	pos.Current().Init(variant)
 	pos.Current().Ply = 0
+}
+
+func (pos *Position) Reset(){
+	pos.Init(pos.Current().Variant)
+}
+
+func (pos *Position) ParseFen(fen string){
+	pos.Reset()
+	pos.Current().ParseFen(fen)
 }
 
 func (pos Position) Line() string {
@@ -255,6 +266,13 @@ func (pos *Position) Push(move Move) {
 	pos.States[pos.StatePtr] = oldState
 
 	pos.Current().MakeMove(move)
+}
+
+func (pos *Position) PushUci(uci string){
+	move, ok := pos.Current().UciToMove(uci)
+	if ok{
+		pos.Push(move)
+	}
 }
 
 func (pos *Position) Pop() {
