@@ -85,7 +85,9 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				pos.Pop()
 			}			
 		}else{
-			hasMove = true
+			if move != NullMove{
+				hasMove = true
+			}
 
 			nullMoveMade := abi.NullMoveMade
 			
