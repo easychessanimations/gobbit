@@ -1,7 +1,6 @@
 package main
 
-import (
-	. "github.com/easychessanimations/gobbit/basic"
+import (	
 	. "github.com/easychessanimations/gobbit/uci"
 )
 
@@ -16,7 +15,7 @@ var UCI_COMMAND_ALIASES = map[string]string{
 func main() {
 	uci := Uci{}
 
-	uci.Init(ENGINE_NAME, ENGINE_AUTHOR, VariantEightPiece, UCI_COMMAND_ALIASES)
+	uci.Init(ENGINE_NAME, ENGINE_AUTHOR, UCI_COMMAND_ALIASES)
 
 	uci.Welcome()
 

@@ -127,13 +127,13 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	return nil
 }
 
-func (uci *Uci) Init(name string, author string, variant Variant, aliases map[string]string){
+func (uci *Uci) Init(name string, author string, aliases map[string]string){
 	uci.Name = name
 	uci.Author = author
 	uci.UciOptions = UCI_OPTIONS
 	uci.Aliases = aliases
 
-	uci.SetVariant(variant)
+	uci.SetVariant(DEFAULT_VARIANT)
 }
 
 func (uci Uci) Welcome(){
