@@ -9,55 +9,82 @@ import (
 	. "github.com/easychessanimations/gobbit/basic"
 )
 
-func Uci(){
-	fmt.Printf("id name %s\n", ENGINE_NAME)
-	fmt.Printf("id author %s\n\n", ENGINE_AUTHOR)
+type Uci struct{
+	Name string
+	Author string
+	Id string
+	UciOptions []UciOption
+	Pos Position
+}
 
-	for _, uo := range UCI_OPTIONS{
+func (uci Uci) Uci(){
+	fmt.Printf("id name %s\n", uci.Name)
+	fmt.Printf("id author %s\n\n", uci.Author)
+
+	for _, uo := range uci.UciOptions{
 		fmt.Println(uo.UciCommandOutputString())
 	}
 }
 
-func UciLoop(){
-	fmt.Println(EngineId())
+func (uci *Uci) ExecUciCommandLine(commandLine string) error{
+	command := commandLine
 
-	pos := Position{}
+	if command == "x" || command == "q" || command == "quit" {
+		return fmt.Errorf("exit")
+	} else if command == "h" || command == "help" {
+		fmt.Println("h, help = help")
+		fmt.Println("x, q, quit = quit")
+		fmt.Println("pmt = print material table")
+		fmt.Println("g = go depth 6")
+		fmt.Println("s = stop")
+		fmt.Println("d = del")
+		fmt.Println("f = forward")
+		fmt.Println("r = reset")
+	}else if command == "uci"{
+		uci.Uci()
+	} else if command == "pmt" {
+		fmt.Println(PieceMaterialTablesString())
+	} else if command == "g" {
+		go uci.Pos.Search(10)
+	} else if command == "s" {
+		uci.Pos.SearchStopped = true
+	} else if command == "r" {
+		uci.Pos.StatePtr = 0
+		uci.Pos.Print()
+	} else {
+		uci.Pos.ExecCommand(command)
+	}
 
-	pos.Init(DEFAULT_VARIANT)
+	return nil
+}
 
-	//pos.Print()
+func (uci *Uci) Init(name string, author string, uciOptions []UciOption, id string, variant Variant){
+	uci.Name = name
+	uci.Author = author
+	uci.UciOptions = uciOptions
+	uci.Id = id
 
+	uci.Pos = Position{}
+
+	uci.Pos.Init(variant)
+}
+
+func (uci Uci) Welcome(){
+	fmt.Println(uci.Id)
+}
+
+func (uci *Uci) UciLoop(){	
 	scan := bufio.NewScanner(os.Stdin)
 
 	for scan.Scan() {
 		line := scan.Text()
 
-		command := strings.TrimSpace(line)
+		commandLine := strings.TrimSpace(line)
 
-		if command == "x" || command == "q" || command == "quit" {
+		err := uci.ExecUciCommandLine(commandLine)
+
+		if err != nil{
 			break
-		} else if command == "h" || command == "help" {
-			fmt.Println("h, help = help")
-			fmt.Println("x, q, quit = quit")
-			fmt.Println("pmt = print material table")
-			fmt.Println("g = go depth 6")
-			fmt.Println("s = stop")
-			fmt.Println("d = del")
-			fmt.Println("f = forward")
-			fmt.Println("r = reset")
-		}else if command == "uci"{
-			Uci()
-		} else if command == "pmt" {
-			fmt.Println(PieceMaterialTablesString())
-		} else if command == "g" {
-			go pos.Search(10)
-		} else if command == "s" {
-			pos.SearchStopped = true
-		} else if command == "r" {
-			pos.StatePtr = 0
-			pos.Print()
-		} else {
-			pos.ExecCommand(command)
 		}
 	}
 }
