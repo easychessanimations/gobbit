@@ -50,6 +50,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.Print()
 			}
 
+			if name == "Null Move Pruning"{
+				uci.Pos.NullMovePruning = uo.BooleanValue()
+			}
+
 			return
 		}
 	}
@@ -134,6 +138,12 @@ func (uci *Uci) ExecGoCommand(t *Tokenizer){
 	go uci.Pos.Search(depth)
 }
 
+func (uci Uci) ListUciOptionValues(){
+	for _, uo := range uci.UciOptions{
+		fmt.Printf("%-20s = %s\n", uo.Name, uo.StringValue())
+	}
+}
+
 func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	alias, ok := uci.Aliases[commandLine]
 
@@ -156,6 +166,7 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	} else if command == "h" || command == "help" {
 		fmt.Println("h, help = help")
 		fmt.Println("x, q, quit = quit")
+		fmt.Println("l = list uci option values")
 		fmt.Println("pmt = print material table")
 		fmt.Println("g = go depth 10")
 		fmt.Println("s = stop")
@@ -170,6 +181,8 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		uci.ExecGoCommand(&t)
 	}else if command == "setoption"{
 		uci.ExecSetOptionCommand(&t)
+	}else if command == "l"{
+		uci.ListUciOptionValues()
 	} else if command == "pmt" {
 		fmt.Println(PieceMaterialTablesString())
 	} else if command == "g" {
@@ -193,6 +206,10 @@ func (uci *Uci) Init(name string, author string, aliases map[string]string){
 	uci.Aliases = aliases
 
 	uci.SetVariant(DEFAULT_VARIANT)
+
+	for _, uo := range uci.UciOptions{
+		uci.SetOption(uo.Name, uo.StringValue())
+	}
 }
 
 func (uci Uci) Welcome(){

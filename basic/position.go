@@ -11,11 +11,12 @@ const SEARCH_MAX_DEPTH = 100
 const MAX_STATES = SEARCH_MAX_DEPTH + 1
 
 type Position struct {
-	States        [MAX_STATES]State
-	StatePtr      int
-	MaxStatePtr   int
-	Nodes         int
-	SearchStopped bool
+	States          [MAX_STATES]State
+	StatePtr        int
+	MaxStatePtr     int
+	Nodes           int
+	SearchStopped   bool
+	NullMovePruning bool
 }
 
 func (pos *Position) Current() *State {

@@ -27,6 +27,23 @@ var UCI_OPTIONS = []UciOption{
 		Vars: VARIANT_NAMES,
 		Default: VARIANT_NAMES[DEFAULT_VARIANT],
 	},
+	{
+		Name: "Null Move Pruning",
+		Type: "check",		
+		Default: "false",
+	},
+}
+
+func (uo UciOption) StringValue() string{
+	if uo.Value == ""{
+		return uo.Default
+	}
+
+	return uo.Value
+}
+
+func (uo UciOption) BooleanValue() bool{
+	return uo.Value == "true"
 }
 
 func (uo UciOption) UciCommandOutputString() string{
