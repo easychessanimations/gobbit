@@ -19,5 +19,7 @@ func main() {
 
 	uci.Welcome()
 
+	uci.ProcessConfig()
+
 	uci.UciLoop()
 }

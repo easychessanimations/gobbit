@@ -199,6 +199,14 @@ func (uci Uci) Welcome(){
 	fmt.Println(uci.Id())
 }
 
+func (uci *Uci) ProcessConfigLine(line string){
+	uci.ExecUciCommandLine(line)	
+}
+
+func (uci *Uci) ProcessConfig(){
+	IterateTextFile("engineconfig.txt", uci.ProcessConfigLine)
+}
+
 func (uci *Uci) UciLoop(){	
 	scan := bufio.NewScanner(os.Stdin)
 
