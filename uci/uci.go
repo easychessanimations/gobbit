@@ -28,6 +28,8 @@ func (uci Uci) ExecUciCommand(){
 	for _, uo := range uci.UciOptions{
 		fmt.Println(uo.UciCommandOutputString())
 	}
+
+	fmt.Println("uciok")
 }
 
 func (uci *Uci) SetVariant(variant Variant){

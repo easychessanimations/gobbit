@@ -10,11 +10,6 @@ import (
 
 const DEFAULT_VARIANT = VariantEightPiece
 
-var VARIANT_NAMES = []string{
-	"Standard",
-	"Eightpiece",
-}
-
 type UciOption struct{
 	Name string
 	Type string

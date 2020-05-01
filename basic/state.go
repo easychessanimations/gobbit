@@ -32,6 +32,14 @@ var VariantInfos = []VariantInfo{
 	},
 }
 
+var VARIANT_NAMES = make([]string, len(VariantInfos))
+
+func init(){
+	for i, vinfo := range VariantInfos{
+		VARIANT_NAMES[i] = vinfo.DisplayName
+	}
+}
+
 func VariantNameToVariant(name string) Variant{
 	for i, vinfo := range VariantInfos{
 		if vinfo.DisplayName == name{
