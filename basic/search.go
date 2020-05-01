@@ -7,10 +7,12 @@ import (
 )
 
 type AlphaBetaInfo struct {
-	Alpha        Score
-	Beta         Score
-	CurrentDepth int
-	MaxDepth     int
+	Alpha         Score
+	Beta          Score
+	CurrentDepth  int
+	MaxDepth      int
+	NullMoveMade  bool
+	NullMoveDepth int
 }
 
 var PvTable map[uint64][]Move
@@ -45,7 +47,7 @@ func (st State) Score() Score {
 	return score
 }
 
-const NULL_MOVE_PRUNING_MIN_DEPTH = 3
+const NULL_MOVE_PRUNING_MIN_DEPTH = 2
 
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
@@ -67,7 +69,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	hasMove := false
 
 	// https://www.chessprogramming.org/Null_Move_Pruning
-	allowNMP := pos.NullMovePruning && abi.CurrentDepth > NULL_MOVE_PRUNING_MIN_DEPTH
+	allowNMP := pos.NullMovePruning && (!abi.NullMoveMade) && abi.CurrentDepth >= NULL_MOVE_PRUNING_MIN_DEPTH
 
 	st.InitStack(allowNMP)
 
@@ -85,11 +87,28 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 		}else{
 			hasMove = true
 
+			nullMoveMade := abi.NullMoveMade
+			
+			if nullMoveMade{
+				if move != NullMove && abi.CurrentDepth <= abi.NullMoveDepth{
+					nullMoveMade = false
+				}
+			}
+
+			nullMoveDepth := abi.NullMoveDepth
+
+			if move == NullMove{
+				nullMoveDepth = abi.CurrentDepth
+				abi.NullMoveMade = true
+			}
+
 			score = -pos.AlphaBetaRec(AlphaBetaInfo{
-				Alpha:        -abi.Beta,
-				Beta:         -abi.Alpha,
-				CurrentDepth: abi.CurrentDepth + 1,
-				MaxDepth:     abi.MaxDepth,
+				Alpha:         -abi.Beta,
+				Beta:          -abi.Alpha,
+				CurrentDepth:  abi.CurrentDepth + 1,
+				MaxDepth:      abi.MaxDepth,
+				NullMoveMade:  nullMoveMade,
+				NullMoveDepth: nullMoveDepth,
 			})
 
 			pos.Pop()
@@ -98,7 +117,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				// alpha improvement
 				abi.Alpha = score
 
-				if move.MoveType() != Null{
+				if move != NullMove{
 					pvMoves, ok := PvTable[st.Zobrist]
 					if ok{
 						newPvMoves := []Move{move}
