@@ -47,9 +47,6 @@ func (st State) Score() Score {
 	return score
 }
 
-const NULL_MOVE_PRUNING_MIN_DEPTH = 2
-const NULL_MOVE_DEPTH_REDUCTION = 1
-
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -70,7 +67,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	hasMove := false
 
 	// https://www.chessprogramming.org/Null_Move_Pruning
-	allowNMP := pos.NullMovePruning && (!abi.NullMoveMade) && abi.CurrentDepth >= NULL_MOVE_PRUNING_MIN_DEPTH
+	allowNMP := pos.NullMovePruning && (!abi.NullMoveMade) && abi.CurrentDepth >= pos.NullMovePruningMinDepth
 
 	st.InitStack(allowNMP)
 
@@ -90,24 +87,24 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				hasMove = true
 			}
 
+			maxDepth := abi.MaxDepth
 			nullMoveMade := abi.NullMoveMade
-			
-			if nullMoveMade{
-				if move != NullMove && abi.CurrentDepth <= abi.NullMoveDepth{
-					nullMoveMade = false
-				}
-			}
-
 			nullMoveDepth := abi.NullMoveDepth
 
-			maxDepth := abi.MaxDepth
+			if pos.NullMovePruning{
+				if nullMoveMade{
+					if move != NullMove && abi.CurrentDepth <= abi.NullMoveDepth{
+						nullMoveMade = false
+					}
+				}
 
-			if move == NullMove{
-				nullMoveDepth = abi.CurrentDepth
-				abi.NullMoveMade = true
+				if move == NullMove{
+					nullMoveDepth = abi.CurrentDepth
+					abi.NullMoveMade = true
 
-				maxDepth -= NULL_MOVE_DEPTH_REDUCTION
-			}
+					maxDepth -= pos.NullMoveDepthReduction
+				}
+			}			
 
 			score = -pos.AlphaBetaRec(AlphaBetaInfo{
 				Alpha:         -abi.Beta,

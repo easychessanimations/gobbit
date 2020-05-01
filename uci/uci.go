@@ -52,6 +52,14 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.NullMovePruning = uo.BooleanValue()
 			}
 
+			if name == "Null Move Pruning Min Depth"{
+				uci.Pos.NullMovePruningMinDepth = uo.IntValue()
+			}
+
+			if name == "Null Move Depth Reduction"{
+				uci.Pos.NullMoveDepthReduction = uo.IntValue()
+			}
+
 			return
 		}
 	}
@@ -138,7 +146,7 @@ func (uci *Uci) ExecGoCommand(t *Tokenizer){
 
 func (uci Uci) ListUciOptionValues(){
 	for _, uo := range uci.UciOptions{
-		fmt.Printf("%-20s = %s\n", uo.Name, uo.StringValue())
+		fmt.Printf("%-30s = %s\n", uo.Name, uo.StringValue())
 	}
 }
 
