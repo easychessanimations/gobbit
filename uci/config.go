@@ -10,13 +10,6 @@ import (
 
 const DEFAULT_VARIANT = VariantEightPiece
 
-const ENGINE_NAME = "gobbit"
-const ENGINE_AUTHOR = "easychessanimations"
-
-func EngineId() string{
-	return fmt.Sprintf("%s multi variant uci engine by %s", ENGINE_NAME, ENGINE_AUTHOR)
-}
-
 var VARIANT_NAMES = []string{
 	"Standard",
 	"Eightpiece",

@@ -12,12 +12,16 @@ import (
 type Uci struct{
 	Name string
 	Author string
-	Id string
 	UciOptions []UciOption
 	Pos Position
+	Aliases map[string]string
 }
 
-func (uci Uci) Uci(){
+func (uci Uci) Id() string{
+	return fmt.Sprintf("%s multi variant uci engine by %s", uci.Name, uci.Author)
+}
+
+func (uci Uci) ExecUciCommand(){
 	fmt.Printf("id name %s\n", uci.Name)
 	fmt.Printf("id author %s\n\n", uci.Author)
 
@@ -26,8 +30,69 @@ func (uci Uci) Uci(){
 	}
 }
 
+func (uci *Uci) SetVariant(variant Variant){
+	uci.Pos = Position{}
+
+	uci.Pos.Init(variant)
+}
+
+func (uci *Uci) SetOption(name, value string){
+	for i, uo := range uci.UciOptions{
+		if uo.Name == name{
+			uo.Value = value
+			uci.UciOptions[i] = uo
+
+			if name == "UCI_Variant"{
+				uci.SetVariant(VariantNameToVariant(value))
+
+				uci.Pos.Print()
+			}
+
+			return
+		}
+	}
+
+	fmt.Println("unknown option")
+}
+
+func (uci *Uci) ExecSetOptionCommand(t *Tokenizer){
+	nameToken, ok := t.GetToken()
+
+	if (!ok) || nameToken != "name"{
+		fmt.Println("expected name")
+		return
+	}
+
+	nameParts := t.GetTokensUpTo("value")
+
+	if len(nameParts) == 0{
+		fmt.Println("option name missing")
+		return
+	}
+
+	name := strings.Join(nameParts, " ")
+
+	value := t.Content
+
+	uci.SetOption(name, value)
+}
+
 func (uci *Uci) ExecUciCommandLine(commandLine string) error{
-	command := commandLine
+	alias, ok := uci.Aliases[commandLine]
+
+	if ok{
+		commandLine = alias
+		fmt.Println(commandLine)
+	}
+
+	t := Tokenizer{commandLine}
+
+	command, ok := t.GetToken()
+
+	if !ok{
+		fmt.Println("no command")
+		return nil
+	}
 
 	if command == "x" || command == "q" || command == "quit" {
 		return fmt.Errorf("exit")
@@ -35,20 +100,22 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		fmt.Println("h, help = help")
 		fmt.Println("x, q, quit = quit")
 		fmt.Println("pmt = print material table")
-		fmt.Println("g = go depth 6")
+		fmt.Println("g = go depth 10")
 		fmt.Println("s = stop")
 		fmt.Println("d = del")
 		fmt.Println("f = forward")
-		fmt.Println("r = reset")
+		fmt.Println("b = to begin")
 	}else if command == "uci"{
-		uci.Uci()
+		uci.ExecUciCommand()
+	}else if command == "setoption"{
+		uci.ExecSetOptionCommand(&t)
 	} else if command == "pmt" {
 		fmt.Println(PieceMaterialTablesString())
 	} else if command == "g" {
 		go uci.Pos.Search(10)
 	} else if command == "s" {
 		uci.Pos.SearchStopped = true
-	} else if command == "r" {
+	} else if command == "b" {
 		uci.Pos.StatePtr = 0
 		uci.Pos.Print()
 	} else {
@@ -58,19 +125,17 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	return nil
 }
 
-func (uci *Uci) Init(name string, author string, uciOptions []UciOption, id string, variant Variant){
+func (uci *Uci) Init(name string, author string, variant Variant, aliases map[string]string){
 	uci.Name = name
 	uci.Author = author
-	uci.UciOptions = uciOptions
-	uci.Id = id
+	uci.UciOptions = UCI_OPTIONS
+	uci.Aliases = aliases
 
-	uci.Pos = Position{}
-
-	uci.Pos.Init(variant)
+	uci.SetVariant(variant)
 }
 
 func (uci Uci) Welcome(){
-	fmt.Println(uci.Id)
+	fmt.Println(uci.Id())
 }
 
 func (uci *Uci) UciLoop(){	

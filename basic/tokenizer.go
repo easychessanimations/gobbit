@@ -10,6 +10,48 @@ func (t *Tokenizer) Init(content string) {
 	t.Content = content
 }
 
+func (t *Tokenizer) GetToken() (string, bool){	
+	buff := ""
+
+	var i int
+
+	hasToken := false
+
+	for i = 0; i < len(t.Content); i++{
+		c := t.Content[i:i+1]		
+		if c != " "{
+			hasToken = true
+			buff += c	
+		}else{
+			i++
+			break
+		}		
+	}
+
+	if hasToken{		
+		t.Content = t.Content[i:]
+		return buff, true
+	}
+
+	return "", false
+}
+
+func (t *Tokenizer) GetTokensUpTo(upTo string) []string{	
+	tokens := []string{}
+
+	for true{
+		token, ok := t.GetToken()
+
+		if (!ok) || token == upTo{
+			return tokens
+		}
+
+		tokens = append(tokens, token)
+	}
+
+	return tokens
+}
+
 func (t *Tokenizer) GetSquare() Square {
 	file := 0
 	rank := 0

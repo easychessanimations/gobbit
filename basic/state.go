@@ -32,6 +32,16 @@ var VariantInfos = []VariantInfo{
 	},
 }
 
+func VariantNameToVariant(name string) Variant{
+	for i, vinfo := range VariantInfos{
+		if vinfo.DisplayName == name{
+			return Variant(i)
+		}
+	}
+
+	return VariantStandard
+}
+
 const (
 	CastlingSideKing = iota
 	CastlingSideQueen
