@@ -48,6 +48,7 @@ func (st State) Score() Score {
 }
 
 const NULL_MOVE_PRUNING_MIN_DEPTH = 2
+const NULL_MOVE_DEPTH_REDUCTION = 1
 
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
@@ -99,16 +100,20 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			nullMoveDepth := abi.NullMoveDepth
 
+			maxDepth := abi.MaxDepth
+
 			if move == NullMove{
 				nullMoveDepth = abi.CurrentDepth
 				abi.NullMoveMade = true
+
+				maxDepth -= NULL_MOVE_DEPTH_REDUCTION
 			}
 
 			score = -pos.AlphaBetaRec(AlphaBetaInfo{
 				Alpha:         -abi.Beta,
 				Beta:          -abi.Alpha,
 				CurrentDepth:  abi.CurrentDepth + 1,
-				MaxDepth:      abi.MaxDepth,
+				MaxDepth:      maxDepth,
 				NullMoveMade:  nullMoveMade,
 				NullMoveDepth: nullMoveDepth,
 			})
