@@ -445,7 +445,7 @@ func (st State) PrettyPrintString() string {
 	mobW := st.MobilityForColor(White)
 	mobB := st.MobilityForColor(Black)
 
-	buff += fmt.Sprintf("Mob White %v , Black %v , Balance %v , POV %v\n", mobW, mobB, st.MobilityBalance(), st.MobilityPOV())
+	buff += fmt.Sprintf("Mob White %v , Black %v , Balance %v , POV %v , Phase %.2f\n", mobW, mobB, st.MobilityBalance(), st.MobilityPOV(), st.Phase())
 
 	st.GenMoveBuff()
 

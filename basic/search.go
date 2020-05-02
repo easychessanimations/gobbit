@@ -23,26 +23,38 @@ type TranspositionTableEntry struct{
 	Zobrist  uint64
 }
 
-func (st State) Score() Score {
+func (st State) Phase() float32{
 	mat := st.Material[White]
 	mat.Merge(st.Material[Black])
 
+	return float32(mat.M) / float32(INITIAL_MATERIAL)
+}
+
+const MAX_SCORE = 9000
+
+func (st State) Score() Score {
+	phase := st.Phase()
+
+	mat := st.MaterialPOV()
+
 	mf := float32(mat.M)
-
-	phase := mf / float32(INITIAL_MATERIAL)
-
-	mat = st.MaterialPOV()
-
-	mf = float32(mat.M)
 	ef := float32(mat.E)
 
-	scoref := mf*phase + (1-phase)*ef
+	scoref := mf * phase + ( 1 - phase ) * ef
 
 	score := Score(scoref)
 
 	mob := st.MobilityPOV()
 
 	score += mob.M + mob.E
+
+	if score > MAX_SCORE{
+		score = MAX_SCORE
+	}
+
+	if score < -MAX_SCORE{
+		score = -MAX_SCORE
+	}
 
 	return score
 }

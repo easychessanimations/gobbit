@@ -149,6 +149,15 @@ func (pos Position) GameEnd(ply int) (bool, Score) {
 		return true, -MATE_SCORE + Score(ply)
 	}
 
+	currentZobrist := pos.Zobrist()
+
+	for testPtr := 0; testPtr < ( pos.StatePtr - 1 ); testPtr++{
+		if pos.States[testPtr].Zobrist == currentZobrist{
+			// repetition
+			return true, 0
+		}
+	}
+
 	return false, 0
 }
 
