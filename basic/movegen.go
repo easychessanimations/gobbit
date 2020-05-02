@@ -45,7 +45,7 @@ func (st *State) PopStackBuff() (Move, bool){
 		return Move(0), false
 	}
 
-	move := st.StackBuff[l-1]
+	move := st.StackBuff[l-1].Move
 	st.StackBuff = st.StackBuff[0:l-1]
 
 	if len(st.StackPvMoves) > 0{
@@ -94,7 +94,7 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == GenViolent{
-		st.StackBuff = st.Pslms(Violent)
+		st.SetStackBuff(st.Pslms(Violent))
 		st.StackPhase = PopViolent
 	}
 
@@ -108,7 +108,7 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == GenQuiet{
-		st.StackBuff = st.Pslms(Quiet)
+		st.SetStackBuff(st.Pslms(Quiet))
 		st.StackPhase = PopQuiet
 	}
 

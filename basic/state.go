@@ -3,6 +3,7 @@ package basic
 import (
 	"fmt"
 	"strings"
+	"sort"
 )
 
 type Variant int
@@ -79,6 +80,35 @@ type KingInfo struct {
 	Square     Square
 }
 
+type StackBuffEntry struct{
+	Move    Move
+	SubTree int
+}
+
+type StackBuff []StackBuffEntry
+
+func (a StackBuff) Len() int           { return len(a) }
+func (a StackBuff) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a StackBuff) Less(i, j int) bool { return a[i].SubTree < a[j].SubTree }
+
+func (st *State) SetStackBuff(moves []Move){
+	st.StackBuff = []StackBuffEntry{}
+	for _, move := range moves{
+		posMove := PosMove{
+			Zobrist: st.Zobrist,
+			Move: move,			
+		}
+		subTree, _ := PosMoveTable[posMove]		
+		st.StackBuff = append(st.StackBuff, StackBuffEntry{
+			Move: move, 
+			SubTree: subTree,
+		})
+	}	
+	if true{
+		sort.Sort(st.StackBuff)
+	}
+}
+
 // State records the state of a position
 type State struct {
 	Variant           Variant
@@ -101,7 +131,7 @@ type State struct {
 	Zobrist           uint64
 	KingInfos         [ColorArraySize]KingInfo
 	StackPhase        int
-	StackBuff         []Move	
+	StackBuff         StackBuff
 	StackPvMoves      []Move
 }
 

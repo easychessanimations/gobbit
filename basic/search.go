@@ -17,6 +17,13 @@ type AlphaBetaInfo struct {
 
 var PvTable map[uint64][]Move
 
+type PosMove struct{
+	Zobrist uint64
+	Move    Move
+}
+
+var PosMoveTable = make(map[PosMove]int)
+
 type TranspositionTableEntry struct{
 	Score    Score
 	RemDepth int
@@ -118,6 +125,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				}
 			}			
 
+			nodesStart := pos.Nodes
+
 			score = -pos.AlphaBetaRec(AlphaBetaInfo{
 				Alpha:         -abi.Beta,
 				Beta:          -abi.Alpha,
@@ -128,6 +137,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			})
 
 			pos.Pop()
+
+			subTree := pos.Nodes - nodesStart
+
+			PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 
 			if score > abi.Alpha {
 				// alpha improvement
