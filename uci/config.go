@@ -46,8 +46,8 @@ var UCI_OPTIONS = []UciOption{
 		Name: "Null Move Depth Reduction",
 		Type: "spin",		
 		Min: 1,
-		Max: 3,
-		Default: "1",
+		Max: 5,
+		Default: "3",
 	},
 }
 
