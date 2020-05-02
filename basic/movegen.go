@@ -116,7 +116,7 @@ func (st *State) PopStack() Move{
 		for rF * rF < numQuiet{
 			rF++
 		}
-		st.StackReduceFrom = numQuiet - ( rF / 2 )
+		st.StackReduceFrom = numQuiet - 1
 		st.StackReduceFactor = rF
 		st.StackPhase = PopQuiet
 	}
@@ -125,7 +125,7 @@ func (st *State) PopStack() Move{
 		sbe, ok := st.PopStackBuff()
 		if ok{
 			st.StackReduceDepth = 0
-			if sbe.SubTree > 1000 && len(st.StackBuff) < st.StackReduceFrom{
+			if sbe.SubTree > 0 && len(st.StackBuff) <= st.StackReduceFrom{
 				st.StackReduceDepth = 1
 			}
 			return sbe.Move
