@@ -260,6 +260,17 @@ func (pos *Position) Search(maxDepth int) {
 
 		pv := strings.Join(buff, " ")
 
+		totalPvTableMoves := 0
+		maxPvItemLength := 0
+		for _, item := range PvTable{
+			l := len(item)
+			totalPvTableMoves += l
+			if l > maxPvItemLength{
+				maxPvItemLength = l
+			}
+		}
+
+		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(PvTable), totalPvTableMoves, maxPvItemLength)
 		fmt.Printf("info depth %d time %.0f nodes %d nps %.0f score cp %d pv %v\n", depth, elapsed*1000, pos.Nodes, nps, score, pv)
 	}
 
