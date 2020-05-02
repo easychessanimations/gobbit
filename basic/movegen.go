@@ -31,6 +31,8 @@ const (
 )
 
 func (st *State) InitStack(nmp bool){	
+	st.StackReduceDepth = 0
+
 	st.StackPhase = GenPv	
 
 	if nmp{
@@ -38,25 +40,25 @@ func (st *State) InitStack(nmp bool){
 	}
 }
 
-func (st *State) PopStackBuff() (Move, bool){
+func (st *State) PopStackBuff() (StackBuffEntry, bool){
 	l := len(st.StackBuff)
 
 	if l <= 0{
-		return Move(0), false
+		return StackBuffEntry{}, false
 	}
 
-	move := st.StackBuff[l-1].Move
+	sbe := st.StackBuff[l-1]
 	st.StackBuff = st.StackBuff[0:l-1]
 
 	if len(st.StackPvMoves) > 0{
 		for _, testMove := range st.StackPvMoves{
-			if move == testMove{
+			if sbe.Move == testMove{
 				return st.PopStackBuff()		
 			}
 		}
 	}
 
-	return move, true
+	return sbe, true
 }
 
 const NullMove = Move(Null) << MOVE_TYPE_SHIFT
@@ -99,9 +101,9 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == PopViolent{
-		move, ok := st.PopStackBuff()
+		sbe, ok := st.PopStackBuff()
 		if ok{
-			return move
+			return sbe.Move
 		}else{
 			st.StackPhase = GenQuiet
 		}
@@ -109,13 +111,24 @@ func (st *State) PopStack() Move{
 
 	if st.StackPhase == GenQuiet{
 		st.SetStackBuff(st.Pslms(Quiet))
+		numQuiet := len(st.StackBuff)		
+		rF := 1
+		for rF * rF < numQuiet{
+			rF++
+		}
+		st.StackReduceFrom = numQuiet - ( rF / 2 )
+		st.StackReduceFactor = rF
 		st.StackPhase = PopQuiet
 	}
 
 	if st.StackPhase == PopQuiet{
-		move, ok := st.PopStackBuff()
+		sbe, ok := st.PopStackBuff()
 		if ok{
-			return move
+			st.StackReduceDepth = 0
+			if sbe.SubTree > 1000 && len(st.StackBuff) < st.StackReduceFrom{
+				st.StackReduceDepth = 1
+			}
+			return sbe.Move
 		}else{
 			st.StackPhase = GenDone
 		}

@@ -127,11 +127,17 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			nodesStart := pos.Nodes
 
+			stackReduceDepth := st.StackReduceDepth
+
+			if !pos.StackReduction{
+				stackReduceDepth = 0
+			}
+
 			score = -pos.AlphaBetaRec(AlphaBetaInfo{
 				Alpha:         -abi.Beta,
 				Beta:          -abi.Alpha,
 				CurrentDepth:  abi.CurrentDepth + 1,
-				MaxDepth:      maxDepth,
+				MaxDepth:      maxDepth - stackReduceDepth,
 				NullMoveMade:  nullMoveMade,
 				NullMoveDepth: nullMoveDepth,
 			})
@@ -139,6 +145,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			pos.Pop()
 
 			subTree := pos.Nodes - nodesStart
+
+			if stackReduceDepth > 0{
+				subTree *= st.StackReduceFactor
+			}
 
 			PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 
@@ -248,9 +258,9 @@ func (pos *Position) Search(maxDepth int) {
 
 	pos.SearchStopped = false
 
-	for depth := 1; depth <= maxDepth; depth++ {
+	start := time.Now()
 
-		start := time.Now()
+	for depth := 1; depth <= maxDepth; depth++ {
 
 		score := pos.AlphaBeta(depth)
 

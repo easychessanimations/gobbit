@@ -49,6 +49,11 @@ var UCI_OPTIONS = []UciOption{
 		Max: 5,
 		Default: "3",
 	},
+	{
+		Name: "Stack Reduction",
+		Type: "check",		
+		Default: "false",
+	},
 }
 
 func (uo UciOption) StringValue() string{

@@ -133,6 +133,9 @@ type State struct {
 	StackPhase        int
 	StackBuff         StackBuff
 	StackPvMoves      []Move
+	StackReduceFrom   int
+	StackReduceDepth  int
+	StackReduceFactor int
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){

@@ -60,6 +60,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.NullMoveDepthReduction = uo.IntValue()
 			}
 
+			if name == "Stack Reduction"{
+				uci.Pos.StackReduction = uo.BooleanValue()
+			}
+
 			return
 		}
 	}

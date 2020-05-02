@@ -19,6 +19,7 @@ type Position struct {
 	NullMovePruning          bool
 	NullMovePruningMinDepth  int
 	NullMoveDepthReduction   int
+	StackReduction           bool
 }
 
 func (pos *Position) Current() *State {
