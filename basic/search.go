@@ -146,13 +146,13 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			subTree := pos.Nodes - nodesStart
 
-			if stackReduceDepth > 0{
+			if stackReduceDepth > 7{
 				for i := 0; i < stackReduceDepth; i++{
 					subTree *= st.StackReduceFactor
 				}				
 			}
 
-			if abi.CurrentDepth < 8{
+			if pos.StackReduction && abi.CurrentDepth < 8{
 				PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 			}
 
