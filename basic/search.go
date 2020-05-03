@@ -200,7 +200,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 	pos.Nodes = 0
 
 	// for low depth perform normal search
-	if (!pos.AspirationWindow) || maxDepth < 5{
+	if (!pos.AspirationWindow) || maxDepth < 4{
 		return pos.AlphaBetaRec(AlphaBetaInfo{
 			Alpha:        -INFINITE_SCORE,
 			Beta:         INFINITE_SCORE,
@@ -209,15 +209,16 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		})
 	}
 
-	window := Score(50)
+	windowLow := Score(50)
+	windowHigh := Score(50)
 
 	// for higher depths try aspiration window
 	// https://www.chessprogramming.org/Aspiration_Windows
-	for asp := 1; asp < 5; asp++{
-		alpha := pos.LastRootPvScore - window
-		beta := pos.LastRootPvScore + window
+	for asp := 1; asp < 3; asp++{
+		alpha := pos.LastRootPvScore - windowLow
+		beta := pos.LastRootPvScore + windowHigh
 
-		fmt.Printf("info asp %d window %d est %d alpha %d beta %d\n", asp, window, pos.LastRootPvScore, alpha, beta)
+		fmt.Printf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d\n", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta)
 
 		score := pos.AlphaBetaRec(AlphaBetaInfo{
 			Alpha:        alpha,
@@ -232,13 +233,15 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 		if score == alpha{
 			fmt.Println("info failed low")
+
+			windowLow *= 3
 		}
 
 		if score == beta{
 			fmt.Println("info failed high")
-		}
 
-		window *= 2
+			windowHigh *= 3
+		}
 	}
 
 	// aspiration window failed to return a pv, fall back to normal search

@@ -33,8 +33,6 @@ func (uci Uci) ExecUciCommand(){
 }
 
 func (uci *Uci) SetVariant(variant Variant){
-	uci.Pos = Position{}
-
 	uci.Pos.Init(variant)
 }
 
@@ -218,6 +216,8 @@ func (uci *Uci) Init(name string, author string, aliases map[string]string){
 	uci.Author = author
 	uci.UciOptions = UCI_OPTIONS
 	uci.Aliases = aliases
+
+	uci.Pos = Position{}
 
 	uci.SetVariant(DEFAULT_VARIANT)
 
