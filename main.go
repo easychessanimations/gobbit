@@ -21,6 +21,8 @@ func main() {
 
 	uci.ProcessConfig()
 
+	uci.ProcessMatePuzzles()
+
 	uci.ProcessCommandLine()
 
 	uci.UciLoop()

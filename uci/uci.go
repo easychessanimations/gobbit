@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"math/rand"
 
 	. "github.com/easychessanimations/gobbit/basic"
 )
 
+type Puzzle struct{
+	Event  string
+	Fen    string
+}
+
 type Uci struct{
-	Name string
-	Author string
-	UciOptions []UciOption
-	Pos Position
-	Aliases map[string]string
+	Name         string
+	Author       string
+	UciOptions   []UciOption
+	Pos          Position
+	Aliases      map[string]string
+	MatePuzzles  []Puzzle
 }
 
 func (uci Uci) Id() string{
@@ -156,6 +163,19 @@ func (uci Uci) ListUciOptionValues(){
 	}
 }
 
+func (uci *Uci) NextPuzzle(){
+	if len(uci.MatePuzzles) > 0{
+		i := rand.Intn(len(uci.MatePuzzles))
+		puzzle := uci.MatePuzzles[i]
+		fen := puzzle.Fen
+		uci.Pos.ParseFen(fen)
+		uci.Pos.Print()
+		fmt.Println(puzzle.Event)
+	}else{
+		fmt.Println("no mate puzzle")
+	}
+}
+
 func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	alias, ok := uci.Aliases[commandLine]
 
@@ -185,6 +205,7 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		fmt.Println("d = del")
 		fmt.Println("f = forward")
 		fmt.Println("b = to begin")
+		fmt.Println("u = next puzzle")
 	}else if command == "uci"{
 		uci.ExecUciCommand()
 	}else if command == "position" || command == "p"{
@@ -204,6 +225,8 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	} else if command == "b" {
 		uci.Pos.StatePtr = 0
 		uci.Pos.Print()
+	} else if command == "u"{
+		uci.NextPuzzle()
 	} else {
 		uci.Pos.ExecCommand(command)
 	}
@@ -242,6 +265,23 @@ func (uci *Uci) ProcessConfigLine(line string){
 
 func (uci *Uci) ProcessConfig(){
 	IterateTextFile("engineconfig.txt", uci.ProcessConfigLine)
+}
+
+var prevLine = ""
+
+func (uci *Uci) ProcessMatePuzzleLine(line string){
+	rawFenParts := strings.Split(line, "/")
+	if len(rawFenParts) == 8{
+		uci.MatePuzzles = append(uci.MatePuzzles, Puzzle{
+			Fen: line,
+			Event: prevLine,
+		})
+	}
+	prevLine = line
+}
+
+func (uci *Uci) ProcessMatePuzzles(){
+	IterateTextFile("matein4.txt", uci.ProcessMatePuzzleLine)
 }
 
 func (uci *Uci) ProcessCommandLine(){
