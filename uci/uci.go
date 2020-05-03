@@ -178,7 +178,7 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		fmt.Println("x, q, quit = quit")
 		fmt.Println("l = list uci option values")
 		fmt.Println("pmt = print material table")
-		fmt.Println("g = go depth 10")
+		fmt.Println("g = go depth 20")
 		fmt.Println("s = stop")
 		fmt.Println("d = del")
 		fmt.Println("f = forward")
@@ -196,7 +196,7 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	} else if command == "pmt" {
 		fmt.Println(PieceMaterialTablesString())
 	} else if command == "g" {
-		go uci.Pos.Search(10)
+		go uci.Pos.Search(20)
 	} else if command == "s" || command == "stop" {
 		uci.Pos.SearchStopped = true
 	} else if command == "b" {
