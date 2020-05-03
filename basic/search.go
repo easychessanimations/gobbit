@@ -152,7 +152,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				}				
 			}
 
-			if abi.CurrentDepth < 7{
+			if abi.CurrentDepth < 8{
 				PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 			}
 
