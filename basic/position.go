@@ -22,8 +22,7 @@ type Position struct {
 	StackReduction           bool
 	AspirationWindow         bool
 	PvTable                  map[uint64][]Move
-	PosMoveTable             map[PosMove]int
-	HasRootPv                bool
+	PosMoveTable             map[PosMove]int	
 	LastRootPvScore          Score
 	LastGoodPv               []Move
 }

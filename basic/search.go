@@ -86,10 +86,6 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 	st.InitStack(allowNMP)
 
-	if abi.CurrentDepth == 0{
-		pos.HasRootPv = false
-	}
-
 	for st.StackPhase != GenDone {
 		move := st.PopStack(pos)
 
@@ -160,8 +156,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				// alpha improvement
 				abi.Alpha = score
 
-				if abi.CurrentDepth == 0{
-					pos.HasRootPv = true
+				if abi.CurrentDepth == 0{					
 					pos.LastRootPvScore = score
 				}
 
@@ -214,12 +209,13 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		})
 	}
 
-	window := Score(75)
+	window := Score(50)
 
 	// for higher depths try aspiration window
+	// https://www.chessprogramming.org/Aspiration_Windows
 	for asp := 1; asp < 5; asp++{
 		alpha := pos.LastRootPvScore - window
-		beta := pos.LastRootPvScore + 5 * window
+		beta := pos.LastRootPvScore + window
 
 		fmt.Printf("info asp %d window %d est %d alpha %d beta %d\n", asp, window, pos.LastRootPvScore, alpha, beta)
 
@@ -230,8 +226,16 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 			MaxDepth:     maxDepth,
 		})
 
-		if pos.HasRootPv{
+		if score > alpha && score < beta{
 			return score
+		}
+
+		if score == alpha{
+			fmt.Println("info failed low")
+		}
+
+		if score == beta{
+			fmt.Println("info failed high")
 		}
 
 		window *= 2
