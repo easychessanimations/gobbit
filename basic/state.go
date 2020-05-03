@@ -91,14 +91,14 @@ func (a StackBuff) Len() int           { return len(a) }
 func (a StackBuff) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a StackBuff) Less(i, j int) bool { return a[i].SubTree < a[j].SubTree }
 
-func (st *State) SetStackBuff(moves []Move){
+func (st *State) SetStackBuff(pos *Position, moves []Move){
 	st.StackBuff = []StackBuffEntry{}
 	for _, move := range moves{
 		posMove := PosMove{
 			Zobrist: st.Zobrist,
 			Move: move,			
 		}
-		subTree, _ := PosMoveTable[posMove]		
+		subTree, _ := pos.PosMoveTable[posMove]		
 		st.StackBuff = append(st.StackBuff, StackBuffEntry{
 			Move: move, 
 			SubTree: subTree,

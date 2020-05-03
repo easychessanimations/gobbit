@@ -15,14 +15,10 @@ type AlphaBetaInfo struct {
 	NullMoveDepth int
 }
 
-var PvTable map[uint64][]Move
-
 type PosMove struct{
 	Zobrist uint64
 	Move    Move
 }
-
-var PosMoveTable = make(map[PosMove]int)
 
 type TranspositionTableEntry struct{
 	Score    Score
@@ -66,9 +62,6 @@ func (st State) Score() Score {
 	return score
 }
 
-var HasRootPv bool
-var LastRootPvScore Score
-
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -94,11 +87,11 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	st.InitStack(allowNMP)
 
 	if abi.CurrentDepth == 0{
-		HasRootPv = false
+		pos.HasRootPv = false
 	}
 
 	for st.StackPhase != GenDone {
-		move := st.PopStack()
+		move := st.PopStack(pos)
 
 		if st.StackPhase != GenDone{
 			pos.Push(move)
@@ -160,7 +153,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			}
 
 			if pos.StackReduction && abi.CurrentDepth < 8{
-				PosMoveTable[PosMove{st.Zobrist, move}] = subTree
+				pos.PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 			}
 
 			if score > abi.Alpha {
@@ -168,12 +161,12 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				abi.Alpha = score
 
 				if abi.CurrentDepth == 0{
-					HasRootPv = true
-					LastRootPvScore = score
+					pos.HasRootPv = true
+					pos.LastRootPvScore = score
 				}
 
 				if move != NullMove{
-					pvMoves, ok := PvTable[st.Zobrist]
+					pvMoves, ok := pos.PvTable[st.Zobrist]
 					if ok{
 						newPvMoves := []Move{move}
 						for _, testMove := range pvMoves{
@@ -181,9 +174,9 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 								newPvMoves = append(newPvMoves, testMove)
 							}
 						}
-						PvTable[st.Zobrist] = newPvMoves
+						pos.PvTable[st.Zobrist] = newPvMoves
 					}else{
-						PvTable[st.Zobrist] = []Move{move}
+						pos.PvTable[st.Zobrist] = []Move{move}
 					}					
 				}				
 			}
@@ -207,7 +200,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 }
 
 func (pos *Position) AlphaBeta(maxDepth int) Score {
-	delete(PvTable, pos.Zobrist())
+	delete(pos.PvTable, pos.Zobrist())
 
 	pos.Nodes = 0
 
@@ -225,10 +218,10 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 	// for higher depths try aspiration window
 	for asp := 1; asp < 5; asp++{
-		alpha := LastRootPvScore - window
-		beta := LastRootPvScore + 5 * window
+		alpha := pos.LastRootPvScore - window
+		beta := pos.LastRootPvScore + 5 * window
 
-		fmt.Printf("info asp %d window %d est %d alpha %d beta %d\n", asp, window, LastRootPvScore, alpha, beta)
+		fmt.Printf("info asp %d window %d est %d alpha %d beta %d\n", asp, window, pos.LastRootPvScore, alpha, beta)
 
 		score := pos.AlphaBetaRec(AlphaBetaInfo{
 			Alpha:        alpha,
@@ -237,7 +230,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 			MaxDepth:     maxDepth,
 		})
 
-		if HasRootPv{
+		if pos.HasRootPv{
 			return score
 		}
 
@@ -262,7 +255,7 @@ func (pos Position) GetPvRec(depthRemaining int, pvSoFar []Move) []Move {
 		return pvSoFar
 	}
 
-	moves, ok := PvTable[pos.Zobrist()]
+	moves, ok := pos.PvTable[pos.Zobrist()]
 
 	if ok {
 		pos.Push(moves[0])
@@ -293,18 +286,17 @@ func (pos *Position) PrintBestMove(pv []Move) {
 	fmt.Println("bestmove", pv[0].UCI(), "ponder", pv[1].UCI())
 }
 
-var lastGoodPv []Move
-
-func PrintPvTable() {
-	for zobrist, moves := range PvTable {
+func PrintPvTable(pos Position) {
+	for zobrist, moves := range pos.PvTable {
 		fmt.Printf("%016X %s\n", zobrist, moves[0].UCI())
 	}
 }
 
 func (pos *Position) Search(maxDepth int) {
-	PvTable = make(map[uint64][]Move)
+	pos.PvTable = make(map[uint64][]Move)
+	pos.PosMoveTable = make(map[PosMove]int)
 
-	lastGoodPv = []Move{}
+	pos.LastGoodPv = []Move{}
 
 	pos.SearchStopped = false
 
@@ -315,11 +307,11 @@ func (pos *Position) Search(maxDepth int) {
 		score := pos.AlphaBeta(depth)
 
 		if pos.SearchStopped {
-			pos.PrintBestMove(lastGoodPv)
+			pos.PrintBestMove(pos.LastGoodPv)
 			return
 		}
 
-		lastGoodPv = pos.GetPv(depth)
+		pos.LastGoodPv = pos.GetPv(depth)
 
 		elapsed := float32(time.Now().Sub(start)) / 1e9
 
@@ -327,7 +319,7 @@ func (pos *Position) Search(maxDepth int) {
 
 		buff := []string{}
 
-		for _, testMove := range lastGoodPv {
+		for _, testMove := range pos.LastGoodPv {
 			buff = append(buff, testMove.UCI())
 		}
 
@@ -335,7 +327,7 @@ func (pos *Position) Search(maxDepth int) {
 
 		totalPvTableMoves := 0
 		maxPvItemLength := 0
-		for _, item := range PvTable{
+		for _, item := range pos.PvTable{
 			l := len(item)
 			totalPvTableMoves += l
 			if l > maxPvItemLength{
@@ -343,11 +335,11 @@ func (pos *Position) Search(maxDepth int) {
 			}
 		}
 
-		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(PvTable), totalPvTableMoves, maxPvItemLength)
+		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
 		fmt.Printf("info depth %d time %.0f nodes %d nps %.0f score cp %d pv %v\n", depth, elapsed*1000, pos.Nodes, nps, score, pv)
 	}
 
-	pos.PrintBestMove(lastGoodPv)
+	pos.PrintBestMove(pos.LastGoodPv)
 }
 
 

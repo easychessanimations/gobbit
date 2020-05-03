@@ -21,6 +21,11 @@ type Position struct {
 	NullMoveDepthReduction   int
 	StackReduction           bool
 	AspirationWindow         bool
+	PvTable                  map[uint64][]Move
+	PosMoveTable             map[PosMove]int
+	HasRootPv                bool
+	LastRootPvScore          Score
+	LastGoodPv               []Move
 }
 
 func (pos *Position) Current() *State {

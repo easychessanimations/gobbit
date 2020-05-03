@@ -63,11 +63,11 @@ func (st *State) PopStackBuff() (StackBuffEntry, bool){
 
 const NullMove = Move(Null) << MOVE_TYPE_SHIFT
 
-func (st *State) PopStack() Move{
+func (st *State) PopStack(pos *Position) Move{
 	if st.StackPhase == PopNull{
 		st.StackPhase = GenPv
 
-		_, hasPvMove := PvTable[st.Zobrist]
+		_, hasPvMove := pos.PvTable[st.Zobrist]
 
 		if !hasPvMove{			
 			return NullMove
@@ -75,7 +75,7 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == GenPv{
-		pvMoves, ok := PvTable[st.Zobrist]
+		pvMoves, ok := pos.PvTable[st.Zobrist]
 		if ok{			
 			st.StackPvMoves = pvMoves
 			st.StackPhase = PopPv			
@@ -96,7 +96,7 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == GenViolent{
-		st.SetStackBuff(st.Pslms(Violent))
+		st.SetStackBuff(pos, st.Pslms(Violent))
 		st.StackPhase = PopViolent
 	}
 
@@ -110,7 +110,7 @@ func (st *State) PopStack() Move{
 	}
 
 	if st.StackPhase == GenQuiet{
-		st.SetStackBuff(st.Pslms(Quiet))
+		st.SetStackBuff(pos, st.Pslms(Quiet))
 		numQuiet := len(st.StackBuff)		
 		rF := 1
 		for rF * rF < numQuiet{
