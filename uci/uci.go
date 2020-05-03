@@ -64,6 +64,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.StackReduction = uo.BooleanValue()
 			}
 
+			if name == "Aspiration Window"{
+				uci.Pos.AspirationWindow = uo.BooleanValue()
+			}
+
 			return
 		}
 	}

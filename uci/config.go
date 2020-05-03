@@ -54,6 +54,11 @@ var UCI_OPTIONS = []UciOption{
 		Type: "check",		
 		Default: "false",
 	},
+	{
+		Name: "Aspiration Window",
+		Type: "check",		
+		Default: "false",
+	},
 }
 
 func (uo UciOption) StringValue() string{

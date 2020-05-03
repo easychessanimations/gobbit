@@ -66,6 +66,9 @@ func (st State) Score() Score {
 	return score
 }
 
+var HasRootPv bool
+var LastRootPvScore Score
+
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	pos.Nodes++
 
@@ -89,6 +92,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	allowNMP := pos.NullMovePruning && (!abi.NullMoveMade) && abi.CurrentDepth >= pos.NullMovePruningMinDepth
 
 	st.InitStack(allowNMP)
+
+	if abi.CurrentDepth == 0{
+		HasRootPv = false
+	}
 
 	for st.StackPhase != GenDone {
 		move := st.PopStack()
@@ -160,6 +167,11 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				// alpha improvement
 				abi.Alpha = score
 
+				if abi.CurrentDepth == 0{
+					HasRootPv = true
+					LastRootPvScore = score
+				}
+
 				if move != NullMove{
 					pvMoves, ok := PvTable[st.Zobrist]
 					if ok{
@@ -199,6 +211,37 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 	pos.Nodes = 0
 
+	// for low depth perform normal search
+	if (!pos.AspirationWindow) || maxDepth < 5{
+		return pos.AlphaBetaRec(AlphaBetaInfo{
+			Alpha:        -INFINITE_SCORE,
+			Beta:         INFINITE_SCORE,
+			CurrentDepth: 0,
+			MaxDepth:     maxDepth,
+		})
+	}
+
+	window := Score(75)
+
+	// for higher depths try aspiration window
+	for asp := 1; asp < 5; asp++{
+		fmt.Printf("info asp %d window %d\n", asp, window)
+
+		score := pos.AlphaBetaRec(AlphaBetaInfo{
+			Alpha:        LastRootPvScore - window,
+			Beta:         LastRootPvScore + 5 * window,
+			CurrentDepth: 0,
+			MaxDepth:     maxDepth,
+		})
+
+		if HasRootPv{
+			return score
+		}
+
+		window *= 2
+	}
+
+	// aspiration window failed to return a pv, fall back to normal search
 	return pos.AlphaBetaRec(AlphaBetaInfo{
 		Alpha:        -INFINITE_SCORE,
 		Beta:         INFINITE_SCORE,
