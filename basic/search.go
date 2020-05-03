@@ -147,7 +147,9 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			subTree := pos.Nodes - nodesStart
 
 			if stackReduceDepth > 0{
-				subTree *= st.StackReduceFactor
+				for i := 0; i < stackReduceDepth; i++{
+					subTree *= st.StackReduceFactor
+				}				
 			}
 
 			if abi.CurrentDepth < 7{

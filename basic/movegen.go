@@ -127,6 +127,12 @@ func (st *State) PopStack() Move{
 			st.StackReduceDepth = 0
 			if sbe.SubTree > 0 && len(st.StackBuff) <= st.StackReduceFrom{
 				st.StackReduceDepth = 1
+				if len(st.StackBuff) <= st.StackReduceFrom - 3{
+					st.StackReduceDepth = 2
+				}
+				if len(st.StackBuff) <= st.StackReduceFrom / 2{
+					st.StackReduceDepth = 3
+				}
 			}
 			return sbe.Move
 		}else{
