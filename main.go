@@ -21,5 +21,7 @@ func main() {
 
 	uci.ProcessConfig()
 
+	uci.ProcessCommandLine()
+
 	uci.UciLoop()
 }

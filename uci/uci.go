@@ -240,6 +240,26 @@ func (uci *Uci) ProcessConfig(){
 	IterateTextFile("engineconfig.txt", uci.ProcessConfigLine)
 }
 
+func (uci *Uci) ProcessCommandLine(){
+	args := os.Args[1:]	
+
+	if len(args) > 0{
+		fmt.Println("++++ processing command line")
+
+		if args[0] == "a"{
+			fen := strings.Join(args[1:], " ")
+			
+			uci.Pos.ParseFen(fen)
+			uci.Pos.Print()
+
+			fmt.Println("++++ analyzing fen", fen)
+			fmt.Println()
+
+			go uci.Pos.Search(20)
+		}
+	}
+}
+
 func (uci *Uci) UciLoop(){	
 	scan := bufio.NewScanner(os.Stdin)
 
