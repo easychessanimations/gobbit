@@ -225,11 +225,14 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 	// for higher depths try aspiration window
 	for asp := 1; asp < 5; asp++{
-		fmt.Printf("info asp %d window %d\n", asp, window)
+		alpha := LastRootPvScore - window
+		beta := LastRootPvScore + 5 * window
+
+		fmt.Printf("info asp %d window %d est %d alpha %d beta %d\n", asp, window, LastRootPvScore, alpha, beta)
 
 		score := pos.AlphaBetaRec(AlphaBetaInfo{
-			Alpha:        LastRootPvScore - window,
-			Beta:         LastRootPvScore + 5 * window,
+			Alpha:        alpha,
+			Beta:         beta,
 			CurrentDepth: 0,
 			MaxDepth:     maxDepth,
 		})
