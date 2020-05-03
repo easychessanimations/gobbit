@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"math/rand"
+	"time"
 
 	. "github.com/easychessanimations/gobbit/basic"
 )
@@ -281,6 +282,8 @@ func (uci *Uci) ProcessMatePuzzleLine(line string){
 }
 
 func (uci *Uci) ProcessMatePuzzles(){
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	IterateTextFile("matein4.txt", uci.ProcessMatePuzzleLine)
 }
 
