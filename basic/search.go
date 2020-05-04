@@ -140,7 +140,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			pos.Pop()
 
 			if pos.CheckTime() > 60{
-				fmt.Printf("info currmove %s depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
+				fmt.Printf("info currmove %s currdepth %d time %d nodes %d nps %.0f oldscore cp %d oldpv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
