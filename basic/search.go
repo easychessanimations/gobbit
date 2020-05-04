@@ -111,6 +111,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 	st.InitStack(allowNMP)
 
+	currPvMove := NullMove
+
 	for st.StackPhase != GenDone {
 		move := st.PopStack(pos)
 
@@ -165,12 +167,6 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			pos.Pop()
 
-			if pos.CheckTime() > 30{
-				fmt.Printf("info currstack %d currdepth %d time %d currscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
-
-				pos.CheckPoint = time.Now()
-			}
-
 			subTree := pos.Nodes - nodesStart
 
 			if stackReduceDepth > 0{
@@ -195,6 +191,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 				if abi.CurrentDepth == 0{					
 					pos.LastRootPvScore = score
+					currPvMove = move
 				}
 
 				if move != NullMove{
@@ -211,6 +208,17 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 						pos.PvTable[st.Zobrist] = []Move{move}
 					}					
 				}				
+			}
+
+			if pos.CheckTime() > 30{
+				currPvUci := "none"
+				if currPvMove != NullMove{
+					currPvUci = currPvMove.UCI()
+				}
+
+				fmt.Printf("info currstack %d currdepth %d time %d currpvmove %s latestrootscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), currPvUci, pos.LastRootPvScore, pos.PvUCI())
+
+				pos.CheckPoint = time.Now()
 			}
 
 			if score >= abi.Beta {
