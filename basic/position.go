@@ -30,6 +30,14 @@ type Position struct {
 	Depth                    int
 }
 
+func (sc Score) IsMateInN() bool{
+	return sc < -MAX_SCORE || sc > MAX_SCORE
+}
+
+func (pos Position) IsMateInN() bool{
+	return pos.LastRootPvScore.IsMateInN()
+}
+
 func (pos Position) PvUCI() string{
 	buff := []string{}
 
