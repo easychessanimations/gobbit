@@ -84,33 +84,82 @@ type KingInfo struct {
 	Square     Square
 }
 
-type StackBuffEntry struct{
-	Move    Move
-	SubTree int
+type StackBuffEntry struct{	
+	Move      Move
+	IsPv      bool
+	IsCapture bool
+	Mobility  Accum
+	SubTree   int		
 }
 
 type StackBuff []StackBuffEntry
 
-func (a StackBuff) Len() int           { return len(a) }
-func (a StackBuff) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a StackBuff) Less(i, j int) bool { return a[i].SubTree < a[j].SubTree }
+func (sb StackBuff) Len() int{
+	return len(sb)
+}
+
+func (sb StackBuff) Swap(i, j int){
+	sb[i], sb[j] = sb[j], sb[i]
+}
+
+func (sb StackBuff) Less(i, j int) bool{	
+	if sb[j].IsPv && (!sb[i].IsPv){
+		return true
+	}
+
+	if (!sb[j].IsPv) && sb[i].IsPv{
+		return false
+	}
+
+	if sb[j].IsCapture && (!sb[i].IsCapture){
+		return true
+	}
+
+	if (!sb[j].IsCapture) && sb[i].IsCapture{
+		return false
+	}	
+
+	if sb[j].Mobility.E > 0 && sb[i].Mobility.E == 0{
+		return true
+	}
+
+	if sb[j].Mobility.E == 0 && sb[i].Mobility.E >= 0{
+		return false
+	}
+
+	return sb[j].SubTree > sb[i].SubTree
+}
 
 func (st *State) SetStackBuff(pos *Position, moves []Move){
 	st.StackBuff = []StackBuffEntry{}
+
 	for _, move := range moves{
 		posMove := PosMove{
 			Zobrist: st.Zobrist,
 			Move: move,			
 		}
+
 		subTree, _ := pos.PosMoveTable[posMove]		
-		st.StackBuff = append(st.StackBuff, StackBuffEntry{
+
+		isPv := false
+
+		for _, testMove := range st.StackPvMoves{
+			if move == testMove{
+				isPv = true
+				break
+			}
+		}
+
+		st.StackBuff = append(st.StackBuff, StackBuffEntry{			
 			Move: move, 
+			IsPv: isPv,
+			IsCapture: st.PieceAtSquare(move.ToSq()) != NoPiece,
+			Mobility: st.MobilityForPieceAtSquare(st.PieceAtSquare(move.FromSq()), move.ToSq()),
 			SubTree: subTree,
 		})
 	}	
-	if true{
-		sort.Sort(st.StackBuff)
-	}
+	
+	sort.Sort(st.StackBuff)
 }
 
 // State records the state of a position
@@ -433,37 +482,46 @@ func (st State) MobilityPOV() Accum{
 	return mobBal.Mult(-1)
 }
 
-func (st State) MobilityForColor(color Color) Accum{
+func (st State) MobilityForPieceAtSquare(p Piece, sq Square) Accum{
+	color := ColorOf[p]
+	mobility := Accum{}
+
 	occupUs := st.ByColor[color]
 	occupThem := st.ByColor[color.Inverse()]
+
+	if !st.IsSquareJailedForColor(sq, color){		
+		fig := FigureOf[p]
+		var mob Bitboard
+		switch fig{
+		case Knight:
+			mob = KnightMobility(Violent|Quiet, sq, occupUs, occupThem)
+			break
+		// approximate sentry as bishop
+		case Bishop, Sentry:
+			mob = BishopMobility(Violent|Quiet, sq, occupUs, occupThem)
+			break
+		// approximate jailer as rook
+		case Rook, Jailer:
+			mob = RookMobility(Violent|Quiet, sq, occupUs, occupThem)
+			break
+		case Queen:
+			mob = QueenMobility(Violent|Quiet, sq, occupUs, occupThem)
+			break
+		case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
+			mob = LancerMobility(Violent|Quiet, p.LancerDirection(), sq, occupUs, occupThem)
+			break
+		}			
+		attack := mob & KingArea[sq]
+		mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attack.Count() * ATTACK_MULTIPLIER)})
+	}		
+
+	return mobility
+}
+
+func (st State) MobilityForColor(color Color) Accum{	
 	mobility := Accum{}
 	for _, sq := range st.ByColor[color].PopAll(){
-		if !st.IsSquareJailedForColor(sq, color){
-			p := st.PieceAtSquare(sq)
-			fig := FigureOf[p]
-			var mob Bitboard
-			switch fig{
-			case Knight:
-				mob = KnightMobility(Violent|Quiet, sq, occupUs, occupThem)
-				break
-			// approximate sentry as bishop
-			case Bishop, Sentry:
-				mob = BishopMobility(Violent|Quiet, sq, occupUs, occupThem)
-				break
-			// approximate jailer as rook
-			case Rook, Jailer:
-				mob = RookMobility(Violent|Quiet, sq, occupUs, occupThem)
-				break
-			case Queen:
-				mob = QueenMobility(Violent|Quiet, sq, occupUs, occupThem)
-				break
-			case LancerN, LancerNE, LancerE, LancerSE, LancerS, LancerSW, LancerW, LancerNW:
-				mob = LancerMobility(Violent|Quiet, p.LancerDirection(), sq, occupUs, occupThem)
-				break
-			}			
-			attack := mob & KingArea[sq]
-			mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attack.Count() * ATTACK_MULTIPLIER)})
-		}		
+		mobility.Merge(st.MobilityForPieceAtSquare(st.PieceAtSquare(sq), sq))		
 	}
 	return mobility
 }

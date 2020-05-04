@@ -23,10 +23,8 @@ const (
 	PopNull = iota
 	GenPv
 	PopPv
-	GenViolent
-	PopViolent
-	GenQuiet
-	PopQuiet
+	GenAll
+	PopAll	
 	GenDone
 )
 
@@ -49,14 +47,6 @@ func (st *State) PopStackBuff() (StackBuffEntry, bool){
 
 	sbe := st.StackBuff[l-1]
 	st.StackBuff = st.StackBuff[0:l-1]
-
-	if len(st.StackPvMoves) > 0{
-		for _, testMove := range st.StackPvMoves{
-			if sbe.Move == testMove{
-				return st.PopStackBuff()		
-			}
-		}
-	}
 
 	return sbe, true
 }
@@ -81,7 +71,7 @@ func (st *State) PopStack(pos *Position) Move{
 			st.StackPhase = PopPv			
 		}else{			
 			st.StackPvMoves = []Move{}
-			st.StackPhase = GenViolent			
+			st.StackPhase = GenAll
 		}
 	}
 
@@ -91,45 +81,31 @@ func (st *State) PopStack(pos *Position) Move{
 			st.StackPvMoves = st.StackPvMoves[1:]
 			return move
 		}else{
-			st.StackPhase = GenViolent
+			st.StackPhase = GenAll
 		}
 	}
 
-	if st.StackPhase == GenViolent{
-		st.SetStackBuff(pos, st.Pslms(Violent))
-		st.StackPhase = PopViolent
-	}
+	if st.StackPhase == GenAll{
+		st.SetStackBuff(pos, st.GenerateMoves())
+		numAll := len(st.StackBuff)
 
-	if st.StackPhase == PopViolent{
-		sbe, ok := st.PopStackBuff()
-		if ok{
-			return sbe.Move
-		}else{
-			st.StackPhase = GenQuiet
-		}
-	}
-
-	if st.StackPhase == GenQuiet{
-		st.SetStackBuff(pos, st.Pslms(Quiet))
-		numQuiet := len(st.StackBuff)		
 		rF := 1
-		for rF * rF < numQuiet{
+		for rF * rF < numAll{
 			rF++
 		}
-		st.StackReduceFrom = numQuiet - 5
+
+		st.StackReduceFrom = numAll - rF
 		st.StackReduceFactor = rF
-		st.StackPhase = PopQuiet
+
+		st.StackPhase = PopAll
 	}
 
-	if st.StackPhase == PopQuiet{
+	if st.StackPhase == PopAll{
 		sbe, ok := st.PopStackBuff()
 		if ok{
 			st.StackReduceDepth = 0
 			if sbe.SubTree > 0 && len(st.StackBuff) <= st.StackReduceFrom{
-				st.StackReduceDepth = 1				
-				if len(st.StackBuff) <= st.StackReduceFrom / 2{
-					st.StackReduceDepth = 2
-				}
+				st.StackReduceDepth = 1
 			}
 			return sbe.Move
 		}else{
