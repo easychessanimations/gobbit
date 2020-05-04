@@ -87,6 +87,7 @@ type KingInfo struct {
 type StackBuffEntry struct{	
 	Move      Move
 	IsPv      bool
+	PvIndex   int
 	IsCapture bool
 	Mobility  Accum
 	SubTree   int		
@@ -109,6 +110,10 @@ func (sb StackBuff) Less(i, j int) bool{
 
 	if (!sb[j].IsPv) && sb[i].IsPv{
 		return false
+	}
+
+	if sb[j].IsPv && sb[i].IsPv{
+		return sb[j].PvIndex < sb[i].PvIndex
 	}
 
 	if sb[j].IsCapture && (!sb[i].IsCapture){
@@ -142,10 +147,12 @@ func (st *State) SetStackBuff(pos *Position, moves []Move){
 		subTree, _ := pos.PosMoveTable[posMove]		
 
 		isPv := false
+		pvIndex := 0
 
-		for _, testMove := range st.StackPvMoves{
+		for i, testMove := range st.StackPvMoves{
 			if move == testMove{
 				isPv = true
+				pvIndex = i
 				break
 			}
 		}
@@ -153,6 +160,7 @@ func (st *State) SetStackBuff(pos *Position, moves []Move){
 		st.StackBuff = append(st.StackBuff, StackBuffEntry{			
 			Move: move, 
 			IsPv: isPv,
+			PvIndex: pvIndex,
 			IsCapture: st.PieceAtSquare(move.ToSq()) != NoPiece,
 			Mobility: st.MobilityForPieceAtSquare(st.PieceAtSquare(move.FromSq()), move.ToSq()),
 			SubTree: subTree,
