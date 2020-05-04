@@ -2,7 +2,6 @@ package basic
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -140,15 +139,21 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			pos.Pop()
 
+			if pos.CheckTime() > 60{
+				fmt.Printf("info currmove %s depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
+
+				pos.CheckPoint = time.Now()
+			}
+
 			subTree := pos.Nodes - nodesStart
 
-			if stackReduceDepth > 7{
+			if stackReduceDepth > 0{
 				for i := 0; i < stackReduceDepth; i++{
 					subTree *= st.StackReduceFactor
 				}				
 			}
 
-			if pos.StackReduction && abi.CurrentDepth < 8{
+			if pos.StackReduction && abi.CurrentDepth < 7{
 				pos.PosMoveTable[PosMove{st.Zobrist, move}] = subTree
 			}
 
@@ -307,30 +312,19 @@ func (pos *Position) Search(maxDepth int) {
 
 	pos.SearchStopped = false
 
-	start := time.Now()
+	pos.Start = time.Now()
+	pos.CheckPoint = pos.Start
 
-	for depth := 1; depth <= maxDepth; depth++ {
+	for pos.Depth = 1; pos.Depth <= maxDepth; pos.Depth++ {
 
-		score := pos.AlphaBeta(depth)
+		score := pos.AlphaBeta(pos.Depth)
 
 		if pos.SearchStopped {
 			pos.PrintBestMove(pos.LastGoodPv)
 			return
 		}
 
-		pos.LastGoodPv = pos.GetPv(depth)
-
-		elapsed := float32(time.Now().Sub(start)) / 1e9
-
-		nps := float32(pos.Nodes) / elapsed
-
-		buff := []string{}
-
-		for _, testMove := range pos.LastGoodPv {
-			buff = append(buff, testMove.UCI())
-		}
-
-		pv := strings.Join(buff, " ")
+		pos.LastGoodPv = pos.GetPv(pos.Depth)
 
 		totalPvTableMoves := 0
 		maxPvItemLength := 0
@@ -343,7 +337,9 @@ func (pos *Position) Search(maxDepth int) {
 		}
 
 		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
-		fmt.Printf("info depth %d time %.0f nodes %d nps %.0f score cp %d pv %v\n", depth, elapsed*1000, pos.Nodes, nps, score, pv)
+		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
+
+		pos.CheckPoint = time.Now()
 	}
 
 	pos.PrintBestMove(pos.LastGoodPv)

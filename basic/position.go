@@ -25,6 +25,37 @@ type Position struct {
 	PosMoveTable             map[PosMove]int	
 	LastRootPvScore          Score
 	LastGoodPv               []Move
+	Start                    time.Time
+	CheckPoint               time.Time
+	Depth                    int
+}
+
+func (pos Position) PvUCI() string{
+	buff := []string{}
+
+	for _, testMove := range pos.LastGoodPv {
+		buff = append(buff, testMove.UCI())
+	}
+
+	pv := strings.Join(buff, " ")
+
+	return pv
+}
+
+func (pos Position) Time() float32{
+	return float32(time.Now().Sub(pos.Start)) / 1e9
+}
+
+func (pos Position) Nps() float32{
+	return float32(pos.Nodes) / pos.Time()
+}
+
+func (pos Position) TimeMs() int{
+	return int(float32(time.Now().Sub(pos.Start)) / 1e6)
+}
+
+func (pos Position) CheckTime() float32{
+	return float32(time.Now().Sub(pos.CheckPoint)) / 1e9
 }
 
 func (pos *Position) Current() *State {
