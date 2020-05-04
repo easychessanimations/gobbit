@@ -165,8 +165,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			pos.Pop()
 
-			if pos.CheckTime() > 60 && abi.CurrentDepth == 0{
-				fmt.Printf("info currstack %d currdepth %d time %d oldscore cp %d oldpv %v\n", len(pos.Current().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
+			if (pos.CheckTime() > 30 && abi.CurrentDepth == 0) || (pos.CheckTime() > 60 && abi.CurrentDepth == 1){
+				fmt.Printf("info currstack %d currdepth %d abidepth %d time %d oldscore cp %d oldpv %v\n", len(pos.Current().StackBuff), pos.Depth, abi.CurrentDepth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
