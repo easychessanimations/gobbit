@@ -268,6 +268,11 @@ func (st *State) MakeMove(move Move) {
 
 	if FigureOf[p] == King{
 		// if king was moved, delete all castling rights
+		if st.CastlingRights[pCol].CanCastle() && move.MoveType() != Castling{
+			// if king lost castling rights without castling, note that
+			st.LostCastlingForColor[pCol] = true
+		}
+
 		newCastlingRights[pCol][CastlingSideKing].CanCastle = false
 		newCastlingRights[pCol][CastlingSideQueen].CanCastle = false
 

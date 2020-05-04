@@ -66,6 +66,10 @@ type CastlingRight struct{
 type ColorCastlingRights [2]CastlingRight
 type CastlingRights [2]ColorCastlingRights
 
+func (ccr ColorCastlingRights) CanCastle() bool{
+	return ccr[0].CanCastle || ccr[1].CanCastle
+}
+
 type MoveBuffItem struct {
 	Move Move
 	Uci  string
@@ -111,31 +115,32 @@ func (st *State) SetStackBuff(pos *Position, moves []Move){
 
 // State records the state of a position
 type State struct {
-	Variant           Variant
-	Pieces            [NUM_RANKS][NUM_FILES]Piece
-	Turn              Color
-	CastlingRights    CastlingRights
-	EpSquare          Square
-	HalfmoveClock     int
-	FullmoveNumber    int
-	HasDisabledMove   bool
-	DisableFromSquare Square
-	DisableToSquare   Square
-	ByFigure          [FigureArraySize]Bitboard
-	ByLancer          Bitboard
-	ByColor           [ColorArraySize]Bitboard
-	Ply               int
-	Move              Move
-	MoveBuff          MoveBuff
-	Material          [ColorArraySize]Accum
-	Zobrist           uint64
-	KingInfos         [ColorArraySize]KingInfo
-	StackPhase        int
-	StackBuff         StackBuff
-	StackPvMoves      []Move
-	StackReduceFrom   int
-	StackReduceDepth  int
-	StackReduceFactor int
+	Variant               Variant
+	Pieces                [NUM_RANKS][NUM_FILES]Piece
+	Turn                  Color
+	CastlingRights        CastlingRights
+	EpSquare              Square
+	HalfmoveClock         int
+	FullmoveNumber        int
+	HasDisabledMove       bool
+	DisableFromSquare     Square
+	DisableToSquare       Square
+	ByFigure              [FigureArraySize]Bitboard
+	ByLancer              Bitboard
+	ByColor               [ColorArraySize]Bitboard
+	Ply                   int
+	Move                  Move
+	MoveBuff              MoveBuff
+	Material              [ColorArraySize]Accum
+	Zobrist               uint64
+	KingInfos             [ColorArraySize]KingInfo
+	StackPhase            int
+	StackBuff             StackBuff
+	StackPvMoves          []Move
+	StackReduceFrom       int
+	StackReduceDepth      int
+	StackReduceFactor     int
+	LostCastlingForColor  [ColorArraySize]bool
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
@@ -338,6 +343,9 @@ func (st *State) ParseCastlingRights(crs string) {
 	t := Tokenizer{}
 	t.Init(crs)
 
+	st.LostCastlingForColor[White] = false
+	st.LostCastlingForColor[Black] = false
+
 	newCastlingRights := t.GetCastlingRights()
 
 	populatedCastlingRights := st.PopulateCastlingRights(newCastlingRights)
@@ -471,7 +479,7 @@ func (st State) MaterialPOV() Accum {
 func (st State) PrettyPrintString() string {
 	buff := st.PrettyPlacementString()
 
-	buff += fmt.Sprintf("\n%s : %s : %16X\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist)
+	buff += fmt.Sprintf("\n%s : %s : %16X ! %d\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist, st.LostCastlingDeductionPOV(st.Phase()))
 
 	buff += fmt.Sprintf("\nMat White %v , Black %v , Balance %v , POV %v , Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
 

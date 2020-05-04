@@ -34,6 +34,30 @@ func (st State) Phase() float32{
 
 const MAX_SCORE = 9000
 
+const LOST_CASTLING_DEDUCTION = 150
+
+func (st State) LostCastlingDeductionForColor(color Color, phase float32) Score{
+	if st.LostCastlingForColor[color]{
+		return Score(phase * float32(LOST_CASTLING_DEDUCTION))
+	}	
+
+	return 0
+}
+
+func (st State) LostCastlingDeductionBalance(phase float32) Score{	
+	return st.LostCastlingDeductionForColor(White, phase) - st.LostCastlingDeductionForColor(Black, phase)
+}
+
+func (st State) LostCastlingDeductionPOV(phase float32) Score{	
+	bal := st.LostCastlingDeductionBalance(phase)
+	
+	if st.Turn == White{
+		return bal
+	}
+
+	return -bal
+}
+
 func (st State) Score() Score {
 	phase := st.Phase()
 
@@ -49,6 +73,8 @@ func (st State) Score() Score {
 	mob := st.MobilityPOV()
 
 	score += mob.M + mob.E
+
+	score -= st.LostCastlingDeductionPOV(phase)
 
 	if score > MAX_SCORE{
 		score = MAX_SCORE
