@@ -166,7 +166,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			pos.Pop()
 
 			if pos.CheckTime() > 30{
-				fmt.Printf("info currstack %d currdepth %d time %d oldscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
+				fmt.Printf("info currstack %d currdepth %d time %d currscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
@@ -186,6 +186,12 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			if score > abi.Alpha {
 				// alpha improvement
 				abi.Alpha = score
+
+				if abi.CurrentDepth == 0 && score.IsMateInN(){
+					// stop at forced mate
+					fmt.Printf("info skip %d\n", len(st.StackBuff))
+					st.StackPhase = GenDone
+				}
 
 				if abi.CurrentDepth == 0{					
 					pos.LastRootPvScore = score
