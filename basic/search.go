@@ -165,8 +165,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			pos.Pop()
 
-			if (pos.CheckTime() > 30 && abi.CurrentDepth == 0) || (pos.CheckTime() > 60 && abi.CurrentDepth == 1){
-				fmt.Printf("info currstack %d currdepth %d abidepth %d time %d oldscore cp %d oldpv %v\n", len(pos.Current().StackBuff), pos.Depth, abi.CurrentDepth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
+			if pos.CheckTime() > 30{
+				fmt.Printf("info currstack %d currdepth %d time %d oldscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
@@ -229,6 +229,8 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 	delete(pos.PvTable, pos.Zobrist())
 
 	pos.Nodes = 0
+
+	pos.SearchRootPtr = pos.StatePtr
 
 	// for low depth perform normal search
 	if (!pos.AspirationWindow) || maxDepth < 4{

@@ -13,6 +13,7 @@ const MAX_STATES = SEARCH_MAX_DEPTH + 1
 type Position struct {
 	States                   [MAX_STATES]State
 	StatePtr                 int
+	SearchRootPtr            int
 	MaxStatePtr              int
 	Nodes                    int
 	SearchStopped            bool
@@ -28,6 +29,10 @@ type Position struct {
 	Start                    time.Time
 	CheckPoint               time.Time
 	Depth                    int
+}
+
+func (pos Position) SearchRoot() *State{
+	return &pos.States[pos.SearchRootPtr]
 }
 
 func (sc Score) IsMateInN() bool{
