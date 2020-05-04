@@ -140,7 +140,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			pos.Pop()
 
 			if pos.CheckTime() > 60{
-				fmt.Printf("info currmove %s currdepth %d time %d nodes %d nps %.0f oldscore cp %d oldpv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
+				fmt.Printf("info currmove %s currdepth %d time %d nodes %d nps %.0f oldscore cp %d oldpv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
@@ -219,7 +219,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 	// for higher depths try aspiration window
 	// https://www.chessprogramming.org/Aspiration_Windows
-	for asp := 1; asp < 3; asp++{
+	for asp := 1; asp <= 3; asp++{
 		alpha := pos.LastRootPvScore - windowLow
 		beta := pos.LastRootPvScore + windowHigh
 
@@ -248,6 +248,8 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 			windowHigh *= 3
 		}
 	}
+
+	fmt.Println("info asp full")
 
 	// aspiration window failed to return a pv, fall back to normal search
 	return pos.AlphaBetaRec(AlphaBetaInfo{
@@ -317,7 +319,7 @@ func (pos *Position) Search(maxDepth int) {
 
 	for pos.Depth = 1; pos.Depth <= maxDepth; pos.Depth++ {
 
-		score := pos.AlphaBeta(pos.Depth)
+		pos.AlphaBeta(pos.Depth)
 
 		if pos.SearchStopped {
 			pos.PrintBestMove(pos.LastGoodPv)
@@ -337,7 +339,7 @@ func (pos *Position) Search(maxDepth int) {
 		}
 
 		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
-		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), score, pos.PvUCI())
+		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
 
 		pos.CheckPoint = time.Now()
 	}
