@@ -14,6 +14,7 @@ import (
 type Puzzle struct{
 	Event  string
 	Fen    string
+	Clue   string
 }
 
 type Uci struct{
@@ -172,6 +173,7 @@ func (uci *Uci) NextPuzzle(){
 		uci.Pos.ParseFen(fen)
 		uci.Pos.Print()
 		fmt.Println(puzzle.Event)
+		fmt.Println(puzzle.Clue)
 	}else{
 		fmt.Println("no mate puzzle")
 	}
@@ -268,17 +270,23 @@ func (uci *Uci) ProcessConfig(){
 	IterateTextFile("engineconfig.txt", uci.ProcessConfigLine)
 }
 
-var prevLine = ""
+var prevEvent = ""
+var prevFen = ""
 
 func (uci *Uci) ProcessMatePuzzleLine(line string){
 	rawFenParts := strings.Split(line, "/")
 	if len(rawFenParts) == 8{
+		prevFen = line		
+	}else if prevFen == ""{
+		prevEvent = line
+	}else{
 		uci.MatePuzzles = append(uci.MatePuzzles, Puzzle{
-			Fen: line,
-			Event: prevLine,
+			Fen: prevFen,
+			Event: prevEvent,
+			Clue: line,
 		})
+		prevFen = ""
 	}
-	prevLine = line
 }
 
 func (uci *Uci) ProcessMatePuzzles(){
