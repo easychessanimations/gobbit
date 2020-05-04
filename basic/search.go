@@ -139,8 +139,8 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			pos.Pop()
 
-			if pos.CheckTime() > 60{
-				fmt.Printf("info currmove %s currdepth %d time %d nodes %d nps %.0f oldscore cp %d oldpv %v\n", move.UCI(), pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
+			if pos.CheckTime() > 60 && abi.CurrentDepth == 0{
+				fmt.Printf("info currstack %d currdepth %d time %d oldscore cp %d oldpv %v\n", len(pos.Current().StackBuff), pos.Depth, pos.TimeMs(), pos.LastRootPvScore, pos.PvUCI())
 
 				pos.CheckPoint = time.Now()
 			}
@@ -225,6 +225,8 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 		fmt.Printf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d\n", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta)
 
+		pos.CheckPoint = time.Now()
+
 		score := pos.AlphaBetaRec(AlphaBetaInfo{
 			Alpha:        alpha,
 			Beta:         beta,
@@ -250,6 +252,8 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 	}
 
 	fmt.Println("info asp full")
+
+	pos.CheckPoint = time.Now()
 
 	// aspiration window failed to return a pv, fall back to normal search
 	return pos.AlphaBetaRec(AlphaBetaInfo{
