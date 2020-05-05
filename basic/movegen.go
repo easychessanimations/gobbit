@@ -95,6 +95,10 @@ func (st *State) PopStack(pos *Position) Move{
 		}
 
 		st.StackReduceFrom = numAll - ( rF / 2 )
+
+		if rF / 2 < 4{
+			st.StackReduceFrom = numAll - 4
+		}
 		
 		st.StackReduceFactor = rF
 

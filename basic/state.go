@@ -209,7 +209,7 @@ type State struct {
 	StackReduceFrom       int
 	StackReduceDepth      int
 	StackReduceFactor     int
-	LostCastlingForColor  [ColorArraySize]bool
+	LostCastlingForColor  [ColorArraySize]bool	
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){
@@ -484,7 +484,7 @@ func (mb MoveBuff) PrettyPrintString() string {
 	return buff
 }
 
-const MOBILITY_MULTIPLIER = 5
+const MOBILITY_MULTIPLIER = 10
 const ATTACK_MULTIPLIER = 25
 
 func (st State) MobilityBalance() Accum{
