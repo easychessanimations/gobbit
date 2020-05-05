@@ -93,12 +93,9 @@ func (pos *Position) ParseFen(fen string){
 func (pos Position) Line() string {
 	sans := []string{}
 
-	for ptr := 1; ptr <= pos.StatePtr; ptr++ {
+	for ptr := pos.StatePtr; ptr > 0; ptr-- {
 		prevSt := pos.States[ptr-1]
-		san := prevSt.MoveToSan(pos.States[ptr].Move)
-		if prevSt.Turn == White {
-			san = fmt.Sprintf("%d. %s", prevSt.FullmoveNumber, san)
-		}
+		san := prevSt.MoveToSan(pos.States[ptr].Move)		
 		sans = append(sans, san)
 	}
 
@@ -108,7 +105,7 @@ func (pos Position) Line() string {
 func (pos Position) PrettyPrintString() string {
 	buff := pos.Current().PrettyPrintString()
 
-	buff += fmt.Sprintf("\n\nLine ( %d ) : %s\n", pos.StatePtr, pos.Line())
+	buff += fmt.Sprintf("\n\n%s\n", pos.Line())
 
 	return buff
 }

@@ -79,6 +79,18 @@ type MoveBuffItem struct {
 
 type MoveBuff []MoveBuffItem
 
+func (mb MoveBuff) Len() int{
+	return len(mb)
+}
+
+func (mb MoveBuff) Swap(i, j int){
+	mb[i], mb[j] = mb[j], mb[i]
+}
+
+func (mb MoveBuff) Less(i, j int) bool{
+	return strings.ToUpper(mb[i].San) < strings.ToUpper(mb[j].San)
+}
+
 type KingInfo struct {
 	IsCaptured bool
 	Square     Square
@@ -440,6 +452,8 @@ func (st *State) GenMoveBuff() {
 		mbi.Uci = mbi.Move.UCI()
 		st.MoveBuff[i] = mbi
 	}
+
+	sort.Sort(st.MoveBuff)
 }
 
 func (st *State) UciToMove(uci string) (Move, bool){
@@ -454,23 +468,20 @@ func (st *State) UciToMove(uci string) (Move, bool){
 }
 
 func (mb MoveBuff) PrettyPrintString() string {
-	buff := []string{}
+	buff := ""
 
 	cumul := 0
 
-	for i, mbi := range mb {
-		newLine := ""		
-		item := fmt.Sprintf("%d. %s", i+1, mbi.San)
-		cumul += len(item)
-		if cumul > 70 && i != len(mb)-1{
+	for i, mbi := range mb {		
+		buff += fmt.Sprintf("%-2d. %-12s", i+1, mbi.San)
+		cumul++
+		if cumul > 6 && i != len(mb)-1{
 			cumul = 0
-			newLine = "\n"
-		}
-		buff = append(buff, item + newLine)		
-		
+			buff += "\n"
+		}		
 	}
 
-	return strings.Join(buff, " ")
+	return buff
 }
 
 const MOBILITY_MULTIPLIER = 5
@@ -545,18 +556,18 @@ func (st State) MaterialPOV() Accum {
 func (st State) PrettyPrintString() string {
 	buff := st.PrettyPlacementString()
 
-	buff += fmt.Sprintf("\n%s : %s : %16X ! %d\n", VariantInfos[st.Variant].DisplayName, st.ReportFen(), st.Zobrist, st.LostCastlingDeductionPOV(st.Phase()))
+	buff += fmt.Sprintf("\n%s %s\n", VariantInfos[st.Variant].DisplayName, st.ReportFen())
 
-	buff += fmt.Sprintf("\nMat White %v , Black %v , Balance %v , POV %v , Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
+	buff += fmt.Sprintf("\nMat White %v Black %v Balance %v POV %v Score %d\n", st.Material[White], st.Material[Black], st.Material[NoColor], st.MaterialPOV(), st.Score())
 
 	mobW := st.MobilityForColor(White)
 	mobB := st.MobilityForColor(Black)
 
-	buff += fmt.Sprintf("Mob White %v , Black %v , Balance %v , POV %v , Phase %.2f\n", mobW, mobB, st.MobilityBalance(), st.MobilityPOV(), st.Phase())
+	buff += fmt.Sprintf("Mob White %v Black %v Balance %v POV %v Phase %.2f\n", mobW, mobB, st.MobilityBalance(), st.MobilityPOV(), st.Phase())
 
 	st.GenMoveBuff()
 
-	buff += fmt.Sprintf("\nLegal moves ( %d ) :\n %s", len(st.MoveBuff), st.MoveBuff.PrettyPrintString())
+	buff += fmt.Sprintf("\n%s", st.MoveBuff.PrettyPrintString())
 
 	return buff
 }

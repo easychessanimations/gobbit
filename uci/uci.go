@@ -201,6 +201,7 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 	} else if command == "h" || command == "help" {
 		fmt.Println("h, help = help")
 		fmt.Println("x, q, quit = quit")
+		fmt.Println("i = print position")
 		fmt.Println("l = list uci option values")
 		fmt.Println("pmt = print material table")
 		fmt.Println("g = go depth 20")
@@ -217,6 +218,8 @@ func (uci *Uci) ExecUciCommandLine(commandLine string) error{
 		uci.ExecGoCommand(&t)
 	}else if command == "setoption"{
 		uci.ExecSetOptionCommand(&t)
+	}else if command == "i"{
+		uci.Pos.Print()
 	}else if command == "l"{
 		uci.ListUciOptionValues()
 	} else if command == "pmt" {
@@ -252,16 +255,17 @@ func (uci *Uci) Init(name string, author string, aliases map[string]string){
 	}
 }
 
-func (uci Uci) Welcome(){
+func (uci Uci) Welcome(){	
 	fmt.Println(uci.Id())
+	fmt.Println()
 }
 
 func (uci *Uci) ProcessConfigLine(line string){
 	if line[0:2] == "//"{
-		fmt.Println("--", line[2:])
+		//fmt.Println("--", line[2:])
 		return
 	}else{
-		fmt.Println("++", line)
+		//fmt.Println("++", line)
 	}
 	uci.ExecUciCommandLine(line)	
 }
