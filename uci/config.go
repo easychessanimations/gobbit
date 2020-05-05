@@ -59,6 +59,11 @@ var UCI_OPTIONS = []UciOption{
 		Type: "check",		
 		Default: "false",
 	},
+	{
+		Name: "Verbose",
+		Type: "check",		
+		Default: "false",
+	},
 }
 
 func (uo UciOption) StringValue() string{

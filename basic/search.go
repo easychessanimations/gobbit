@@ -185,7 +185,9 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 				if abi.CurrentDepth == 0 && score.IsMateInN(){
 					// stop at forced mate
-					fmt.Printf("info skip %d\n", len(st.StackBuff))
+					if pos.Verbose{
+						fmt.Printf("info skip %d\n", len(st.StackBuff))
+					}					
 					st.StackPhase = GenDone
 				}
 
@@ -216,7 +218,9 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 					currPvUci = currPvMove.UCI()
 				}
 
-				fmt.Printf("info currstack %d currdepth %d time %d currpvmove %s latestrootscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), currPvUci, pos.LastRootPvScore, pos.PvUCI())
+				if pos.Verbose{
+					fmt.Printf("info currstack %d currdepth %d time %d currpvmove %s latestrootscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), currPvUci, pos.LastRootPvScore, pos.PvUCI())
+				}				
 
 				pos.CheckPoint = time.Now()
 			}
@@ -265,7 +269,9 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		alpha := pos.LastRootPvScore - windowLow
 		beta := pos.LastRootPvScore + windowHigh
 
-		fmt.Printf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d\n", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta)
+		if pos.Verbose{
+			fmt.Printf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d\n", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta)
+		}		
 
 		pos.CheckPoint = time.Now()
 
@@ -281,19 +287,25 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		}
 
 		if score == alpha{
-			fmt.Println("info failed low")
+			if pos.Verbose{
+				fmt.Println("info failed low")	
+			}			
 
 			windowLow *= 3
 		}
 
 		if score == beta{
-			fmt.Println("info failed high")
+			if pos.Verbose{
+				fmt.Println("info failed high")
+			}			
 
 			windowHigh *= 3
 		}
 	}
 
-	fmt.Println("info asp full")
+	if pos.Verbose{
+		fmt.Println("info asp full")
+	}	
 
 	pos.CheckPoint = time.Now()
 
@@ -384,7 +396,9 @@ func (pos *Position) Search(maxDepth int) {
 			}
 		}
 
-		fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
+		if pos.Verbose{
+			fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
+		}		
 		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
 
 		pos.CheckPoint = time.Now()

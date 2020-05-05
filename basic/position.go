@@ -29,6 +29,7 @@ type Position struct {
 	Start                    time.Time
 	CheckPoint               time.Time
 	Depth                    int
+	Verbose                  bool
 }
 
 func (pos Position) SearchRoot() *State{

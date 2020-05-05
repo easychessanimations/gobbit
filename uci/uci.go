@@ -75,6 +75,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.AspirationWindow = uo.BooleanValue()
 			}
 
+			if name == "Verbose"{
+				uci.Pos.Verbose = uo.BooleanValue()
+			}
+
 			return
 		}
 	}
