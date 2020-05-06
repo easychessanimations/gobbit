@@ -402,8 +402,8 @@ func (st State) GenSentryMoves(kind MoveKind, color Color, sq Square, occupUs, o
 				// nudge to adjacent squares				
 				for ld := 0; ld < NUM_LANCER_DIRECTIONS; ld++{
 					if ld != lancerDir{
-						targetSq, ok := st.AddDeltaToSquare(pushSq, LANCER_DELTAS[ld])						
-						if ok{
+						targetSq, ok := st.AddDeltaToSquare(pushSq, LANCER_DELTAS[ld])												
+						if ok && st.PieceAtSquare(targetSq) == NoPiece{
 							moves = append(moves, MakeMoveFTPS(sq, pushSq, ColorFigure[pushCol][LancerN + Figure(ld)], targetSq))
 						}
 					}
