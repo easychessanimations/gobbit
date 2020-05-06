@@ -33,8 +33,8 @@ func Mix32Uint64AndUint32(v64 uint64, v32 uint32) uint32{
 }
 
 const POS_MOVE_HASH_KEY_SIZE_IN_BITS = 25
-const POS_MOVE_HASH_SIZE = 1 << POS_MOVE_HASH_KEY_SIZE_IN_BITS
-const POS_MOVE_HASH_MASK = POS_MOVE_HASH_SIZE - 1
+const POS_MOVE_HASH_SIZE = 1 << PV_HASH_KEY_SIZE_IN_BITS
+const POS_MOVE_HASH_MASK = PV_HASH_SIZE - 1
 
 type PosMoveEntry struct{
 	Used            bool
@@ -67,4 +67,38 @@ func (pmh *PosMoveHash) Set(zobrist uint64, move Move, pme PosMoveEntry){
 	}
 
 	pmh.Entries[key] = pme
+}
+
+const PV_HASH_KEY_SIZE_IN_BITS = 20
+const PV_HASH_SIZE = 1 << PV_HASH_KEY_SIZE_IN_BITS
+const PV_HASH_MASK = PV_HASH_SIZE - 1
+
+const MAX_PV_MOVES = 2
+
+type PvEntry struct{		
+	Depth           int8
+	Zobrist         uint64
+	Moves           [MAX_PV_MOVES]Move
+}
+
+type PvHash struct{
+	Entries         [PV_HASH_SIZE]PvEntry
+}
+
+func (pvh *PvHash) Get(zobrist uint64) (uint32, PvEntry, bool){
+	key := uint32(zobrist & PV_HASH_MASK)
+
+	entry := pvh.Entries[key]
+
+	return key, entry, ( entry.Zobrist == zobrist ) && entry.Depth < INFINITE_DEPTH
+}
+
+func (pvh *PvHash) Set(zobrist uint64, pve PvEntry){
+	pve.Zobrist = zobrist
+
+	key, oldPve, _ := pvh.Get(zobrist)
+
+	if pve.Depth <= oldPve.Depth{
+		pvh.Entries[key] = pve
+	}
 }

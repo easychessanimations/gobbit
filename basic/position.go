@@ -8,6 +8,8 @@ import (
 
 const SEARCH_MAX_DEPTH = 100
 
+const INFINITE_DEPTH = int8(SEARCH_MAX_DEPTH + 1)
+
 const MAX_STATES = SEARCH_MAX_DEPTH + 1
 
 type Position struct {
@@ -22,7 +24,7 @@ type Position struct {
 	NullMoveDepthReduction   int
 	StackReduction           bool
 	AspirationWindow         bool
-	PvTable                  map[uint64][]Move
+	PvTable                  *PvHash
 	PosMoveTable             *PosMoveHash
 	LastRootPvScore          Score
 	LastGoodPv               []Move
@@ -30,6 +32,12 @@ type Position struct {
 	CheckPoint               time.Time
 	Depth                    int
 	Verbose                  bool
+}
+
+func (pos *Position) ClearPvTable(){
+	for i := 0; i < len(pos.PvTable.Entries); i++{
+		pos.PvTable.Entries[i].Depth = INFINITE_DEPTH
+	}
 }
 
 func (pos *Position) ClearPosMoveTable(){

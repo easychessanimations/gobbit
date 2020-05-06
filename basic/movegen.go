@@ -57,7 +57,7 @@ func (st *State) PopStack(pos *Position) Move{
 	if st.StackPhase == PopNull{
 		st.StackPhase = GenPv
 
-		_, hasPvMove := pos.PvTable[st.Zobrist]
+		_, _, hasPvMove := pos.PvTable.Get(st.Zobrist)
 
 		if !hasPvMove{			
 			return NullMove
@@ -65,9 +65,10 @@ func (st *State) PopStack(pos *Position) Move{
 	}
 
 	if st.StackPhase == GenPv{
-		pvMoves, ok := pos.PvTable[st.Zobrist]
+		_, entry, ok := pos.PvTable.Get(st.Zobrist)
+		pvMoves := entry.Moves
 		if ok{			
-			st.StackPvMoves = pvMoves
+			st.StackPvMoves = pvMoves[:]
 			st.StackPhase = PopPv			
 		}else{			
 			st.StackPvMoves = []Move{}

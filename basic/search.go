@@ -195,17 +195,26 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				}
 
 				if move != NullMove{
-					pvMoves, ok := pos.PvTable[st.Zobrist]
+					_, entry, ok := pos.PvTable.Get(st.Zobrist)
+					pvMoves := entry.Moves
 					if ok{
-						newPvMoves := []Move{move}
+						newPvMoves := [MAX_PV_MOVES]Move{move}
+						ptr := 1
 						for _, testMove := range pvMoves{
-							if testMove != move{
-								newPvMoves = append(newPvMoves, testMove)
+							if testMove != move && ptr < MAX_PV_MOVES{
+								newPvMoves[ptr] = testMove
+								ptr++
 							}
 						}
-						pos.PvTable[st.Zobrist] = newPvMoves
-					}else{
-						pos.PvTable[st.Zobrist] = []Move{move}
+						pos.PvTable.Set(st.Zobrist, PvEntry{
+							Depth: int8(abi.CurrentDepth),
+							Moves: newPvMoves,
+						})
+					}else{						
+						pos.PvTable.Set(st.Zobrist, PvEntry{
+							Depth: int8(abi.CurrentDepth),
+							Moves: [MAX_PV_MOVES]Move{move},
+						})
 					}					
 				}				
 			}
@@ -241,8 +250,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	return abi.Alpha
 }
 
-func (pos *Position) AlphaBeta(maxDepth int) Score {
-	delete(pos.PvTable, pos.Zobrist())
+func (pos *Position) AlphaBeta(maxDepth int) Score {	
+	pos.PvTable.Set(pos.Zobrist(), PvEntry{		
+		Depth: INFINITE_DEPTH,
+	})	
 
 	pos.Nodes = 0
 
@@ -325,7 +336,9 @@ func (pos Position) GetPvRec(depthRemaining int, pvSoFar []Move) []Move {
 		return pvSoFar
 	}
 
-	moves, ok := pos.PvTable[pos.Zobrist()]
+	_, entry, ok := pos.PvTable.Get(pos.Zobrist())
+
+	moves := entry.Moves
 
 	if ok {
 		pos.Push(moves[0])
@@ -356,16 +369,12 @@ func (pos *Position) PrintBestMove(pv []Move) {
 	fmt.Println("bestmove", pv[0].UCI(), "ponder", pv[1].UCI())
 }
 
-func PrintPvTable(pos Position) {
-	for zobrist, moves := range pos.PvTable {
-		fmt.Printf("%016X %s\n", zobrist, moves[0].UCI())
-	}
-}
-
+var PvTable PvHash
 var PosMoveTable PosMoveHash
 
 func (pos *Position) Search(maxDepth int) {
-	pos.PvTable = make(map[uint64][]Move)
+	pos.PvTable = &PvTable
+	pos.ClearPvTable()
 	pos.PosMoveTable = &PosMoveTable
 	pos.ClearPosMoveTable()
 
@@ -387,18 +396,15 @@ func (pos *Position) Search(maxDepth int) {
 
 		pos.LastGoodPv = pos.GetPv(pos.Depth)
 
-		totalPvTableMoves := 0
-		maxPvItemLength := 0
-		for _, item := range pos.PvTable{
-			l := len(item)
-			totalPvTableMoves += l
-			if l > maxPvItemLength{
-				maxPvItemLength = l
-			}
+		pvTableSize := 0
+		for _, item := range pos.PvTable.Entries{
+			if item.Depth != INFINITE_DEPTH{
+				pvTableSize++
+			}			
 		}
 
-		if pos.Verbose{
-			fmt.Printf("info pvtablesize %d pvtablemoves %d maxpvitemlength %d\n", len(pos.PvTable), totalPvTableMoves, maxPvItemLength)
+		if pos.Verbose || true{
+			fmt.Printf("info pvtablesize %d\n", pvTableSize)
 		}		
 		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
 
