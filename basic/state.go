@@ -151,29 +151,40 @@ func (st *State) SetStackBuff(pos *Position, moves []Move){
 	st.StackBuff = []StackBuffEntry{}
 
 	for _, move := range moves{
-		_, pme := pos.PosMoveTable.Get(st.Zobrist, move)
+		isIgnoredMove := false
 
-		subTree := pme.SubTree
-
-		isPv := false
-		pvIndex := 0
-
-		for i, testMove := range st.StackPvMoves{
+		for _, testMove := range st.StackIgnoreMoves{
 			if move == testMove{
-				isPv = true
-				pvIndex = i
+				isIgnoredMove = true
 				break
 			}
 		}
 
-		st.StackBuff = append(st.StackBuff, StackBuffEntry{			
-			Move: move, 
-			IsPv: isPv,
-			PvIndex: pvIndex,
-			IsCapture: st.PieceAtSquare(move.ToSq()) != NoPiece,
-			Mobility: st.MobilityForPieceAtSquare(st.PieceAtSquare(move.FromSq()), move.ToSq()),
-			SubTree: subTree,
-		})
+		if !isIgnoredMove{
+			_, pme := pos.PosMoveTable.Get(st.Zobrist, move)
+
+			subTree := pme.SubTree
+
+			isPv := false
+			pvIndex := 0
+
+			for i, testMove := range st.StackPvMoves{
+				if move == testMove{
+					isPv = true
+					pvIndex = i
+					break
+				}
+			}
+
+			st.StackBuff = append(st.StackBuff, StackBuffEntry{			
+				Move: move, 
+				IsPv: isPv,
+				PvIndex: pvIndex,
+				IsCapture: st.PieceAtSquare(move.ToSq()) != NoPiece,
+				Mobility: st.MobilityForPieceAtSquare(st.PieceAtSquare(move.FromSq()), move.ToSq()),
+				SubTree: subTree,
+			})
+		}
 	}	
 	
 	sort.Sort(st.StackBuff)
@@ -202,11 +213,12 @@ type State struct {
 	KingInfos             [ColorArraySize]KingInfo
 	StackPhase            int
 	StackBuff             StackBuff
-	StackPvMoves          []Move
+	StackPvMoves          [MAX_PV_MOVES]Move
 	StackReduceFrom       int
 	StackReduceDepth      int
 	StackReduceFactor     int
 	LostCastlingForColor  [ColorArraySize]bool	
+	StackIgnoreMoves      []Move
 }
 
 func (st State) AddDeltaToSquare(sq Square, delta Delta) (Square, bool){

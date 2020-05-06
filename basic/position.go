@@ -32,6 +32,7 @@ type Position struct {
 	CheckPoint               time.Time
 	Depth                    int
 	Verbose                  bool
+	IgnoreRootMoves          []Move
 }
 
 func (pos *Position) ClearPvTable(){

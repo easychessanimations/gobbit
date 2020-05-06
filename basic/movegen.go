@@ -20,18 +20,26 @@ const (
 
 // stack phases
 const (
-	PopNull = iota
-	GenPv
-	PopPv
+	PopNull = iota	
 	GenAll
 	PopAll	
 	GenDone
 )
 
-func (st *State) InitStack(nmp bool){	
+func (st *State) InitStack(nmp bool, pvTable *PvHash, ignoreMoves []Move){	
+	_, entry, ok := pvTable.Get(st.Zobrist)
+
+	st.StackPvMoves = [MAX_PV_MOVES]Move{}
+
+	if ok{
+		st.StackPvMoves = entry.Moves
+	}
+
+	st.StackIgnoreMoves = ignoreMoves
+
 	st.StackReduceDepth = 0
 
-	st.StackPhase = GenPv	
+	st.StackPhase = GenAll
 
 	if nmp{
 		st.StackPhase = PopNull
@@ -55,34 +63,12 @@ const NullMove = Move(Null) << MOVE_TYPE_SHIFT
 
 func (st *State) PopStack(pos *Position) Move{
 	if st.StackPhase == PopNull{
-		st.StackPhase = GenPv
+		st.StackPhase = GenAll
 
 		_, _, hasPvMove := pos.PvTable.Get(st.Zobrist)
 
 		if !hasPvMove{			
 			return NullMove
-		}
-	}
-
-	if st.StackPhase == GenPv{
-		_, entry, ok := pos.PvTable.Get(st.Zobrist)
-		pvMoves := entry.Moves
-		if ok{			
-			st.StackPvMoves = pvMoves[:]
-			st.StackPhase = PopPv			
-		}else{			
-			st.StackPvMoves = []Move{}
-			st.StackPhase = GenAll
-		}
-	}
-
-	if st.StackPhase == PopPv{
-		if len(st.StackPvMoves) > 0{
-			move := st.StackPvMoves[0]
-			st.StackPvMoves = st.StackPvMoves[1:]
-			return move
-		}else{
-			st.StackPhase = GenAll
 		}
 	}
 

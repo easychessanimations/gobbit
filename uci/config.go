@@ -11,7 +11,7 @@ import (
 
 const DEFAULT_VARIANT = VariantEightPiece
 
-const DEFAULT_DEPTH = 4
+const DEFAULT_DEPTH = 10
 
 type UciOption struct{
 	Name string

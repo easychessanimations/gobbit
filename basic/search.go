@@ -104,7 +104,13 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 	// https://www.chessprogramming.org/Null_Move_Pruning
 	allowNMP := pos.NullMovePruning && (!abi.NullMoveMade) && abi.CurrentDepth >= pos.NullMovePruningMinDepth
 
-	st.InitStack(allowNMP)
+	ignoreMoves := []Move{}
+
+	if abi.CurrentDepth == 0{
+		ignoreMoves = pos.IgnoreRootMoves
+	}
+
+	st.InitStack(allowNMP, pos.PvTable, ignoreMoves)
 
 	currPvMove := NullMove
 

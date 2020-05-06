@@ -155,6 +155,21 @@ func (uci *Uci) ExecGoCommand(t *Tokenizer){
 			}
 		}
 
+		uci.Pos.IgnoreRootMoves = []Move{}
+
+		if token == "ignoremoves" || token == "i"{
+			for ok{				
+				token, ok = t.GetToken()
+
+				if ok{
+					move, legal := uci.Pos.Current().UciToMove(token)					
+					if legal{
+						uci.Pos.IgnoreRootMoves = append(uci.Pos.IgnoreRootMoves, move)
+					}					
+				}
+			}
+		}
+
 		if token == "infinite"{
 			depth = SEARCH_MAX_DEPTH
 		}
