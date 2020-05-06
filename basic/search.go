@@ -29,7 +29,7 @@ func (st State) Phase() float32{
 
 const MAX_SCORE = 9000
 
-const LOST_CASTLING_DEDUCTION = 150
+const LOST_CASTLING_DEDUCTION = 50
 
 func (st State) LostCastlingDeductionForColor(color Color, phase float32) Score{
 	if st.LostCastlingForColor[color]{
