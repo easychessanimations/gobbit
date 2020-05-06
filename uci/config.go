@@ -39,8 +39,8 @@ var UCI_OPTIONS = []UciOption{
 		Name: "Null Move Pruning Min Depth",
 		Type: "spin",		
 		Min: 2,
-		Max: 5,
-		Default: "2",
+		Max: 6,
+		Default: "4",
 	},
 	{
 		Name: "Null Move Depth Reduction",
