@@ -47,7 +47,7 @@ var UCI_OPTIONS = []UciOption{
 		Type: "spin",		
 		Min: 1,
 		Max: 5,
-		Default: "3",
+		Default: "1",
 	},
 	{
 		Name: "Stack Reduction",
