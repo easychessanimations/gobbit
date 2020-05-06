@@ -73,7 +73,7 @@ const PV_HASH_KEY_SIZE_IN_BITS = 20
 const PV_HASH_SIZE = 1 << PV_HASH_KEY_SIZE_IN_BITS
 const PV_HASH_MASK = PV_HASH_SIZE - 1
 
-const MAX_PV_MOVES = 2
+const MAX_PV_MOVES = 4
 
 type PvEntry struct{		
 	Depth           int8
@@ -90,7 +90,7 @@ func (pvh *PvHash) Get(zobrist uint64) (uint32, PvEntry, bool){
 
 	entry := pvh.Entries[key]
 
-	return key, entry, ( entry.Zobrist == zobrist ) && entry.Depth < INFINITE_DEPTH
+	return key, entry, ( entry.Zobrist == zobrist ) && ( entry.Depth < INFINITE_DEPTH )
 }
 
 func (pvh *PvHash) Set(zobrist uint64, pve PvEntry){
