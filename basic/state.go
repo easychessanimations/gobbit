@@ -531,7 +531,7 @@ func (st State) MobilityForPieceAtSquare(p Piece, sq Square) Accum{
 		attack := mob & KingArea[oppKingSq]
 		attackCount := attack.Count()
 		if mob & oppKingSq.Bitboard() != 0{
-			attackCount *= 9
+			attackCount = 9
 		}
 		mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attackCount * ATTACK_MULTIPLIER)})
 	}		
@@ -541,8 +541,10 @@ func (st State) MobilityForPieceAtSquare(p Piece, sq Square) Accum{
 
 func (st State) MobilityForColor(color Color) Accum{	
 	mobility := Accum{}
-	for _, sq := range st.ByColor[color].PopAll(){
-		mobility.Merge(st.MobilityForPieceAtSquare(st.PieceAtSquare(sq), sq))		
+	occupUs := st.ByColor[color]
+	for _, sq := range occupUs.PopAll(){
+		pMob := st.MobilityForPieceAtSquare(st.PieceAtSquare(sq), sq)		
+		mobility.Merge(pMob)		
 	}
 	return mobility
 }
