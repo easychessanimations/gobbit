@@ -14,11 +14,6 @@ type AlphaBetaInfo struct {
 	NullMoveDepth int
 }
 
-type PosMove struct{
-	Zobrist uint64
-	Move    Move
-}
-
 type TranspositionTableEntry struct{
 	Score    Score
 	RemDepth int
@@ -176,7 +171,10 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 			}
 
 			if pos.StackReduction && abi.CurrentDepth < 10{
-				pos.PosMoveTable[PosMove{st.Zobrist, move}] = subTree
+				pos.PosMoveTable.Set(st.Zobrist, move, PosMoveEntry{
+					Depth: int8(abi.CurrentDepth),
+					SubTree: subTree,
+				})
 			}
 
 			if score > abi.Alpha {
@@ -364,9 +362,12 @@ func PrintPvTable(pos Position) {
 	}
 }
 
+var PosMoveTable PosMoveHash
+
 func (pos *Position) Search(maxDepth int) {
 	pos.PvTable = make(map[uint64][]Move)
-	pos.PosMoveTable = make(map[PosMove]int)
+	pos.PosMoveTable = &PosMoveTable
+	pos.ClearPosMoveTable()
 
 	pos.LastGoodPv = []Move{}
 

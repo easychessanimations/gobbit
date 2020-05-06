@@ -151,12 +151,9 @@ func (st *State) SetStackBuff(pos *Position, moves []Move){
 	st.StackBuff = []StackBuffEntry{}
 
 	for _, move := range moves{
-		posMove := PosMove{
-			Zobrist: st.Zobrist,
-			Move: move,			
-		}
+		_, pme := pos.PosMoveTable.Get(st.Zobrist, move)
 
-		subTree, _ := pos.PosMoveTable[posMove]		
+		subTree := pme.SubTree
 
 		isPv := false
 		pvIndex := 0

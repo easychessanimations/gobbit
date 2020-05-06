@@ -23,13 +23,19 @@ type Position struct {
 	StackReduction           bool
 	AspirationWindow         bool
 	PvTable                  map[uint64][]Move
-	PosMoveTable             map[PosMove]int	
+	PosMoveTable             *PosMoveHash
 	LastRootPvScore          Score
 	LastGoodPv               []Move
 	Start                    time.Time
 	CheckPoint               time.Time
 	Depth                    int
 	Verbose                  bool
+}
+
+func (pos *Position) ClearPosMoveTable(){
+	for i := 0; i < len(pos.PosMoveTable.Entries); i++{
+		pos.PosMoveTable.Entries[i].Used = false
+	}
 }
 
 func (pos Position) SearchRoot() *State{
