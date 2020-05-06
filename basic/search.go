@@ -153,7 +153,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 
 			stackReduceDepth := st.StackReduceDepth
 
-			if !pos.StackReduction{
+			if !pos.StackReduction || abi.CurrentDepth < 3{
 				stackReduceDepth = 0
 			}
 
