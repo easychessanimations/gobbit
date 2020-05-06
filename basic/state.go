@@ -527,8 +527,13 @@ func (st State) MobilityForPieceAtSquare(p Piece, sq Square) Accum{
 			mob = LancerMobility(Violent|Quiet, p.LancerDirection(), sq, occupUs, occupThem)
 			break
 		}			
-		attack := mob & KingArea[sq]
-		mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attack.Count() * ATTACK_MULTIPLIER)})
+		oppKingSq := st.KingInfos[color.Inverse()].Square
+		attack := mob & KingArea[oppKingSq]
+		attackCount := attack.Count()
+		if mob & oppKingSq.Bitboard() != 0{
+			attackCount *= 9
+		}
+		mobility.Merge(Accum{Score(mob.Count() * MOBILITY_MULTIPLIER), Score(attackCount * ATTACK_MULTIPLIER)})
 	}		
 
 	return mobility
