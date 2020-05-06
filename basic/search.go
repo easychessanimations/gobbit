@@ -403,7 +403,7 @@ func (pos *Position) Search(maxDepth int) {
 			}			
 		}
 
-		if pos.Verbose || true{
+		if pos.Verbose {
 			fmt.Printf("info pvtablesize %d\n", pvTableSize)
 		}		
 		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
