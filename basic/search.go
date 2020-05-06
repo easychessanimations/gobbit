@@ -259,8 +259,6 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		Depth: INFINITE_DEPTH,
 	})	
 
-	pos.Nodes = 0
-
 	pos.SearchRootPtr = pos.StatePtr
 
 	// for low depth perform normal search
@@ -385,6 +383,8 @@ func (pos *Position) Search(maxDepth int) {
 	pos.LastGoodPv = []Move{}
 
 	pos.SearchStopped = false
+
+	pos.Nodes = 0
 
 	pos.Start = time.Now()
 	pos.CheckPoint = pos.Start
