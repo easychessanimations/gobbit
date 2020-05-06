@@ -79,6 +79,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.Verbose = uo.BooleanValue()
 			}
 
+			if  name == "Pruning Agressivity"{
+				uci.Pos.PruningAgressivity = uo.IntValue()
+			}
+
 			return
 		}
 	}

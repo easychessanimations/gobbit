@@ -64,6 +64,13 @@ var UCI_OPTIONS = []UciOption{
 		Type: "check",		
 		Default: "false",
 	},
+	{
+		Name: "Pruning Agressivity",
+		Type: "spin",		
+		Min: 1,
+		Max: 10,
+		Default: "1",
+	},
 }
 
 func (uo UciOption) StringValue() string{

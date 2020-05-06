@@ -61,6 +61,8 @@ func (st *State) PopStackBuff() (StackBuffEntry, bool){
 
 const NullMove = Move(Null) << MOVE_TYPE_SHIFT
 
+const MIN_REDUCE_LIMIT = 8
+
 func (st *State) PopStack(pos *Position) Move{
 	if st.StackPhase == PopNull{
 		st.StackPhase = GenAll
@@ -81,11 +83,17 @@ func (st *State) PopStack(pos *Position) Move{
 			rF++
 		}
 
-		st.StackReduceFrom = numAll - rF
+		reduceLimit := rF / pos.PruningAgressivity
 
-		if rF < 8{
-			st.StackReduceFrom = numAll - 8
+		if reduceLimit < MIN_REDUCE_LIMIT / pos.PruningAgressivity{
+			reduceLimit = MIN_REDUCE_LIMIT / pos.PruningAgressivity
 		}
+
+		if reduceLimit < 1{
+			reduceLimit = 1
+		}
+
+		st.StackReduceFrom = numAll - reduceLimit
 		
 		st.StackReduceFactor = rF
 
