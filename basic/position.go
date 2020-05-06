@@ -34,6 +34,7 @@ type Position struct {
 	Verbose                  bool
 	IgnoreRootMoves          []Move
 	PruningAgressivity       int
+	PruningReduction         int
 }
 
 func (pos *Position) ClearPvTable(){

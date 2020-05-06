@@ -83,6 +83,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.PruningAgressivity = uo.IntValue()
 			}
 
+			if  name == "Pruning Reduction"{
+				uci.Pos.PruningReduction = uo.IntValue()
+			}
+
 			return
 		}
 	}

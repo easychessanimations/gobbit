@@ -71,6 +71,13 @@ var UCI_OPTIONS = []UciOption{
 		Max: 10,
 		Default: "1",
 	},
+	{
+		Name: "Pruning Reduction",
+		Type: "spin",		
+		Min: 1,
+		Max: 3,
+		Default: "1",
+	},
 }
 
 func (uo UciOption) StringValue() string{

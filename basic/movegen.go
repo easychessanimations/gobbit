@@ -105,7 +105,7 @@ func (st *State) PopStack(pos *Position) Move{
 		if ok{
 			st.StackReduceDepth = 0
 			if sbe.SubTree > 0 && len(st.StackBuff) <= st.StackReduceFrom{
-				st.StackReduceDepth = 1
+				st.StackReduceDepth = pos.PruningReduction
 			}
 			return sbe.Move
 		}else{
