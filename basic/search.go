@@ -3,6 +3,7 @@ package basic
 import (
 	"fmt"
 	"time"
+	"sort"
 )
 
 type AlphaBetaInfo struct {
@@ -389,39 +390,67 @@ func (pos *Position) Search(maxDepth int) {
 	pos.Start = time.Now()
 	pos.CheckPoint = pos.Start
 
+	ignoreMovesOrig := pos.IgnoreRootMoves
+
+	for i := 1; i <= pos.MultiPV; i++{
+		pos.MultiPvInfos[i - 1] = MultiPvInfo{}
+	}
+
 	for pos.Depth = 1; pos.Depth <= maxDepth; pos.Depth++ {
 
-		pos.AlphaBeta(pos.Depth)
+		pos.IgnoreRootMoves = ignoreMovesOrig
 
-		if pos.SearchStopped {
-			pos.PrintBestMove(pos.LastGoodPv)
-			return
+		for pos.MultiPvIndex = 1; pos.MultiPvIndex <= pos.MultiPV; pos.MultiPvIndex++{
+
+			pos.AlphaBeta(pos.Depth)
+
+			if pos.SearchStopped {
+				sort.Sort(pos.MultiPvInfos)
+				
+				pos.PrintBestMove(pos.MultiPvInfos[0].Pv)
+				return
+			}
+
+			pos.LastGoodPv = pos.GetPv(pos.Depth)
+
+			if len(pos.LastGoodPv) > 0{
+				pos.IgnoreRootMoves = append(pos.IgnoreRootMoves, pos.LastGoodPv[0])
+			}
+
+			pvTableSize := 0
+			for _, item := range pos.PvTable.Entries{
+				if item.Depth != INFINITE_DEPTH{
+					pvTableSize++
+				}			
+			}
+
+			if pos.Verbose {
+				fmt.Printf("info pvtablesize %d\n", pvTableSize)
+			}		
+			info := fmt.Sprintf("info multipv %d depth %d time %d nodes %d nps %.0f score cp %d pv %v", pos.MultiPvIndex, pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
+
+			pos.MultiPvInfos[pos.MultiPvIndex - 1] = MultiPvInfo{
+				Depth: pos.Depth,
+				Score: pos.LastRootPvScore,
+				Pv: pos.LastGoodPv,
+				Info: info,
+			}
+
+			pos.CheckPoint = time.Now()
+
 		}
 
-		pos.LastGoodPv = pos.GetPv(pos.Depth)
+		sort.Sort(pos.MultiPvInfos)		
 
-		pvTableSize := 0
-		for _, item := range pos.PvTable.Entries{
-			if item.Depth != INFINITE_DEPTH{
-				pvTableSize++
-			}			
-		}
-
-		if pos.Verbose {
-			fmt.Printf("info pvtablesize %d\n", pvTableSize)
-		}		
-		fmt.Printf("info depth %d time %d nodes %d nps %.0f score cp %d pv %v\n", pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
-
-		pos.CheckPoint = time.Now()
-
-		if pos.IsMateInN(){
-			break
+		for i := 1; i <= pos.MultiPV; i++{
+			fmt.Println(pos.MultiPvInfos[i - 1].Info)
 		}
 	}
 
-	pos.PrintBestMove(pos.LastGoodPv)
+	sort.Sort(pos.MultiPvInfos)
+				
+	pos.PrintBestMove(pos.MultiPvInfos[0].Pv)
 }
-
 
 func init(){	
 }

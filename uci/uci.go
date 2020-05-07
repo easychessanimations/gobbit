@@ -55,6 +55,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.SetVariant(VariantNameToVariant(value))
 			}
 
+			if  name == "MultiPV"{
+				uci.Pos.MultiPV = uo.IntValue()
+			}
+
 			if name == "Null Move Pruning"{
 				uci.Pos.NullMovePruning = uo.BooleanValue()
 			}

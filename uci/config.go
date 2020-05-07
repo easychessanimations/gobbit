@@ -31,6 +31,13 @@ var UCI_OPTIONS = []UciOption{
 		Default: VARIANT_NAMES[DEFAULT_VARIANT],
 	},
 	{
+		Name: "MultiPV",
+		Type: "spin",		
+		Min: 1,
+		Max: 20,
+		Default: "1",
+	},
+	{
 		Name: "Null Move Pruning",
 		Type: "check",		
 		Default: "false",

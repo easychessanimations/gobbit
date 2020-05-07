@@ -12,6 +12,33 @@ const INFINITE_DEPTH = int8(SEARCH_MAX_DEPTH + 1)
 
 const MAX_STATES = SEARCH_MAX_DEPTH + 1
 
+const MAX_MULTIPV = 20
+
+type MultiPvInfo struct{
+	Depth                    int
+	Score                    Score
+	Pv                       []Move
+	Info                     string
+}
+
+type MultiPvInfos [MAX_MULTIPV]MultiPvInfo
+
+func (mpis MultiPvInfos) Len() int{
+	return len(mpis)
+}
+
+func (mpis MultiPvInfos) Swap(i, j int){
+	mpis[i], mpis[j] = mpis[j], mpis[i]
+}
+
+func (mpis MultiPvInfos) Less(i, j int) bool{
+	if mpis[j].Depth != mpis[i].Depth{
+		return mpis[j].Depth > mpis[i].Depth
+	}
+
+	return mpis[j].Score > mpis[i].Score
+}
+
 type Position struct {
 	States                   [MAX_STATES]State
 	StatePtr                 int
@@ -35,6 +62,9 @@ type Position struct {
 	IgnoreRootMoves          []Move
 	PruningAgressivity       int
 	PruningReduction         int
+	MultiPV                  int
+	MultiPvInfos             MultiPvInfos
+	MultiPvIndex             int
 }
 
 func (pos *Position) ClearPvTable(){
