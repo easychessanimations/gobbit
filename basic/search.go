@@ -448,13 +448,14 @@ func (pos *Position) Search(maxDepth int) {
 
 			pos.CheckPoint = time.Now()
 
+			sort.Sort(pos.MultiPvInfos)		
+
+			for i := 1; i <= maxMultiPv; i++{
+				fmt.Println(pos.MultiPvInfos[i - 1].Info)
+			}
+
 		}
 
-		sort.Sort(pos.MultiPvInfos)		
-
-		for i := 1; i <= maxMultiPv; i++{
-			fmt.Println(pos.MultiPvInfos[i - 1].Info)
-		}
 	}
 
 	sort.Sort(pos.MultiPvInfos)
