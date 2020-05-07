@@ -62,16 +62,6 @@ var UCI_OPTIONS = []UciOption{
 		Default: "false",
 	},
 	{
-		Name: "Aspiration Window",
-		Type: "check",		
-		Default: "false",
-	},
-	{
-		Name: "Verbose",
-		Type: "check",		
-		Default: "false",
-	},
-	{
 		Name: "Pruning Agressivity",
 		Type: "spin",		
 		Min: 1,
@@ -84,6 +74,21 @@ var UCI_OPTIONS = []UciOption{
 		Min: 1,
 		Max: 3,
 		Default: "1",
+	},
+	{
+		Name: "Aspiration Window",
+		Type: "check",		
+		Default: "false",
+	},
+	{
+		Name: "Verbose",
+		Type: "check",		
+		Default: "false",
+	},
+	{
+		Name: "Log File",
+		Type: "string",		
+		Default: "",
 	},
 }
 

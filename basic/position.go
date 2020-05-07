@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"os"
 )
 
 const SEARCH_MAX_DEPTH = 100
@@ -65,6 +66,27 @@ type Position struct {
 	MultiPV                  int
 	MultiPvInfos             MultiPvInfos
 	MultiPvIndex             int
+	LogFilePath              string
+}
+
+func (pos Position) Log(content string){
+	if content == ""{
+		return
+	}
+
+	fmt.Println(content)
+
+	if pos.LogFilePath != ""{
+		f, err := os.OpenFile(pos.LogFilePath,
+			os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer f.Close()
+		if _, err := f.WriteString(content + "\n"); err != nil {
+			fmt.Println(err)
+		}
+	}
 }
 
 func (pos *Position) ClearPvTable(){

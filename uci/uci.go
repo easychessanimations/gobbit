@@ -91,6 +91,10 @@ func (uci *Uci) SetOption(name, value string){
 				uci.Pos.PruningReduction = uo.IntValue()
 			}
 
+			if name == "Log File"{
+				uci.Pos.LogFilePath = uo.Value
+			}
+
 			return
 		}
 	}

@@ -1,0 +1,71 @@
+info multipv 1 depth 1 time 21 nodes 43 nps 2048 score cp 860 pv f5c8
+info multipv 1 depth 1 time 21 nodes 43 nps 2048 score cp 860 pv f5c8
+info multipv 2 depth 1 time 33 nodes 85 nps 2576 score cp 675 pv c1c6
+info multipv 1 depth 1 time 21 nodes 43 nps 2048 score cp 860 pv f5c8
+info multipv 2 depth 1 time 33 nodes 85 nps 2576 score cp 675 pv c1c6
+info multipv 3 depth 1 time 46 nodes 126 nps 2739 score cp 526 pv f5f6
+info multipv 1 depth 1 time 21 nodes 43 nps 2048 score cp 860 pv f5c8
+info multipv 2 depth 1 time 33 nodes 85 nps 2576 score cp 675 pv c1c6
+info multipv 3 depth 1 time 46 nodes 126 nps 2739 score cp 526 pv f5f6
+info multipv 4 depth 1 time 59 nodes 166 nps 2813 score cp 322 pv f5h7
+info multipv 1 depth 1 time 21 nodes 43 nps 2048 score cp 860 pv f5c8
+info multipv 2 depth 1 time 33 nodes 85 nps 2576 score cp 675 pv c1c6
+info multipv 3 depth 1 time 46 nodes 126 nps 2739 score cp 526 pv f5f6
+info multipv 4 depth 1 time 59 nodes 166 nps 2813 score cp 322 pv f5h7
+info multipv 5 depth 1 time 72 nodes 205 nps 2847 score cp 290 pv f5d5
+info multipv 1 depth 2 time 93 nodes 391 nps 4204 score cp 31 pv c1c6 b6c6
+info multipv 2 depth 1 time 33 nodes 85 nps 2576 score cp 675 pv c1c6
+info multipv 3 depth 1 time 46 nodes 126 nps 2739 score cp 526 pv f5f6
+info multipv 4 depth 1 time 59 nodes 166 nps 2813 score cp 322 pv f5h7
+info multipv 5 depth 1 time 72 nodes 205 nps 2847 score cp 290 pv f5d5
+info multipv 1 depth 2 time 93 nodes 391 nps 4204 score cp 31 pv c1c6 b6c6
+info multipv 2 depth 2 time 121 nodes 688 nps 5686 score cp -242 pv c1a1 b6e3
+info multipv 3 depth 1 time 46 nodes 126 nps 2739 score cp 526 pv f5f6
+info multipv 4 depth 1 time 59 nodes 166 nps 2813 score cp 322 pv f5h7
+info multipv 5 depth 1 time 72 nodes 205 nps 2847 score cp 290 pv f5d5
+info multipv 1 depth 2 time 93 nodes 391 nps 4204 score cp 31 pv c1c6 b6c6
+info multipv 2 depth 2 time 121 nodes 688 nps 5686 score cp -242 pv c1a1 b6e3
+info multipv 3 depth 2 time 139 nodes 805 nps 5791 score cp -252 pv c1b1 b6e3
+info multipv 4 depth 1 time 59 nodes 166 nps 2813 score cp 322 pv f5h7
+info multipv 5 depth 1 time 72 nodes 205 nps 2847 score cp 290 pv f5d5
+info multipv 1 depth 2 time 93 nodes 391 nps 4204 score cp 31 pv c1c6 b6c6
+info multipv 2 depth 2 time 121 nodes 688 nps 5686 score cp -242 pv c1a1 b6e3
+info multipv 3 depth 2 time 139 nodes 805 nps 5791 score cp -252 pv c1b1 b6e3
+info multipv 4 depth 2 time 158 nodes 920 nps 5822 score cp -272 pv c1e1 b6e3
+info multipv 5 depth 1 time 72 nodes 205 nps 2847 score cp 290 pv f5d5
+info multipv 1 depth 2 time 93 nodes 391 nps 4204 score cp 31 pv c1c6 b6c6
+info multipv 2 depth 2 time 121 nodes 688 nps 5686 score cp -242 pv c1a1 b6e3
+info multipv 3 depth 2 time 139 nodes 805 nps 5791 score cp -252 pv c1b1 b6e3
+info multipv 4 depth 2 time 158 nodes 920 nps 5822 score cp -272 pv c1e1 b6e3
+info multipv 5 depth 2 time 178 nodes 1067 nps 5994 score cp -272 pv c1d1 b6e3
+info multipv 1 depth 3 time 323 nodes 3678 nps 11386 score cp 521 pv c1c6 c8c6 f5f6
+info multipv 2 depth 2 time 121 nodes 688 nps 5686 score cp -242 pv c1a1 b6e3
+info multipv 3 depth 2 time 139 nodes 805 nps 5791 score cp -252 pv c1b1 b6e3
+info multipv 4 depth 2 time 158 nodes 920 nps 5822 score cp -272 pv c1e1 b6e3
+info multipv 5 depth 2 time 178 nodes 1067 nps 5994 score cp -272 pv c1d1 b6e3
+info multipv 1 depth 3 time 323 nodes 3678 nps 11386 score cp 521 pv c1c6 c8c6 f5f6
+info multipv 2 depth 3 time 410 nodes 5181 nps 12636 score cp 470 pv f5c8 c6c8 c1c8
+info multipv 3 depth 2 time 139 nodes 805 nps 5791 score cp -252 pv c1b1 b6e3
+info multipv 4 depth 2 time 158 nodes 920 nps 5822 score cp -272 pv c1e1 b6e3
+info multipv 5 depth 2 time 178 nodes 1067 nps 5994 score cp -272 pv c1d1 b6e3
+info multipv 1 depth 3 time 323 nodes 3678 nps 11386 score cp 521 pv c1c6 c8c6 f5f6
+info multipv 2 depth 3 time 410 nodes 5181 nps 12636 score cp 470 pv f5c8 c6c8 c1c8
+info multipv 3 depth 3 time 502 nodes 6767 nps 13453 score cp 401 pv c1a1 f6d7 f5d7
+info multipv 4 depth 2 time 158 nodes 920 nps 5822 score cp -272 pv c1e1 b6e3
+info multipv 5 depth 2 time 178 nodes 1067 nps 5994 score cp -272 pv c1d1 b6e3
+info multipv 1 depth 3 time 323 nodes 3678 nps 11386 score cp 521 pv c1c6 c8c6 f5f6
+info multipv 2 depth 3 time 410 nodes 5181 nps 12636 score cp 470 pv f5c8 c6c8 c1c8
+info multipv 3 depth 3 time 502 nodes 6767 nps 13453 score cp 401 pv c1a1 f6d7 f5d7
+info multipv 4 depth 3 time 586 nodes 8220 nps 14026 score cp 391 pv c1b1 f6d7 f5d7
+info multipv 5 depth 2 time 178 nodes 1067 nps 5994 score cp -272 pv c1d1 b6e3
+info multipv 1 depth 3 time 323 nodes 3678 nps 11386 score cp 521 pv c1c6 c8c6 f5f6
+info multipv 2 depth 3 time 410 nodes 5181 nps 12636 score cp 470 pv f5c8 c6c8 c1c8
+info multipv 3 depth 3 time 502 nodes 6767 nps 13453 score cp 401 pv c1a1 f6d7 f5d7
+info multipv 4 depth 3 time 586 nodes 8220 nps 14026 score cp 391 pv c1b1 f6d7 f5d7
+info multipv 5 depth 3 time 709 nodes 10311 nps 14542 score cp 371 pv c1d1 f6d7 f5d7
+info multipv 1 depth 4 time 1106 nodes 16031 nps 14494 score cp 245 pv f5c8 c6c8 c1c8 b6d8
+info multipv 2 depth 3 time 410 nodes 5181 nps 12636 score cp 470 pv f5c8 c6c8 c1c8
+info multipv 3 depth 3 time 502 nodes 6767 nps 13453 score cp 401 pv c1a1 f6d7 f5d7
+info multipv 4 depth 3 time 586 nodes 8220 nps 14026 score cp 391 pv c1b1 f6d7 f5d7
+info multipv 5 depth 3 time 709 nodes 10311 nps 14542 score cp 371 pv c1d1 f6d7 f5d7
+bestmove f5c8 ponder c6c8

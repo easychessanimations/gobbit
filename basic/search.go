@@ -189,7 +189,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				if abi.CurrentDepth == 0 && score.IsMateInN(){
 					// stop at forced mate
 					if pos.Verbose{
-						fmt.Printf("info skip %d\n", len(st.StackBuff))
+						pos.Log(fmt.Sprintf("info skip %d", len(st.StackBuff)))
 					}					
 					st.StackPhase = GenDone
 				}
@@ -231,7 +231,7 @@ func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
 				}
 
 				if pos.Verbose{
-					fmt.Printf("info currstack %d currdepth %d time %d currpvmove %s latestrootscore cp %d oldpv %v\n", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), currPvUci, pos.LastRootPvScore, pos.PvUCI())
+					pos.Log(fmt.Sprintf("info currstack %d currdepth %d time %d currpvmove %s latestrootscore cp %d oldpv %v", len(pos.SearchRoot().StackBuff), pos.Depth, pos.TimeMs(), currPvUci, pos.LastRootPvScore, pos.PvUCI()))
 				}				
 
 				pos.CheckPoint = time.Now()
@@ -282,7 +282,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 		beta := pos.LastRootPvScore + windowHigh
 
 		if pos.Verbose{
-			fmt.Printf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d\n", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta)
+			pos.Log(fmt.Sprintf("info asp %d windowlow %d windowhigh %d est %d alpha %d beta %d", asp, windowLow, windowHigh, pos.LastRootPvScore, alpha, beta))
 		}		
 
 		pos.CheckPoint = time.Now()
@@ -300,7 +300,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 		if score == alpha{
 			if pos.Verbose{
-				fmt.Println("info failed low")	
+				pos.Log("info failed low")
 			}			
 
 			windowLow *= 3
@@ -308,7 +308,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 
 		if score == beta{
 			if pos.Verbose{
-				fmt.Println("info failed high")
+				pos.Log("info failed high")
 			}			
 
 			windowHigh *= 3
@@ -316,7 +316,7 @@ func (pos *Position) AlphaBeta(maxDepth int) Score {
 	}
 
 	if pos.Verbose{
-		fmt.Println("info asp full")
+		pos.Log("info asp full")
 	}	
 
 	pos.CheckPoint = time.Now()
@@ -360,16 +360,16 @@ func (pos Position) GetPv(maxDepth int) []Move {
 
 func (pos *Position) PrintBestMove(pv []Move) {
 	if len(pv) == 0 {
-		fmt.Println("bestmove (none)")
+		pos.Log("bestmove (none)")
 		return
 	}
 
 	if len(pv) == 1 {
-		fmt.Println("bestmove", pv[0].UCI())
+		pos.Log("bestmove " + pv[0].UCI())
 		return
 	}
 
-	fmt.Println("bestmove", pv[0].UCI(), "ponder", pv[1].UCI())
+	pos.Log("bestmove " + pv[0].UCI() + " ponder " + pv[1].UCI())
 }
 
 var PvTable PvHash
@@ -435,7 +435,7 @@ func (pos *Position) Search(maxDepth int) {
 			}
 
 			if pos.Verbose {
-				fmt.Printf("info pvtablesize %d\n", pvTableSize)
+				pos.Log(fmt.Sprintf("info pvtablesize %d", pvTableSize))
 			}		
 			info := fmt.Sprintf("info multipv %d depth %d time %d nodes %d nps %.0f score cp %d pv %v", pos.MultiPvIndex, pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
 
@@ -451,7 +451,7 @@ func (pos *Position) Search(maxDepth int) {
 			sort.Sort(pos.MultiPvInfos)		
 
 			for i := 1; i <= maxMultiPv; i++{
-				fmt.Println(pos.MultiPvInfos[i - 1].Info)
+				pos.Log(pos.MultiPvInfos[i - 1].Info)
 			}
 
 		}
