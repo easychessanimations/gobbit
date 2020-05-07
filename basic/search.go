@@ -396,11 +396,21 @@ func (pos *Position) Search(maxDepth int) {
 		pos.MultiPvInfos[i - 1] = MultiPvInfo{}
 	}
 
+	st := pos.Current()
+
+	st.GenMoveBuff()
+
+	maxMultiPv := pos.MultiPV
+
+	if len(st.MoveBuff) < maxMultiPv{
+		maxMultiPv = len(st.MoveBuff)
+	}
+
 	for pos.Depth = 1; pos.Depth <= maxDepth; pos.Depth++ {
 
 		pos.IgnoreRootMoves = ignoreMovesOrig
 
-		for pos.MultiPvIndex = 1; pos.MultiPvIndex <= pos.MultiPV; pos.MultiPvIndex++{
+		for pos.MultiPvIndex = 1; pos.MultiPvIndex <= maxMultiPv; pos.MultiPvIndex++{
 
 			pos.AlphaBeta(pos.Depth)
 
@@ -442,7 +452,7 @@ func (pos *Position) Search(maxDepth int) {
 
 		sort.Sort(pos.MultiPvInfos)		
 
-		for i := 1; i <= pos.MultiPV; i++{
+		for i := 1; i <= maxMultiPv; i++{
 			fmt.Println(pos.MultiPvInfos[i - 1].Info)
 		}
 	}
