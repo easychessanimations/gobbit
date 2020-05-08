@@ -392,10 +392,6 @@ func (pos *Position) Search(maxDepth int) {
 
 	ignoreMovesOrig := pos.IgnoreRootMoves
 
-	for i := 1; i <= pos.MultiPV; i++{
-		pos.MultiPvInfos[i - 1] = MultiPvInfo{}
-	}
-
 	st := pos.Current()
 
 	st.GenMoveBuff()
@@ -404,6 +400,17 @@ func (pos *Position) Search(maxDepth int) {
 
 	if len(st.MoveBuff) < maxMultiPv{
 		maxMultiPv = len(st.MoveBuff)
+	}
+
+	for i := 1; i <= MAX_MULTIPV; i++{
+		pos.MultiPvInfos[i - 1] = MultiPvInfo{
+			Depth: -1,
+			Score: -INFINITE_SCORE,
+		}
+		pos.OldMultiPvInfos[i - 1] = MultiPvInfo{
+			Depth: -1,
+			Score: -INFINITE_SCORE,
+		}
 	}
 
 	for pos.Depth = 1; pos.Depth <= maxDepth; pos.Depth++ {
@@ -415,9 +422,9 @@ func (pos *Position) Search(maxDepth int) {
 			pos.AlphaBeta(pos.Depth)
 
 			if pos.SearchStopped {
-				sort.Sort(pos.MultiPvInfos)
-				
-				pos.PrintBestMove(pos.MultiPvInfos[0].Pv)
+				pos.IgnoreRootMoves = ignoreMovesOrig
+
+				pos.PrintBestMove(pos.OldMultiPvInfos[0].Pv)
 				return
 			}
 
@@ -427,23 +434,25 @@ func (pos *Position) Search(maxDepth int) {
 				pos.IgnoreRootMoves = append(pos.IgnoreRootMoves, pos.LastGoodPv[0])
 			}
 
-			pvTableSize := 0
-			for _, item := range pos.PvTable.Entries{
-				if item.Depth != INFINITE_DEPTH{
-					pvTableSize++
-				}			
-			}
-
 			if pos.Verbose {
+				pvTableSize := 0
+				for _, item := range pos.PvTable.Entries{
+					if item.Depth != INFINITE_DEPTH{
+						pvTableSize++
+					}			
+				}
+
 				pos.Log(fmt.Sprintf("info pvtablesize %d", pvTableSize))
-			}		
-			info := fmt.Sprintf("info multipv %d depth %d time %d nodes %d nps %.0f score cp %d pv %v", pos.MultiPvIndex, pos.Depth, pos.TimeMs(), pos.Nodes, pos.Nps(), pos.LastRootPvScore, pos.PvUCI())
+			}	
 
 			pos.MultiPvInfos[pos.MultiPvIndex - 1] = MultiPvInfo{
 				Depth: pos.Depth,
+				Time: pos.TimeMs(),
+				Nodes: pos.Nodes,
+				Nps: pos.Nps(),
 				Score: pos.LastRootPvScore,
 				Pv: pos.LastGoodPv,
-				Info: info,
+				PvUCI: pos.PvUCI(),
 			}
 
 			pos.CheckPoint = time.Now()			
@@ -453,12 +462,15 @@ func (pos *Position) Search(maxDepth int) {
 		sort.Sort(pos.MultiPvInfos)		
 
 		for i := 1; i <= maxMultiPv; i++{
-			pos.Log(pos.MultiPvInfos[i - 1].Info)
+			pos.MultiPvInfos[i - 1].Index = i
+			pos.Log(pos.MultiPvInfos[i - 1].String())
 		}
+
+		pos.OldMultiPvInfos = pos.MultiPvInfos
 
 	}
 
-	sort.Sort(pos.MultiPvInfos)
+	pos.IgnoreRootMoves = ignoreMovesOrig
 				
-	pos.PrintBestMove(pos.MultiPvInfos[0].Pv)
+	pos.PrintBestMove(pos.OldMultiPvInfos[0].Pv)
 }

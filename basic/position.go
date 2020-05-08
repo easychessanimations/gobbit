@@ -16,10 +16,18 @@ const MAX_STATES = SEARCH_MAX_DEPTH + 1
 const MAX_MULTIPV = 20
 
 type MultiPvInfo struct{
+	Index                    int
 	Depth                    int
+	Time                     int
+	Nodes                    int	
+	Nps                      float32
 	Score                    Score
 	Pv                       []Move
-	Info                     string
+	PvUCI                    string
+}
+
+func (mpi MultiPvInfo) String() string{
+	return fmt.Sprintf("info multipv %d depth %d time %d nodes %d nps %.0f score cp %d pv %v", mpi.Index, mpi.Depth, mpi.Time, mpi.Nodes, mpi.Nps, mpi.Score, mpi.PvUCI)
 }
 
 type MultiPvInfos [MAX_MULTIPV]MultiPvInfo
@@ -65,6 +73,7 @@ type Position struct {
 	PruningReduction         int
 	MultiPV                  int
 	MultiPvInfos             MultiPvInfos
+	OldMultiPvInfos          MultiPvInfos
 	MultiPvIndex             int
 	LogFilePath              string
 }
