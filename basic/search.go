@@ -3,7 +3,6 @@ package basic
 import (
 	"fmt"
 	"time"
-	"sort"
 )
 
 type AlphaBetaInfo struct {
@@ -459,7 +458,15 @@ func (pos *Position) Search(maxDepth int) {
 
 		}
 
-		sort.Sort(pos.MultiPvInfos)		
+		for i := 0; i < pos.MultiPV; i++{
+			for j := 1; j < pos.MultiPV; j++{
+				if pos.MultiPvInfos[j].Score > pos.MultiPvInfos[j-1].Score{
+					temp := pos.MultiPvInfos[j-1]
+					pos.MultiPvInfos[j-1] = pos.MultiPvInfos[j]
+					pos.MultiPvInfos[j] = temp
+				}
+			}
+		}
 
 		for i := 1; i <= maxMultiPv; i++{
 			pos.MultiPvInfos[i - 1].Index = i

@@ -32,22 +32,6 @@ func (mpi MultiPvInfo) String() string{
 
 type MultiPvInfos [MAX_MULTIPV]MultiPvInfo
 
-func (mpis MultiPvInfos) Len() int{
-	return len(mpis)
-}
-
-func (mpis MultiPvInfos) Swap(i, j int){
-	mpis[i], mpis[j] = mpis[j], mpis[i]
-}
-
-func (mpis MultiPvInfos) Less(i, j int) bool{
-	if mpis[j].Depth != mpis[i].Depth{
-		return mpis[j].Depth > mpis[i].Depth
-	}
-
-	return mpis[j].Score > mpis[i].Score
-}
-
 type Position struct {
 	States                   [MAX_STATES]State
 	StatePtr                 int
