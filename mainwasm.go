@@ -10,13 +10,9 @@ import (
 
 var uci Uci
 
-var UciLoopStopped bool
-
 func ExecUciCommandLineWasm(this js.Value, commandLineArray []js.Value) interface{} {
-	err := uci.ExecUciCommandLine(commandLineArray[0].String())
-	if err != nil{
-		UciLoopStopped = true
-	}
+	uci.ExecUciCommandLine(commandLineArray[0].String())
+
 	return js.ValueOf("")
 }
 
@@ -29,9 +25,7 @@ func main() {
 
 	js.Global().Set("ExecUciCommandLineWasm", js.FuncOf(ExecUciCommandLineWasm))
 
-	UciLoopStopped = false
-
-	for !UciLoopStopped{
-		time.Sleep(1 * time.Second)
+	for{
+		time.Sleep(time.Second)
 	}
 }
