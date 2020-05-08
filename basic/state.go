@@ -15,6 +15,7 @@ func (v Variant) String() string {
 const (
 	VariantStandard = Variant(iota)
 	VariantEightPiece
+	VariantAtomic
 )
 
 type VariantInfo struct {
@@ -30,6 +31,10 @@ var VariantInfos = []VariantInfo{
 	{ // eightpiece
 		StartFen:    "jlsesqkbnr/pppppppp/8/8/8/8/PPPPPPPP/JLneSQKBNR w KQkq - 0 1 -",
 		DisplayName: "Eightpiece",
+	},
+	{ // atomic
+		StartFen:    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+		DisplayName: "Atomic",
 	},
 }
 
@@ -875,7 +880,27 @@ func (st State) MoveToSanBatch(move Move) string {
 	return sanLetter + orig + takes + dest + prom + check
 }
 
-func (st State) IsChecked(color Color) bool {
+func (st State) IsChecked(color Color) bool{
+	checked := st.IsCheckedSansExplosion(color)
+
+	if st.Variant != VariantAtomic{
+		return checked
+	}
+
+	if st.KingsAdjacent(){
+		// in atomic we are not in check if kings are adjacent
+		return false
+	}
+
+	if st.KingInfos[color.Inverse()].IsCaptured && (!st.KingInfos[color].IsCaptured){
+		// in atomic if opponent king is exploded without our king being exploded, we are not in check
+		return false
+	}
+
+	return checked
+}
+
+func (st State) IsCheckedSansExplosion(color Color) bool {
 	if st.KingInfos[color].IsCaptured {
 		return true
 	}
@@ -966,4 +991,17 @@ func (st State) IsCheckedUs() bool {
 
 func (st State) IsCheckedThem() bool {
 	return st.IsChecked(st.Turn.Inverse())
+}
+
+func (st State) KingsAdjacent() bool{
+	for col := Black; col <= White; col++{
+		if st.KingInfos[col].IsCaptured{
+			// captured king cannot be adjacent
+			return false
+		}
+	}
+
+	attack := KingAttack[st.KingInfos[White].Square]
+
+	return attack & st.KingInfos[Black].Square.Bitboard() != 0
 }

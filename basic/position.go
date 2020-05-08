@@ -317,6 +317,21 @@ func (st *State) MakeMove(move Move) {
 		st.Put(p, move.ToSq())
 	}
 
+	if st.Variant == VariantAtomic{
+		if ( top != NoPiece ) || ( ( st.EpSquare != SquareA1 ) && ( move.ToSq() == st.EpSquare ) ){
+			// atomic capture
+			st.Remove(move.ToSq())
+
+			adj := KingAttack[move.ToSq()]
+
+			for _, expSq := range adj.PopAll(){
+				if FigureOf[st.PieceAtSquare(expSq)] != Pawn{
+					st.Remove(expSq)
+				}
+			}
+		}
+	}
+
 	st.Move = move
 
 	st.Ply++
