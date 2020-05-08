@@ -1,2 +1,2 @@
 
-start http-server
+start http-server site

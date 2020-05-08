@@ -6,6 +6,10 @@ set GOARCH=wasm
 go build -o main.wasm -tags wasm
 
 copy \go\misc\wasm\*.js
-copy \go\misc\wasm\*.html
+rem copy \go\misc\wasm\*.html
 
 rem copy wasm_exec.html index.html
+
+copy index.html site
+copy main.wasm site
+copy wasm_exec.js site
