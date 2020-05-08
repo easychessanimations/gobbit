@@ -290,8 +290,8 @@ func (uci *Uci) Init(name string, author string, aliases map[string]string){
 	}
 }
 
-func (uci Uci) Welcome(){	
-	fmt.Println(uci.Id())
+func (uci Uci) Welcome(build string){	
+	fmt.Println(uci.Id() + build)
 	fmt.Println()
 }
 

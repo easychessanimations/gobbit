@@ -1,18 +1,11 @@
+// +build !wasm
+
 package main
 
 import (	
 	"fmt"
 	. "github.com/easychessanimations/gobbit/uci"
 )
-
-const ENGINE_NAME = "gobbit"
-const ENGINE_AUTHOR = "easychessanimations"
-
-var UCI_COMMAND_ALIASES = map[string]string{
-	"vs" : "setoption name UCI_Variant value Standard",
-	"ve" : "setoption name UCI_Variant value Eightpiece",
-	"va" : "setoption name UCI_Variant value Atomic",
-}
 
 func main() {
 	fmt.Println()
@@ -21,7 +14,7 @@ func main() {
 
 	uci.Init(ENGINE_NAME, ENGINE_AUTHOR, UCI_COMMAND_ALIASES)
 
-	uci.Welcome()
+	uci.Welcome(" [ native build ]")
 
 	uci.ProcessConfig()
 
