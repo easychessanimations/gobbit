@@ -17,9 +17,9 @@ license that can be found in the LICENSE file.
 	<script src="https://cdn.jsdelivr.net/npm/text-encoding@0.7.0/lib/encoding.min.js"></script>
 	(see https://caniuse.com/#feat=textencoder)
 	-->
-	<script src="wasm_exec.js"></script>
+	<!--<script src="wasm_loader.js"></script>-->
 	<script>
-		if (!WebAssembly.instantiateStreaming) { // polyfill
+		/*if (!WebAssembly.instantiateStreaming) { // polyfill
 			WebAssembly.instantiateStreaming = async (resp, importObject) => {
 				const source = await (await resp).arrayBuffer();
 				return await WebAssembly.instantiate(source, importObject);
@@ -39,7 +39,7 @@ license that can be found in the LICENSE file.
 		async function run() {			
 			await go.run(inst);
 			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance			
-		}
+		}*/
 	</script>
 
 	<div id="controlpanel" style="font-family: monospace; padding: 5px; background-color: #eee;">
@@ -48,6 +48,12 @@ license that can be found in the LICENSE file.
     <div id="logroot" style="font-family: monospace;"></div>
 
     <script>
+    	let worker = new Worker("wasm_loader.js")
+
+    	worker.addEventListener('message', event => {
+    		console.log(event.data.text)
+    	})
+
       let commandInput = document.getElementById("commandinput")
 
       commandInput.addEventListener("keyup", ev => {
@@ -175,7 +181,11 @@ license that can be found in the LICENSE file.
       function issueEngineCommand(command){
         logger.log(LogItem({msg: command, kind: "info", prefix: ">>"}))
 
-        ExecUciCommandLineWasm(command)        
+        //ExecUciCommandLineWasm(command)        
+
+        worker.postMessage({
+        	command: command
+        })
       }
     </script>
 </body>
