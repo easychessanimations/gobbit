@@ -1,0 +1,2 @@
+
+del enginelog.txt
