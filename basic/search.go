@@ -458,7 +458,7 @@ func (pos *Position) Search(maxDepth int) {
 
 		}
 
-		for i := 0; i < pos.MultiPV; i++{
+		for i := 0; i < pos.MultiPV - 1; i++{
 			for j := 1; j < pos.MultiPV; j++{
 				if pos.MultiPvInfos[j].Score > pos.MultiPvInfos[j-1].Score{
 					temp := pos.MultiPvInfos[j-1]
