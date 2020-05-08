@@ -83,6 +83,10 @@ func (st State) Score() Score {
 }
 
 func (pos *Position) AlphaBetaRec(abi AlphaBetaInfo) Score {
+	if int(pos.CheckTime()) % 20 == 1{		
+		time.Sleep(time.Second)
+	}
+
 	pos.Nodes++
 
 	st := pos.Current()

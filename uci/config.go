@@ -40,7 +40,7 @@ var UCI_OPTIONS = []UciOption{
 	{
 		Name: "Null Move Pruning",
 		Type: "check",		
-		Default: "false",
+		Default: "true",
 	},
 	{
 		Name: "Null Move Pruning Min Depth",
@@ -59,26 +59,26 @@ var UCI_OPTIONS = []UciOption{
 	{
 		Name: "Stack Reduction",
 		Type: "check",		
-		Default: "false",
+		Default: "true",
 	},
 	{
 		Name: "Pruning Agressivity",
 		Type: "spin",		
 		Min: 1,
 		Max: 10,
-		Default: "1",
+		Default: "10",
 	},
 	{
 		Name: "Pruning Reduction",
 		Type: "spin",		
 		Min: 1,
 		Max: 3,
-		Default: "1",
+		Default: "3",
 	},
 	{
 		Name: "Aspiration Window",
 		Type: "check",		
-		Default: "false",
+		Default: "true",
 	},
 	{
 		Name: "Verbose",
