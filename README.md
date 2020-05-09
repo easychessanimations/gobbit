@@ -8,11 +8,15 @@ Go language bitboard multi variant chess analysis engine.
 
 - **Portability** is important for me. Go is a very portable language, building for a given platform only takes setting two environment variables before running the build command ( the same is not true for C/C++, building for Linux under Windows is close to impossible ). Go is also a pretty low level language ( though not as low level as C/C++ ), so it allows creating a fast native executable. Go compiler has a WASM port, which allows running the engine in the browser.
 
-- The engine was inspired by an existing bitboard Go language engine [Zurichess](https://bitbucket.org/zurichess/zurichess/src/master/) which is listed on [CCRL](https://ccrl.chessdom.com/ccrl/4040/cgi/engine_details.cgi?print=Details&each_game=1&eng=Zurichess%20Neuchatel%2064-bit) and is rated 2800 there. Many ideas were taken over, however not slavishly.
+- The engine was inspired by an existing Go language bitboard engine [Zurichess](https://bitbucket.org/zurichess/zurichess/src/master/) which is listed on [CCRL](https://ccrl.chessdom.com/ccrl/4040/cgi/engine_details.cgi?print=Details&each_game=1&eng=Zurichess%20Neuchatel%2064-bit) and is rated 2800 there. Many ideas were taken over, however not slavishly.
 
 # Variants
 
 Supported variants are Standard, [8-Piece](https://www.chessvariants.com/rules/8-piece-chess) and Atomic.
+
+# Protocol
+
+The engine operates on a useful fraction of the [UCI protocol](http://wbec-ridderkerk.nl/html/UCIProtocol.html). Only analysis features are supported, the engine has no time management and it cannot be used to play a live game.
 
 # Online
 
