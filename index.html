@@ -42,16 +42,21 @@ license that can be found in the LICENSE file.
 		}*/
 	</script>
 
-  <div style="padding: 5px;">
-    <a href="https://github.com/easychessanimations/gobbit">Source</a>&nbsp;&nbsp;
-    <a href="https://github.com/easychessanimations/gobbit#gobbit">ReadMe</a>&nbsp;&nbsp;
-    <a href="https://discord.gg/RKJDzJj">Discussion / Feedback</a>&nbsp;&nbsp;    
+  <div style="padding: 5px; margin: 2px; background-color: #ffe;">
+    <a href="https://github.com/easychessanimations/gobbit" rel="noopener noreferrer" target="_blank">Source</a>&nbsp;&nbsp;
+    <a href="https://github.com/easychessanimations/gobbit#gobbit" rel="noopener noreferrer" target="_blank">ReadMe</a>&nbsp;&nbsp;
+    <a href="https://discord.gg/RKJDzJj" rel="noopener noreferrer" target="_blank">Discussion</a>&nbsp;&nbsp;    
   </div>
 
-  <div>
+  <div style="padding: 5px; margin: 2px; background-color: #eef;">
     <button onclick="setVariant('Standard');">Standard</button>&nbsp;&nbsp;
     <button onclick="setVariant('Eightpiece');">8-Piece</button>&nbsp;&nbsp;
     <button onclick="setVariant('Atomic');">Atomic</button>&nbsp;&nbsp;
+    <button onclick="issueEngineCommand('setoption name MultiPV value 1');">MultiPV 1</button>&nbsp;&nbsp;
+    <button onclick="issueEngineCommand('setoption name MultiPV value 3');">MultiPV 3</button>&nbsp;&nbsp;
+    <button onclick="issueEngineCommand('setoption name MultiPV value 5');">MultiPV 5</button>&nbsp;&nbsp;
+    <button onclick="issueEngineCommand('g');">Analyze</button>&nbsp;&nbsp;
+    <button onclick="issueEngineCommand('s');">Stop</button>&nbsp;&nbsp;
   </div>
 
 	<div id="controlpanel" style="font-family: monospace; padding: 5px; background-color: #eee;">
@@ -192,6 +197,7 @@ license that can be found in the LICENSE file.
 
       function issueEngineCommand(command){
         logger.log(LogItem({msg: command, kind: "info", prefix: ">>"}))
+        logger.renderAsTable()
 
         //ExecUciCommandLineWasm(command)        
 
