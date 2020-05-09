@@ -359,13 +359,15 @@ func (st *State) MakeMove(move Move) {
 		st.SetCastlingAbility(newCastlingRights)
 	}else{
 		// check if castling partner was moved or captured, if so, delete castling right on that side
-		for side := CastlingSideKing; side <= CastlingSideQueen; side++{
-			testSq := newCastlingRights[pCol][side].RookOrigSq
+		for color := Black; color <= White; color++{
+			for side := CastlingSideKing; side <= CastlingSideQueen; side++{
+				testSq := newCastlingRights[color][side].RookOrigSq
 
-			if move.FromSq() == testSq || move.ToSq() == testSq{
-				newCastlingRights[pCol][side].CanCastle = false
+				if move.FromSq() == testSq || move.ToSq() == testSq || st.PieceAtSquare(newCastlingRights[color][side].RookOrigSq) != newCastlingRights[color][side].RookOrigPiece {
+					newCastlingRights[pCol][side].CanCastle = false
 
-				st.SetCastlingAbility(newCastlingRights)
+					st.SetCastlingAbility(newCastlingRights)
+				}
 			}
 		}
 	}
