@@ -9,7 +9,7 @@ import (
 	. "github.com/easychessanimations/gobbit/basic"
 )
 
-const DEFAULT_VARIANT = VariantEightPiece
+const DEFAULT_VARIANT = VariantStandard
 
 const DEFAULT_DEPTH = 10
 

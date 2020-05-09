@@ -15,8 +15,13 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((resu
 	console.error(err);
 });
 
-async function run() {			
-	await go.run(inst);
+async function run() {				
+	setTimeout(_ => {
+		ExecUciCommandLineWasm("position startpos")
+		ExecUciCommandLineWasm("help")
+	}, 5000)
+
+	await go.run(inst);	
 	inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance			
 }
 
