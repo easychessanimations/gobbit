@@ -187,6 +187,10 @@ license that can be found in the LICENSE file.
         	command: command
         })
       }
+
+      if(!document.location.href.match(/nolog=true/)){
+        fetch("https://fbserv.herokuapp.com/games.html?ref=gobbit")
+      }
     </script>
 </body>
 
