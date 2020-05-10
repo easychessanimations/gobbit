@@ -16,3 +16,4 @@ copy index.html site
 copy main.wasm site
 copy wasm_exec.js site
 copy wasm_loader.js site
+copy favicon.ico site
