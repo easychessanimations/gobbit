@@ -60,7 +60,7 @@ This will create the Windows and Linux executable in the `dist` folder and the w
 
 ## Building on other systems
 
-Study the build instructions for Windows, and convert he Windows build script to a script that your system understands.
+Study the build instructions for Windows, and convert the Windows build script to a script that your system understands.
 
 # Discussion
 
