@@ -24,6 +24,44 @@ The WASM build of the engine is available online at
 
 [https://gobbitengine.netlify.app/](https://gobbitengine.netlify.app/)
 
+# Binaries
+
+Precompiled binaries are available in the `dist` folder.
+
+## Windows binary
+
+`dist\gobbit.exe`
+
+## Linux binary
+
+`dist\gobbit`
+
+# Building
+
+Clone the repository:
+
+```
+git clone https://github.com/easychessanimations/gobbit.git
+```
+
+In `go.mod` change `C:/gomodules/modules/gobbit` to the absolute path of the folder where you cloned the repository.
+
+## Building on Windows
+
+In `s\b.bat` change `C:/gomodules/modules/gobbit` to the absolute path of the folder where you cloned the repository.
+
+Then run the build script:
+
+```
+s\b
+```
+
+This will create the Windows and Linux executable in the `dist` folder and the web site, including the WASM executable and the glue code, in the `site` folder.
+
+## Building on other systems
+
+Study the build instructions for Windows, and convert he Windows build script to a script that your system understands.
+
 # Discussion
 
 The engine can be discussed live at

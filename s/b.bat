@@ -17,3 +17,17 @@ copy main.wasm site
 copy wasm_exec.js site
 copy wasm_loader.js site
 copy favicon.ico site
+
+set GOBIN=C:\gomodules\modules\gobbit
+
+set GOOS=linux
+set GOARCH=amd64
+
+go install main.go maincommon.go %*
+move main dist\gobbit
+
+set GOOS=windows
+set GOARCH=amd64
+
+go install main.go maincommon.go %*
+move main.exe dist\gobbit.exe
