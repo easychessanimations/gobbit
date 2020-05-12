@@ -38,29 +38,37 @@ Precompiled binaries are available in the `dist` folder.
 
 # Building
 
-Clone the repository:
+## Prerequisites
+
+Go language's latest version has to be installed on your computer.
+
+## Cloning
 
 ```
 git clone https://github.com/easychessanimations/gobbit.git
 ```
 
+## Customizing module definition
+
 In `go.mod` change `C:/gomodules/modules/gobbit` to the absolute path of the folder where you cloned the repository.
 
 ## Building on Windows
 
+### Customizing the build script
+
 In `s\b.bat` change `C:/gomodules/modules/gobbit` to the absolute path of the folder where you cloned the repository.
 
-Then run the build script:
+### Running the build script
 
 ```
 s\b
 ```
 
-This will create the Windows and Linux executable in the `dist` folder and the web site, including the WASM executable and the glue code, in the `site` folder.
+This will create the Windows and Linux executable in the `dist` folder and the web site that can run the WASM executable, including the WASM executable and the glue code, in the `site` folder.
 
 ## Building on other systems
 
-Study the build instructions for Windows, and convert the Windows build script to a script that your system understands.
+Study the build instructions for Windows, customize and convert the Windows build script to a script that your system understands, then run this build script.
 
 # Discussion
 
