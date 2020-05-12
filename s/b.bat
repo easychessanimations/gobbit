@@ -26,6 +26,12 @@ set GOARCH=amd64
 go install main.go maincommon.go %*
 move main dist\gobbit
 
+set GOOS=darwin
+set GOARCH=amd64
+
+go install main.go maincommon.go %*
+move main dist\gobbitmac
+
 set GOOS=windows
 set GOARCH=amd64
 

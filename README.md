@@ -36,6 +36,10 @@ Precompiled binaries are available in the `dist` folder.
 
 `dist\gobbit`
 
+## Mac binary
+
+`dist\gobbitmac`
+
 # Building
 
 ## Prerequisites
