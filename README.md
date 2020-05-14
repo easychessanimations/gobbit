@@ -40,6 +40,10 @@ Precompiled binaries are available in the `dist` folder.
 
 `dist\gobbitmac`
 
+# Instructions for easy usage
+
+[gobbit wiki](https://github.com/easychessanimations/gobbit/wiki)
+
 # Building
 
 ## Prerequisites
