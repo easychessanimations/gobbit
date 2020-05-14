@@ -42,7 +42,7 @@ Precompiled binaries are available in the `dist` folder.
 
 # Instructions for easy usage
 
-[gobbit wiki](https://github.com/easychessanimations/gobbit/wiki)
+[gobbit wiki](https://github.com/easychessanimations/gobbit/wiki/Wiki)
 
 # Building
 
